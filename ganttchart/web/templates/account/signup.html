@@ -1,0 +1,27 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>Sign up</h1>
+
+    <form method="POST">
+      <fieldset class="form-group {% if form.errors['email_address'] %}has-error{% endif %}">
+        <label class="control-label" for="email_address">Email address</label>
+        <input type="email" class="form-control" name="email_address" id="email_address" placeholder="Email address" value="{{ request.form.get('email_address', '') }}" />
+        {% if form.errors['email_address'] %}
+          <small class="help-block">{{ form.errors['email_address'][0] }}</small>
+        {% endif %}
+      </fieldset>
+
+      <fieldset class="form-group {% if form.errors['password'] %}has-error{% endif %}">
+        <label class="control-label" for="password">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password" />
+        {% if form.errors['password'] %}
+          <small class="help-block">{{ form.errors['password'][0] }}</small>
+        {% endif %}
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary">Sign up</button>
+    </form>
+  </div>
+{% endblock %}

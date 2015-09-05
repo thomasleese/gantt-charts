@@ -21,6 +21,7 @@ setup(
         'SQLAlchemy >=0.9, <1',
         'psycopg2 >=2.5, <3',
         'alembic >=0.7, <1',
+        'WTForms >=2.0, <3',
     ],
     test_suite='nose.collector',
 )

@@ -1,0 +1,27 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>Log in</h1>
+
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>Can't login!</strong> Try using a different email address or password.
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      <fieldset class="form-group">
+        <label class="control-label" for="email_address">Email address</label>
+        <input type="email" class="form-control" name="email_address" id="email_address" placeholder="Email address" value="{{ request.form.get('email_address', '') }}" />
+      </fieldset>
+
+      <fieldset class="form-group">
+        <label class="control-label" for="password">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password" />
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+  </div>
+{% endblock %}

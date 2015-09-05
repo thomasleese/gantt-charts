@@ -1,20 +1,27 @@
 <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-  <a class="navbar-brand" href="#">Gantt Chart</a>
+  <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Chart</a>
 
   <ul class="nav navbar-nav">
     <li class="nav-item active">
-      <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      <a class="nav-link" href="{{ url_for('.home') }}">Home <span class="sr-only">(current)</span></a>
     </li>
   </ul>
 
-  <form class="form-inline navbar-form pull-right">
-    <div class="form-group">
-      <input type="text" placeholder="Email Address" class="form-control">
-    </div>
-    <div class="form-group">
-      <input type="password" placeholder="Password" class="form-control">
-    </div>
-    <button type="submit" class="btn btn-success">Log in</button>
-    <button type="submit" class="btn btn-primary">Sign up</button>
-  </form>
+  {% if g.account %}
+    <ul class="nav navbar-nav pull-right">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('.logout') }}">Log out</a>
+      </li>
+    </ul>
+  {% else %}
+    <form class="form-inline navbar-form pull-right" action="{{ url_for('.login') }}" method="POST">
+      <div class="form-group">
+        <input type="email" name="email_address" placeholder="Email address" class="form-control">
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" placeholder="Password" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-success">Log in</button>
+    </form>
+  {% endif %}
 </nav>
