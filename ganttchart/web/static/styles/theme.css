@@ -4,4 +4,7 @@ body {
 
 .gantt-chart td {
     width: 2rem;
+    max-width: 2rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

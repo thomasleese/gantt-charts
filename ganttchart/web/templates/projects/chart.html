@@ -12,7 +12,7 @@
             <td></td>
           {% endfor %}
 
-          <td class="bg-inverse" style="background: hsl({{ ((loop.index - 1) / chart.blocks | length) * 360 }}, 50%, 50%)" colspan="{{ (block.end - block.start).days }}">
+          <td class="bg-inverse" title="{{ block.task.name }}" style="background: hsl({{ ((loop.index - 1) / chart.blocks | length) * 360 }}, 50%, 50%)" colspan="{{ (block.end - block.start).days }}">
             {{ block.task.name }}
           </td>
 
