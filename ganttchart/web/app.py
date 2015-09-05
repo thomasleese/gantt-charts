@@ -49,7 +49,7 @@ def home():
         projects = list(flask.g.account.projects)
         return flask.render_template('projects/index.html', projects=projects)
     else:
-        return flask.render_template('welcome.html')
+        return flask.render_template('welcome/index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
