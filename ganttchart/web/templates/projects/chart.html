@@ -21,23 +21,25 @@
 
     <div class="clearfix"></div>
 
-    <table class="table table-sm gantt-chart">
-      {% for block in chart.blocks %}
-        <tr>
-          <th>{{ block.task.name }}</th>
-          {% for i in range((block.start - chart.start).days) %}
-            <td></td>
-          {% endfor %}
+    {% if chart %}
+      <table class="table table-sm gantt-chart">
+        {% for block in chart.blocks %}
+          <tr>
+            <th>{{ block.task.name }}</th>
+            {% for i in range((block.start - chart.start).days) %}
+              <td></td>
+            {% endfor %}
 
-          <td class="bg-inverse" title="{{ block.task.name }}" style="background: hsl({{ ((loop.index - 1) / chart.blocks | length) * 360 }}, 50%, 50%)" colspan="{{ (block.end - block.start).days }}">
-            {{ block.task.name }}
-          </td>
+            <td class="bg-inverse" title="{{ block.task.name }}" style="background: hsl({{ ((loop.index - 1) / chart.blocks | length) * 360 }}, 50%, 50%)" colspan="{{ (block.end - block.start).days }}">
+              {{ block.task.name }}
+            </td>
 
-          {% for i in range((chart.end - block.end).days) %}
-            <td></td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-    </table>
+            {% for i in range((chart.end - block.end).days) %}
+              <td></td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
   </div>
 {% endblock %}

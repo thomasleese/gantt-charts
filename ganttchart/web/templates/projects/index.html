@@ -13,9 +13,9 @@
             <div class="card">
               <div class="card-block">
                 {% if project.starred_by(g.account) %}
-                  <a href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="fa fa-star pull-right" style="font-size: 1.6rem"></span></a>
+                  <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="fa fa-star pull-right" style="font-size: 1.6rem"></span></a>
                 {% else %}
-                  <a href="{{ url_for('.star_project', project_id=project.id) }}"><span class="fa fa-star-o pull-right" style="font-size: 1.6rem"></span></a>
+                  <a class="star" href="{{ url_for('.star_project', project_id=project.id) }}"><span class="fa fa-star-o pull-right" style="font-size: 1.6rem"></span></a>
                 {% endif %}
                 <h4 class="card-title">{{ project.name }}</h4>
                 <h6 class="card-subtitle text-muted"><a href="{{ url_for('.view_project_tasks', project_id=project.id) }}">{{ project.tasks | length }} tasks</a> ・ <a href="{{ url_for('.view_project_members', project_id=project.id) }}">{{ project.members | length }} members</a></h6>

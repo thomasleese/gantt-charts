@@ -94,8 +94,12 @@ def new_project():
 @app.route('/projects/<int:project_id>')
 def view_project(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
+    try:
+        chart = Chart(project)
+    except RuntimeError:
+        chart = None
     return flask.render_template('projects/chart.html', project=project,
-                                 chart=Chart(project))
+                                 chart=chart)
 
 
 @app.route('/projects/<int:project_id>/star')
