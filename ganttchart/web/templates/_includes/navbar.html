@@ -16,6 +16,10 @@
   {% if g.account %}
     <ul class="nav navbar-nav pull-right">
       <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('.account') }}">My Account</a>
+      </li>
+
+      <li class="nav-item">
         <a class="nav-link" href="{{ url_for('.logout') }}">Log out</a>
       </li>
     </ul>

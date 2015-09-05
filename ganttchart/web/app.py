@@ -136,3 +136,8 @@ def view_task(task_id):
         return flask.redirect(flask.url_for('.view_project', project_id=task.project.id))
 
     return flask.render_template('tasks/view.html', task=task, form=form)
+
+
+@app.route('/account')
+def account():
+    return flask.render_template('account/index.html')
