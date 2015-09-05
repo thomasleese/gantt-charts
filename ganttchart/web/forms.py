@@ -1,6 +1,6 @@
 import flask
 from wtforms import Form
-from wtforms.fields import IntegerField, StringField
+from wtforms.fields import IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
 
@@ -106,3 +106,7 @@ class CreateTask(Form):
     optimistic_time_estimate = IntegerField('Optimistic Time Estimate', validators=[DataRequired()])
     normal_time_estimate = IntegerField('Normal Time Estimate', validators=[DataRequired()])
     pessimistic_time_estimate = IntegerField('Pessimistic Time Estimate', validators=[DataRequired()])
+
+
+class AddTaskDependency(Form):
+    dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])

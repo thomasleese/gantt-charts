@@ -7,27 +7,27 @@
     <br />
 
     {% for batch in projects | batch(3) %}
-      <div class="card-deck-wrapper">
-        <div class="card-deck">
-          {% for project in batch %}
+      <div class="row">
+        {% for project in batch %}
+          <div class="col-sm-4">
             <div class="card">
               <div class="card-block">
                 <h4 class="card-title">{{ project.name }}</h4>
                 <h6 class="card-subtitle text-muted">{{ project.tasks | length }} tasks ・ {{ project.members | length }} members</h6>
                 <p class="card-text"></p>
-                <a href="#" class="card-link">View</a>
+                <a href="{{ url_for('.view_project', project_id=project.id) }}" class="card-link">View</a>
                 <a href="#" class="card-link">Edit</a>
                 <a href="#" class="card-link">Delete</a>
               </div>
             </div>
-          {% endfor %}
-        </div>
+          </div>
+        {% endfor %}
       </div>
 
       <br />
     {% endfor %}
 
-    <a class="btn btn-primary pull-right" href="{{ url_for('.new_project') }}" role="button">New Project</a>
+    <a class="btn btn-primary pull-right" href="{{ url_for('.new_project') }}" role="button"><span class="fa fa-plus"></span> New Project</a>
     <div class="clearfix"></div>
   </div>
 {% endblock %}

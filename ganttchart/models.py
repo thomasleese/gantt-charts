@@ -126,3 +126,8 @@ class Task(Base):
 
 class TaskDependency(Base):
     __tablename__ = 'task_dependency'
+
+    task = relationship('Task', backref='dependencies',
+                        foreign_keys='TaskDependency.task_id')
+    dependency = relationship('Task',
+                              foreign_keys='TaskDependency.dependency_id')

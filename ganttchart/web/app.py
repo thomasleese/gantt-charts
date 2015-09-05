@@ -5,7 +5,8 @@ from werkzeug.routing import BaseConverter
 
 from .. import database
 from ..chart import Chart
-from ..models import Account, Project, Session as SqlSession, Task
+from ..models import Account, Project, Session as SqlSession, Task, \
+    TaskDependency
 from . import forms
 
 
@@ -113,3 +114,17 @@ def new_task(project_id):
         flask.g.sql_session.commit()
         return flask.redirect(flask.url_for('.view_project', project_id=project.id))
     return flask.render_template('tasks/create.html', form=form)
+
+
+@app.route('/tasks/<int:task_id>', methods=['GET', 'POST'])
+def view_task(task_id):
+    task = flask.g.sql_session.query(Task).get(task_id)
+
+    form = forms.AddTaskDependency(flask.request.form)
+    form.dependency.choices = [(t.id, t.name) for t in task.project.tasks]
+    if flask.request.method == 'POST' and form.validate():
+        task.dependencies.append(TaskDependency(dependency_id=form.dependency.data))
+        flask.g.sql_session.commit()
+        return flask.redirect(flask.url_for('.view_project', project_id=task.project.id))
+
+    return flask.render_template('tasks/view.html', task=task, form=form)
