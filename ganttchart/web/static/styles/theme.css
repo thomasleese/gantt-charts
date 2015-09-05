@@ -1,5 +1,13 @@
 body {
     margin-top: 5rem;
+    background: url('../images/background.png');
+}
+
+body > .container {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 1rem rgb(200, 200, 200);
 }
 
 .gantt-chart td {
