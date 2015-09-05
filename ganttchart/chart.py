@@ -7,7 +7,6 @@ Block = namedtuple('Block', ['task', 'start', 'end'])
 class Chart:
     def __init__(self, project):
         graph = [(task, [dep.dependency for dep in task.dependencies]) for task in project.tasks]
-        print(graph)
 
         self.graph = self.topolgical_sort(graph)
         self.blocks = []
