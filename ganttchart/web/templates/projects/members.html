@@ -1,0 +1,28 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>{{ project.name }}’s Members</h1>
+
+    <table class="table table-striped">
+      <thead class="thead-default">
+        <tr>
+          <th>#</th>
+          <th>Email Address</th>
+        <tr>
+      </thead>
+
+      <tbody>
+        {% for member in project.members %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ member.account.email_addresses[0].email_address }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
+    <div class="clearfix"></div>
+  </div>
+{% endblock %}

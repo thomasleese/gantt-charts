@@ -94,15 +94,20 @@ def new_project():
 @app.route('/projects/<int:project_id>')
 def view_project(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
-    return flask.render_template('projects/view.html', project=project)
-
-
-@app.route('/projects/<int:project_id>/chart')
-def view_gantt_chart(project_id):
-    project = flask.g.sql_session.query(Project).get(project_id)
-    chart = Chart(project)
     return flask.render_template('projects/chart.html', project=project,
-                                 chart=chart)
+                                 chart=Chart(project))
+
+
+@app.route('/projects/<int:project_id>/tasks')
+def view_project_tasks(project_id):
+    project = flask.g.sql_session.query(Project).get(project_id)
+    return flask.render_template('projects/tasks.html', project=project)
+
+
+@app.route('/projects/<int:project_id>/members')
+def view_project_members(project_id):
+    project = flask.g.sql_session.query(Project).get(project_id)
+    return flask.render_template('projects/members.html', project=project)
 
 
 @app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
