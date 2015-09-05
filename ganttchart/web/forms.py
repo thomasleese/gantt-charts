@@ -93,3 +93,7 @@ class LogIn(Form):
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Exists(AccountEmailAddress, 'email_address')])
     password = StringField('Password', validators=[DataRequired(), PasswordCorrect('email_address')])
+
+
+class CreateProject(Form):
+    name = StringField('name', validators=[DataRequired(), Length(2)])

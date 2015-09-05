@@ -22,8 +22,7 @@ def upgrade():
     op.create_table('account',
         sa.Column('id', sa.Integer, primary_key=True, nullable=False),
         sa.Column('password_hashed', sa.String, nullable=False),
-        sa.Column('creation_date', sa.DateTime, nullable=False,
-                  default=datetime.utcnow),
+        sa.Column('creation_date', sa.DateTime, nullable=False),
     )
 
     op.create_table('account_email_address',

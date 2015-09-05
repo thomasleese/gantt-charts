@@ -1,0 +1,15 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>Projects</h1>
+
+    <a class="btn btn-primary" href="{{ url_for('.new_project') }}" role="button">New Project</a>
+
+    <ul>
+      {% for project in projects %}
+        <li><a href="{{ url_for('.view_project', project_id=project.id) }}">{{ project.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

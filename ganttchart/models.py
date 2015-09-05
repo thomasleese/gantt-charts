@@ -55,6 +55,11 @@ class Account(Base):
     def is_password_correct(self, other):
         return password_context.verify(other, self.password_hashed)
 
+    @property
+    def projects(self):
+        for member in self.project_members:
+            yield member.project
+
 
 class AccountEmailAddress(Base):
     __tablename__ = 'account_email_address'
@@ -73,3 +78,24 @@ class AccountEmailAddress(Base):
 
     def __str__(self):
         return self.email_address
+
+
+class Project(Base):
+    __tablename__ = 'project'
+
+    def __init__(self, name, creator, creation_date=None):
+        super().__init__()
+
+        if creation_date is None:
+            creation_date = datetime.datetime.now()
+
+        self.name = name
+        self.creation_date = creation_date
+        self.members.append(ProjectMember(account=creator))
+
+
+class ProjectMember(Base):
+    __tablename__ = 'project_member'
+
+    project = relationship('Project', backref='members')
+    account = relationship('Account', backref='project_members')

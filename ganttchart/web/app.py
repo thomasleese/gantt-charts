@@ -1,8 +1,10 @@
 import os
 
 import flask
+from werkzeug.routing import BaseConverter
 
-from .. import database, models
+from .. import database
+from ..models import Account, Project, Session as SqlSession
 from . import forms
 
 
@@ -18,17 +20,17 @@ def configure_database():
 
 @app.before_request
 def configure_session(*args, **kwargs):
-    flask.g.sql_session = models.Session()
+    flask.g.sql_session = SqlSession()
 
     if 'account_id' in flask.session:
-        account = flask.g.sql_session.query(models.Account) \
+        account = flask.g.sql_session.query(Account) \
             .get(flask.session['account_id'])
         flask.g.account = account
 
 
 @app.teardown_request
 def remove_session(*args, **kwargs):
-    models.Session.remove()
+    SqlSession.remove()
 
 
 @app.route('/')
@@ -62,3 +64,26 @@ def signup():
 def logout():
     del flask.session['account_id']
     return flask.redirect(flask.url_for('.home'))
+
+
+@app.route('/projects')
+def projects():
+    projects = list(flask.g.account.projects)
+    return flask.render_template('projects/index.html', projects=projects)
+
+
+@app.route('/projects/new', methods=['GET', 'POST'])
+def new_project():
+    form = forms.CreateProject(flask.request.form)
+    if flask.request.method == 'POST' and form.validate():
+        project = Project(form.name.data, flask.g.account)
+        flask.g.sql_session.add(project)
+        flask.g.sql_session.commit()
+        return flask.redirect(flask.url_for('.view_project', project_id=project.id))
+    return flask.render_template('projects/create.html', form=form)
+
+
+@app.route('/projects/<int:project_id>')
+def view_project(project_id):
+    project = flask.g.sql_session.query(Project).get(project_id)
+    return flask.render_template('projects/view.html', project=project)
