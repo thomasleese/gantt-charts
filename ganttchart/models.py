@@ -116,6 +116,13 @@ class Task(Base):
         self.project = project
         self.creation_date = datetime.datetime.now()
 
+    @property
+    def expected_time(self):
+        seconds = (self.optimistic_time_estimate + \
+            4 * self.normal_time_estimate + \
+            self.pessimistic_time_estimate) / 6
+        return datetime.timedelta(seconds=seconds)
+
 
 class TaskDependency(Base):
     __tablename__ = 'task_dependency'

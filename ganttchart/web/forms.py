@@ -97,11 +97,11 @@ class LogIn(Form):
 
 
 class CreateProject(Form):
-    name = StringField('Name', validators=[DataRequired(), Length(2)])
+    name = StringField('Name', validators=[DataRequired()])
 
 
 class CreateTask(Form):
-    name = StringField('Name', validators=[DataRequired(), Length(2)])
+    name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()])
     optimistic_time_estimate = IntegerField('Optimistic Time Estimate', validators=[DataRequired()])
     normal_time_estimate = IntegerField('Normal Time Estimate', validators=[DataRequired()])

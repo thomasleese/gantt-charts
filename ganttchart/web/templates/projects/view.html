@@ -7,9 +7,23 @@
     <a class="btn btn-primary" href="{{ url_for('.new_task', project_id=project.id) }}" role="button">New Task</a>
     <a class="btn btn-primary" href="{{ url_for('.view_gantt_chart', project_id=project.id) }}" role="button">View Gantt Chart</a>
 
-    <ul>
-      {% for task in project.tasks %}
-        <li>{{ task.name }}</li>
-      {% endfor %}
-    </ul>
+    <table class="table table-striped">
+      <thead class="thead-default">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Expected time</th>
+        <tr>
+      </thead>
+
+      <tbody>
+        {% for task in project.tasks %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ task.name }}</td>
+            <td>{{ task.expected_time.days }} days</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}
