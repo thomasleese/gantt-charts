@@ -19,7 +19,7 @@ RUN pip install -r requirements.txt
 COPY . /code
 RUN pip install -e .
 
-WORKDIR /data
+WORKDIR /code
 
 COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
