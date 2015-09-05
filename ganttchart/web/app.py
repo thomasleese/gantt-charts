@@ -45,7 +45,11 @@ def remove_session(*args, **kwargs):
 
 @app.route('/')
 def home():
-    return flask.render_template('home.html')
+    if 'account' in flask.g:
+        projects = list(flask.g.account.projects)
+        return flask.render_template('projects/index.html', projects=projects)
+    else:
+        return flask.render_template('welcome.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -74,12 +78,6 @@ def signup():
 def logout():
     del flask.session['account_id']
     return flask.redirect(flask.url_for('.home'))
-
-
-@app.route('/projects')
-def projects():
-    projects = list(flask.g.account.projects)
-    return flask.render_template('projects/index.html', projects=projects)
 
 
 @app.route('/projects/new', methods=['GET', 'POST'])

@@ -19,15 +19,7 @@
       <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Chart</a>
 
       <ul class="nav navbar-nav">
-        <li class="nav-item {% if section == 'home' %}active{% endif %}">
-          <a class="nav-link" href="{{ url_for('.home') }}">Home</a>
-        </li>
-
-        {% if g.account %}
-          <li class="nav-item {% if section == 'projects' %}active{% endif %}">
-            <a class="nav-link" href="{{ url_for('.projects') }}">Projects</a>
-          </li>
-        {% endif %}
+        <!-- Stared projects go here. -->
       </ul>
 
       {% if g.account %}
