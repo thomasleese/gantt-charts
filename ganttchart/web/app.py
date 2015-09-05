@@ -63,7 +63,7 @@ def login():
 def signup():
     form = forms.SignUp(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
-        account = models.Account(form.email_address.data, form.password.data)
+        account = Account(form.email_address.data, form.password.data)
         flask.g.sql_session.add(account)
         flask.g.sql_session.commit()
 
