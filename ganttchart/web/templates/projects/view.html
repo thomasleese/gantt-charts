@@ -4,7 +4,6 @@
   <div class="container">
     <h1>{{ project.name }}</h1>
 
-    <a class="btn btn-primary" href="{{ url_for('.new_task', project_id=project.id) }}" role="button">New Task</a>
     <a class="btn btn-primary" href="{{ url_for('.view_gantt_chart', project_id=project.id) }}" role="button">View Gantt Chart</a>
 
     <table class="table table-striped">
@@ -26,4 +25,7 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="glyphicon glyphicon-plus"></span> New Task</a>
+    <div class="clearfix"></div>
 {% endblock %}
