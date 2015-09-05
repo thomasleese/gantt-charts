@@ -4,7 +4,7 @@ import flask
 from werkzeug.routing import BaseConverter
 
 from .. import database
-from ..models import Account, Project, Session as SqlSession
+from ..models import Account, Project, Session as SqlSession, Task
 from . import forms
 
 
@@ -87,3 +87,20 @@ def new_project():
 def view_project(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
     return flask.render_template('projects/view.html', project=project)
+
+
+@app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
+def new_task(project_id):
+    project = flask.g.sql_session.query(Project).get(project_id)
+
+    form = forms.CreateTask(flask.request.form)
+    if flask.request.method == 'POST' and form.validate():
+        time_estimates = (form.optimistic_time_estimate.data * 60 * 60 * 24,
+                          form.normal_time_estimate.data * 60 * 60 * 24,
+                          form.pessimistic_time_estimate.data * 60 * 60 * 24)
+        task = Task(form.name.data, form.description.data,
+                    time_estimates, project)
+        flask.g.sql_session.add(task)
+        flask.g.sql_session.commit()
+        return flask.redirect(flask.url_for('.view_project', project_id=project.id))
+    return flask.render_template('tasks/create.html', form=form)

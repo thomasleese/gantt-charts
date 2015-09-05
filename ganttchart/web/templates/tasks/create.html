@@ -1,0 +1,21 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>New Task</h1>
+
+    <form method="POST">
+      {% for field in form %}
+        <fieldset class="form-group {% if form.errors[field.name] %}has-error{% endif %}">
+          <label class="control-label" for="{{ field.id }}">{{ field.label.text }}</label>
+          <input type="text" class="form-control" name="{{ field.name }}" id="{{ field.id }}" placeholder="{{ field.label.text }}" value="{{ request.form.get(field.name, '') }}" />
+          {% if form.errors[field.name] %}
+            <small class="help-block">{{ form.errors[field.name][0] }}</small>
+          {% endif %}
+        </fieldset>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+  </div>
+{% endblock %}

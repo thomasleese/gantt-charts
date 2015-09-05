@@ -1,7 +1,8 @@
 import flask
 from wtforms import Form
-from wtforms.fields import StringField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
+from wtforms.fields import IntegerField, StringField
+from wtforms.validators import DataRequired, Email, Length, Optional, \
+    ValidationError
 
 from ..models import Account, AccountEmailAddress
 
@@ -96,4 +97,12 @@ class LogIn(Form):
 
 
 class CreateProject(Form):
-    name = StringField('name', validators=[DataRequired(), Length(2)])
+    name = StringField('Name', validators=[DataRequired(), Length(2)])
+
+
+class CreateTask(Form):
+    name = StringField('Name', validators=[DataRequired(), Length(2)])
+    description = StringField('Description', validators=[Optional()])
+    optimistic_time_estimate = IntegerField('Optimistic Time Estimate', validators=[DataRequired()])
+    normal_time_estimate = IntegerField('Normal Time Estimate', validators=[DataRequired()])
+    pessimistic_time_estimate = IntegerField('Pessimistic Time Estimate', validators=[DataRequired()])

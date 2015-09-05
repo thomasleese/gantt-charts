@@ -3,4 +3,12 @@
 {% block body %}
   <div class="container">
     <h1>{{ project.name }}</h1>
+
+    <a class="btn btn-primary" href="{{ url_for('.new_task', project_id=project.id) }}" role="button">New Task</a>
+
+    <ul>
+      {% for task in project.tasks %}
+        <li>{{ task.name }}</li>
+      {% endfor %}
+    </ul>
 {% endblock %}

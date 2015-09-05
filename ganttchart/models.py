@@ -91,6 +91,7 @@ class Project(Base):
 
         self.name = name
         self.creation_date = creation_date
+        self.start_date = creation_date.date()
         self.members.append(ProjectMember(account=creator))
 
 
@@ -99,3 +100,22 @@ class ProjectMember(Base):
 
     project = relationship('Project', backref='members')
     account = relationship('Account', backref='project_members')
+
+
+class Task(Base):
+    __tablename__ = 'task'
+
+    project = relationship('Project', backref='tasks')
+
+    def __init__(self, name, description, time_estimates, project):
+        super().__init__(name=name, description=description)
+
+        self.optimistic_time_estimate = time_estimates[0]
+        self.normal_time_estimate = time_estimates[1]
+        self.pessimistic_time_estimate = time_estimates[2]
+        self.project = project
+        self.creation_date = datetime.datetime.now()
+
+
+class TaskDependency(Base):
+    __tablename__ = 'task_dependency'
