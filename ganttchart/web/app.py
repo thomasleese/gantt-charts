@@ -5,8 +5,8 @@ import flask
 
 from .. import database
 from ..chart import Chart
-from ..models import Account, Project, Session as SqlSession, Task, \
-    TaskDependency
+from ..models import Account, Project, ProjectStar, Session as SqlSession, \
+    Task, TaskDependency
 from . import forms
 
 
@@ -96,6 +96,26 @@ def view_project(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
     return flask.render_template('projects/chart.html', project=project,
                                  chart=Chart(project))
+
+
+@app.route('/projects/<int:project_id>/star')
+def star_project(project_id):
+    # TODO check if they are a member
+    star = ProjectStar(account=flask.g.account, project_id=project_id)
+    flask.g.sql_session.add(star)
+    flask.g.sql_session.commit()
+    return flask.redirect(flask.url_for('.home'))
+
+
+@app.route('/projects/<int:project_id>/unstar')
+def unstar_project(project_id):
+    star = flask.g.sql_session.query(ProjectStar) \
+        .filter(ProjectStar.account == flask.g.account) \
+        .filter(ProjectStar.project_id == project_id) \
+        .one()
+    flask.g.sql_session.delete(star)
+    flask.g.sql_session.commit()
+    return flask.redirect(flask.url_for('.home'))
 
 
 @app.route('/projects/<int:project_id>/tasks')

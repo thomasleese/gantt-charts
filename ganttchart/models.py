@@ -94,12 +94,25 @@ class Project(Base):
         self.start_date = creation_date.date()
         self.members.append(ProjectMember(account=creator))
 
+    def starred_by(self, account):
+        for star in self.stars:
+            if star.account == account:
+                return True
+        return False
+
 
 class ProjectMember(Base):
     __tablename__ = 'project_member'
 
     project = relationship('Project', backref='members')
     account = relationship('Account', backref='project_members')
+
+
+class ProjectStar(Base):
+    __tablename__ = 'project_star'
+
+    project = relationship('Project', backref='stars')
+    account = relationship('Account', backref='stars')
 
 
 class Task(Base):

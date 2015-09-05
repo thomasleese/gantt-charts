@@ -18,11 +18,15 @@
     <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
       <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Chart</a>
 
-      <ul class="nav navbar-nav">
-        <!-- Stared projects go here. -->
-      </ul>
-
       {% if g.account %}
+        <ul class="nav navbar-nav">
+          {% for star in g.account.stars %}
+            <li class="nav-item {% if current_project == star.project.id %}active{% endif %}">
+              <a class="nav-link" href="{{ url_for('.view_project', project_id=star.project.id) }}">{{ star.project.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+
         <ul class="nav navbar-nav pull-right">
           <li class="nav-item {% if section == 'account' %}active{% endif %}">
             <a class="nav-link" href="{{ url_for('.account') }}">My Account</a>
