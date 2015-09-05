@@ -1,0 +1,14 @@
+{% extends "_includes/page.html" %}
+
+{% block body %}
+  <div class="container">
+    <h1>{{ project.name }}</h1>
+
+    <table>
+      {% for task in project.tasks %}
+        <tr>
+          <th>{{ task.name }}</th>
+        </tr>
+      {% endfor %}
+    </table>
+{% endblock %}

@@ -5,6 +5,7 @@
     <h1>{{ project.name }}</h1>
 
     <a class="btn btn-primary" href="{{ url_for('.new_task', project_id=project.id) }}" role="button">New Task</a>
+    <a class="btn btn-primary" href="{{ url_for('.view_gantt_chart', project_id=project.id) }}" role="button">View Gantt Chart</a>
 
     <ul>
       {% for task in project.tasks %}

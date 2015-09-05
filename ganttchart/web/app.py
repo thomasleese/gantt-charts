@@ -4,6 +4,7 @@ import flask
 from werkzeug.routing import BaseConverter
 
 from .. import database
+from ..chart import Chart
 from ..models import Account, Project, Session as SqlSession, Task
 from . import forms
 
@@ -87,6 +88,14 @@ def new_project():
 def view_project(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
     return flask.render_template('projects/view.html', project=project)
+
+
+@app.route('/projects/<int:project_id>/chart')
+def view_gantt_chart(project_id):
+    project = flask.g.sql_session.query(Project).get(project_id)
+    chart = Chart(project)
+    return flask.render_template('projects/chart.html', project=project,
+                                 chart=chart)
 
 
 @app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
