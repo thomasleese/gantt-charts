@@ -1,7 +1,7 @@
+import logging
 import os
 
 import flask
-from werkzeug.routing import BaseConverter
 
 from .. import database
 from ..chart import Chart
@@ -12,6 +12,14 @@ from . import forms
 
 app = flask.Flask('ganttchart.web')
 app.secret_key = os.environ['GANTT_CHART_SECRET_KEY']
+
+
+@app.before_first_request
+def configure_logging():
+    if not app.debug:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.INFO)
+        app.logger.addHandler(stream_handler)
 
 
 @app.before_first_request
