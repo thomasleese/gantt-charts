@@ -7,4 +7,5 @@ body {
     max-width: 2rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;
 }
