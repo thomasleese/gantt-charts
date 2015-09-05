@@ -1,0 +1,17 @@
+{
+    "name": "gantt-chart",
+    "authors": [
+        "Tom Leese <inbox@tomleese.me.uk>"
+    ],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "ganttchart/web/static/bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+    },
+    "private": true
+}
