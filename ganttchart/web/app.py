@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 
 app = Flask('ganttchart.web')
@@ -6,4 +6,4 @@ app = Flask('ganttchart.web')
 
 @app.route('/')
 def home():
-    return 'Hello, world.'
+    return render_template('_base.html')
