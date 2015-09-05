@@ -1,6 +1,57 @@
+from collections import namedtuple
+
+
+Block = namedtuple('Block', ['task', 'start', 'end'])
+
+
 class Chart:
     def __init__(self, project):
-        pass
+        graph = [(task, [dep.dependency for dep in task.dependencies]) for task in project.tasks]
+        print(graph)
+
+        self.graph = self.topolgical_sort(graph)
+        self.blocks = []
+
+        start_times = {}
+        finish_times = {}
+
+        for entry in self.graph:
+            task = entry[0]
+            if entry[1]:
+                start_times[task] = max(finish_times[t] for t in entry[1])
+            else:
+                start_times[task] = task.project.start_date
+
+            finish_times[task] = start_times[task] + task.expected_time
+
+        self.start = min(start_times.values())
+        self.end = max(finish_times.values())
+
+        for entry in self.graph:
+            task = entry[0]
+            self.blocks.append(Block(task, start_times[task],
+                                     finish_times[task]))
+
+    def topolgical_sort(self, graph_unsorted):
+        graph_sorted = []
+
+        graph_unsorted = dict(graph_unsorted)
+
+        acyclic = False
+        while graph_unsorted:
+            for node, edges in list(graph_unsorted.items()):
+                for edge in edges:
+                    if edge in graph_unsorted:
+                        break
+                else:
+                    acyclic = True
+                    del graph_unsorted[node]
+                    graph_sorted.append((node, edges))
+
+        if not acyclic:
+            raise RuntimeError("A cyclic dependency occurred")
+
+        return graph_sorted
 
 """    def
 

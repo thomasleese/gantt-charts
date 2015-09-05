@@ -4,10 +4,19 @@
   <div class="container">
     <h1>{{ project.name }}</h1>
 
-    <table>
-      {% for task in project.tasks %}
+    <table class="table">
+      {% for block in chart.blocks %}
         <tr>
-          <th>{{ task.name }}</th>
+          <th>{{ block.task.name }}</th>
+          {% for i in range((block.start - chart.start).days) %}
+            <td></td>
+          {% endfor %}
+          {% for i in range((block.end - block.start).days) %}
+            <td class="bg-primary"></td>
+          {% endfor %}
+          {% for i in range((chart.end - block.end).days) %}
+            <td></td>
+          {% endfor %}
         </tr>
       {% endfor %}
     </table>
