@@ -11,9 +11,11 @@
           {% for i in range((block.start - chart.start).days) %}
             <td></td>
           {% endfor %}
-          {% for i in range((block.end - block.start).days) %}
-            <td class="bg-primary"></td>
-          {% endfor %}
+
+          <td class="bg-primary" colspan="{{ (block.end - block.start).days }}">
+            {{ block.task.name }}
+          </td>
+
           {% for i in range((chart.end - block.end).days) %}
             <td></td>
           {% endfor %}
