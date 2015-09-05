@@ -70,6 +70,7 @@ def signup():
         account = Account(form.email_address.data, form.password.data)
         flask.g.sql_session.add(account)
         flask.g.sql_session.commit()
+        return flask.redirect(flask.url_for('.login'))
 
     return flask.render_template('account/signup.html', form=form)
 
