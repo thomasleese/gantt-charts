@@ -35,7 +35,8 @@ def configure_session(*args, **kwargs):
     if 'account_id' in flask.session:
         account = flask.g.sql_session.query(Account) \
             .get(flask.session['account_id'])
-        flask.g.account = account
+        if account is not None:
+            flask.g.account = account
 
 
 @app.teardown_request
