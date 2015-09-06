@@ -87,7 +87,8 @@ def logout():
 def new_project():
     form = forms.CreateProject(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
-        project = Project(form.name.data, flask.g.account)
+        project = Project(form.name.data, form.description.data,
+                          flask.g.account)
         flask.g.sql_session.add(project)
         flask.g.sql_session.commit()
         return flask.redirect(flask.url_for('.view_project', project_id=project.id))

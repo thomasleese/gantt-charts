@@ -109,6 +109,8 @@ class LogIn(Form):
 
 class CreateProject(Form):
     name = StringField('Name', validators=[DataRequired()])
+    description = StringField('Description', validators=[Optional()],
+                              description='Enter a few words about your project — or leave it out entirely.')
 
 
 class CreateTask(Form):

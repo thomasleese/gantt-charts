@@ -114,13 +114,12 @@ def account_created(mapper, connection, email_address):
 class Project(Base):
     __tablename__ = 'project'
 
-    def __init__(self, name, creator, creation_date=None):
-        super().__init__()
+    def __init__(self, name, description, creator, creation_date=None):
+        super().__init__(name=name, description=description)
 
         if creation_date is None:
             creation_date = datetime.datetime.now()
 
-        self.name = name
         self.creation_date = creation_date
         self.start_date = creation_date.date()
         self.members.append(ProjectMember(account=creator))

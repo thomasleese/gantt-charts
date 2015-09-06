@@ -6,13 +6,18 @@
   <h1>New Project</h1>
 
   <form method="POST">
-    <fieldset class="form-group {% if form.errors['name'] %}has-error{% endif %}">
-      <label class="control-label" for="name">Name</label>
-      <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ request.form.get('name', '') }}" />
-      {% if form.errors['name'] %}
-        <small class="help-block">{{ form.errors['name'][0] }}</small>
-      {% endif %}
-    </fieldset>
+    {% for field in form %}
+      <div class="form-group {% if form.errors[field.name] %}has-error{% endif %}">
+        <label class="control-label" for="{{ field.id }}">{{ field.label.text }}</label>
+        <input type="{{ 'password' if field.type == 'PasswordField' else 'text' }}" class="form-control" name="{{ field.name }}" id="{{ field.id }}" placeholder="{{ field.label.text }}" value="{{ request.form.get(field.name, '') }}" />
+        {% if field.description %}
+          <small class="text-muted">{{ field.description }}</small>
+        {% endif %}
+        {% if form.errors[field.name] %}
+          <small class="help-block">{{ form.errors[field.name][0] }}</small>
+        {% endif %}
+      </div>
+    {% endfor %}
 
     <button type="submit" class="btn btn-primary">Create</button>
   </form>
