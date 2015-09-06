@@ -3,8 +3,12 @@ from wtforms import Form
 from wtforms.fields import IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
+import wtforms_json
 
 from ..models import Account, AccountEmailAddress
+
+
+wtforms_json.init()
 
 
 class Unique:
@@ -110,3 +114,8 @@ class CreateTask(Form):
 
 class AddTaskDependency(Form):
     dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])
+
+
+class ApiChangeAccount(Form):
+    display_name = StringField('Display Name', validators=[DataRequired(),
+                                                           Length(2)])

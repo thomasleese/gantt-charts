@@ -169,3 +169,14 @@ def view_task(task_id):
 @app.route('/account')
 def account():
     return flask.render_template('account/index.html')
+
+
+@app.route('/api/account', methods=['PATCH'])
+def api_change_account():
+    form = forms.ApiChangeAccount.from_json(flask.request.json)
+    if form.validate():
+        flask.g.account.display_name = form.display_name.data
+        flask.g.sql_session.commit()
+        return flask.jsonify()
+    else:
+        return flask.jsonify(errors=form.errors), 400

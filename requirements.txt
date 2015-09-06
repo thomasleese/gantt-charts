@@ -21,3 +21,4 @@ sphinx-rtd-theme==0.1.8
 SQLAlchemy==0.9.10
 Werkzeug==0.10.4
 WTForms==2.0.2
+WTForms-JSON==0.2.10

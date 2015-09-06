@@ -22,6 +22,7 @@ setup(
         'psycopg2 >=2.5, <3',
         'alembic >=0.7, <1',
         'WTForms >=2.0, <3',
+        'WTForms-JSON >=0.2, <1',
     ],
     test_suite='nose.collector',
 )

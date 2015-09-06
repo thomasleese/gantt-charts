@@ -10,16 +10,16 @@
 
   <div class="card">
     <div class="card-block">
-      <h4 class="card-title">Name</h4>
-      <p class="card-text">Use this form to change your name as shown on the website.</p>
+      <h4 class="card-title">Display name</h4>
+      <p class="card-text">Use this form to change your display name as shown on the website.</p>
 
       <form>
-        <fieldset class="form-group">
-          <input type="text" class="form-control" id="name" placeholder="Name" />
+        <div class="form-group" id="display-name-group">
+          <input type="text" class="form-control" id="display-name-input" name="display_name" placeholder="Display name" value="{{ g.account.display_name }}" />
           <small class="text-muted">
-            You can use anything as your name — although we recommend using your real name to make it easy for people to find you.
+            You can use anything as your display name — although we recommend using your real name to make it easy for people to find you.
           </small>
-        </fieldset>
+        </div>
       </form>
     </div>
   </div>
@@ -27,7 +27,7 @@
   <div class="card">
     <div class="card-block">
       <h4 class="card-title">Email addresses</h4>
-      <p class="card-text">You can add as many email addresses as you want to your account — allowing people to find you easier.</p>
+      <p class="card-text">You can add as many email addresses as you like to your account — allowing people to find you easier.</p>
     </div>
 
     <ul class="list-group list-group-flush">
@@ -48,4 +48,8 @@
       <a href="#" class="btn btn-primary">Go somewhere</a>
     </div>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='scripts/account/display_name.js') }}"></script>
 {% endblock %}
