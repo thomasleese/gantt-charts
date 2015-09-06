@@ -19,5 +19,9 @@ body > .container {
 }
 
 .star {
-    
+    color: rgb(255, 204, 0);
+}
+
+.star:hover {
+    color: rgb(191, 158, 25);
 }
