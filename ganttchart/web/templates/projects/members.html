@@ -6,29 +6,27 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
-{% block body %}
-  <div class="container">
-    {{ project_lead(project, 'members') }}
+{% block page %}
+  {{ project_lead(project, 'members') }}
 
-    <table class="table table-striped">
-      <thead class="thead-default">
+  <table class="table table-striped">
+    <thead class="thead-default">
+      <tr>
+        <th>#</th>
+        <th>Email Address</th>
+      <tr>
+    </thead>
+
+    <tbody>
+      {% for member in project.members %}
         <tr>
-          <th>#</th>
-          <th>Email Address</th>
-        <tr>
-      </thead>
+          <td>{{ loop.index }}</td>
+          <td>{{ member.account.email_addresses[0].email_address }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-      <tbody>
-        {% for member in project.members %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ member.account.email_addresses[0].email_address }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
-    <div class="clearfix"></div>
-  </div>
+  <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
+  <div class="clearfix"></div>
 {% endblock %}

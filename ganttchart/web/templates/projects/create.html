@@ -2,20 +2,18 @@
 
 {% block title %}New Project{% endblock %}
 
-{% block body %}
-  <div class="container">
-    <h1>New Project</h1>
+{% block page %}
+  <h1>New Project</h1>
 
-    <form method="POST">
-      <fieldset class="form-group {% if form.errors['name'] %}has-error{% endif %}">
-        <label class="control-label" for="name">Name</label>
-        <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ request.form.get('name', '') }}" />
-        {% if form.errors['name'] %}
-          <small class="help-block">{{ form.errors['name'][0] }}</small>
-        {% endif %}
-      </fieldset>
+  <form method="POST">
+    <fieldset class="form-group {% if form.errors['name'] %}has-error{% endif %}">
+      <label class="control-label" for="name">Name</label>
+      <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{ request.form.get('name', '') }}" />
+      {% if form.errors['name'] %}
+        <small class="help-block">{{ form.errors['name'][0] }}</small>
+      {% endif %}
+    </fieldset>
 
-      <button type="submit" class="btn btn-primary">Create</button>
-    </form>
-  </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+  </form>
 {% endblock %}

@@ -6,35 +6,31 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
-{% block body %}
-  <div class="container">
-    {{ project_lead(project, 'tasks') }}
+{% block page %}
+  {{ project_lead(project, 'tasks') }}
 
-    <div class="clearfix"></div>
+  <table class="table table-striped">
+    <thead class="thead-default">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Expected time</th>
+        <th>Dependencies</th>
+      <tr>
+    </thead>
 
-    <table class="table table-striped">
-      <thead class="thead-default">
+    <tbody>
+      {% for task in project.tasks %}
         <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Expected time</th>
-          <th>Dependencies</th>
-        <tr>
-      </thead>
+          <td>{{ loop.index }}</td>
+          <td><a href="{{ url_for('.view_task', task_id=task.id) }}">{{ task.name }}</a></td>
+          <td>{{ task.expected_time.days }} days</td>
+          <td>{{ task.dependencies | map(attribute='dependency.name') | join(', ') }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-      <tbody>
-        {% for task in project.tasks %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td><a href="{{ url_for('.view_task', task_id=task.id) }}">{{ task.name }}</a></td>
-            <td>{{ task.expected_time.days }} days</td>
-            <td>{{ task.dependencies | map(attribute='dependency.name') | join(', ') }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
-    <div class="clearfix"></div>
-  </div>
+  <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
+  <div class="clearfix"></div>
 {% endblock %}

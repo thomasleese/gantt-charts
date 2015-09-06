@@ -3,24 +3,22 @@
 {% block title %}{{ task.name }}{% endblock %}
 
 {% block body %}
-  <div class="container">
-    <h1>{{ task.name }}</h1>
+  <h1>{{ task.name }}</h1>
 
-    <form method="POST">
-      <fieldset class="form-group {% if form.errors['dependency'] %}has-error{% endif %}">
-        <label class="control-label" for="dependency">Dependency</label>
-        <select id="dependency" name="dependency" class="form-control">
-          <option>- Choose one -</option>
-          {% for choice in form.dependency.choices %}
-            <option value="{{ choice[0] }}">{{ choice[1] }}</option>
-          {% endfor %}
-        <select>
-        {% if form.errors['dependency'] %}
-          <small class="help-block">{{ form.errors['dependency'][0] }}</small>
-        {% endif %}
-      </fieldset>
+  <form method="POST">
+    <fieldset class="form-group {% if form.errors['dependency'] %}has-error{% endif %}">
+      <label class="control-label" for="dependency">Dependency</label>
+      <select id="dependency" name="dependency" class="form-control">
+        <option>- Choose one -</option>
+        {% for choice in form.dependency.choices %}
+          <option value="{{ choice[0] }}">{{ choice[1] }}</option>
+        {% endfor %}
+      <select>
+      {% if form.errors['dependency'] %}
+        <small class="help-block">{{ form.errors['dependency'][0] }}</small>
+      {% endif %}
+    </fieldset>
 
-      <button type="submit" class="btn btn-primary">Add Dependency</button>
-    </form>
-  </div>
+    <button type="submit" class="btn btn-primary">Add Dependency</button>
+  </form>
 {% endblock %}
