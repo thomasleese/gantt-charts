@@ -1,0 +1,7 @@
+{% extends "_includes/base.txt" %}
+
+{% block content %}
+Dear {{ email_address }},
+
+Please go to {{ url }} to verify your email address.
+{% endblock %}

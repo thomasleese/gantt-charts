@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import os
 
+import flask
 import sqlalchemy
 from sqlalchemy import event, Column, DateTime, Integer, LargeBinary, \
     MetaData, String, Table, ForeignKey, UniqueConstraint
@@ -11,6 +12,8 @@ from sqlalchemy.orm import backref, deferred, scoped_session, sessionmaker, rela
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.ext.hybrid import hybrid_property
 from passlib.context import CryptContext
+
+from . import emails
 
 
 Base = declarative_base(cls=DeferredReflection)
@@ -37,7 +40,8 @@ class Account(Base):
     def __init__(self, display_name, email_address, password):
         super().__init__(display_name=display_name)
 
-        self.email_addresses.append(AccountEmailAddress(email_address))
+        self.email_addresses.append(AccountEmailAddress(email_address,
+                                                        primary=True))
         self.password = password
         self.creation_date = datetime.datetime.now()
 
@@ -53,6 +57,13 @@ class Account(Base):
         return password_context.verify(other, self.password_hashed)
 
     @property
+    def primary_email_address(self):
+        for email_address in self.email_addresses:
+            if email_address.primary:
+                return email_address
+        return self.email_addresses[0]
+
+    @property
     def projects(self):
         for member in self.project_members:
             yield member.project
@@ -66,15 +77,26 @@ class AccountEmailAddress(Base):
                                            cascade='all, delete-orphan'),
                            cascade='all')
 
-    def __init__(self, email_address, verified=False, verify_key=None):
+    def __init__(self, email_address, primary=False, verified=False,
+                 verify_key=None):
         if verify_key is None:
             verify_key = generate_key()
 
-        super().__init__(email_address=email_address, verified=verified,
-                         verify_key=verify_key)
+        super().__init__(email_address=email_address, primary=primary,
+                         verified=verified, verify_key=verify_key)
 
     def __str__(self):
         return self.email_address
+
+    def send_verify_email(self):
+        if self.verified:
+            return
+
+        url = flask.url_for('.account_verify_email', id=self.id,
+                            key=self.verify_key, _external=True)
+        email = emails.VerifyEmailAddress(self.email_address, url)
+        with emails.Mailer() as mailer:
+            mailer.send(email)
 
     @property
     def as_md5_string(self):
@@ -85,6 +107,11 @@ class AccountEmailAddress(Base):
     def gravatar(self, size=40):
         return 'https://www.gravatar.com/avatar/{}?s={}' \
                .format(self.as_md5_string, size)
+
+
+@event.listens_for(AccountEmailAddress, 'after_insert')
+def account_created(mapper, connection, email_address):
+    email_address.send_verify_email()
 
 
 class Project(Base):

@@ -185,6 +185,25 @@ def account_email_addresses():
     return flask.redirect(flask.url_for('.account'))
 
 
+@app.route('/account/email-addresses/<int:id>/send-verify-email')
+def account_send_verify_email(id):
+    email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
+    email_address.send_verify_email()
+    return flask.redirect(flask.url_for('.account'))
+
+
+@app.route('/account/email-addresses/<int:id>/verify/<key>')
+def account_verify_email(id, key):
+    email_address = flask.g.sql_session.query(AccountEmailAddress) \
+        .filter(AccountEmailAddress.id == id) \
+        .filter(AccountEmailAddress.verify_key == key) \
+        .one()
+    email_address.verified = True
+    flask.g.sql_session.commit()
+    flask.flash('Email address verified.', 'success')
+    return flask.redirect(flask.url_for('.account'))
+
+
 @app.route('/api/account', methods=['PATCH'])
 def api_change_account():
     form = forms.ApiChangeAccount.from_json(flask.request.json)

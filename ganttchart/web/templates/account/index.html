@@ -61,7 +61,28 @@
 
     <ul class="list-group list-group-flush">
       {% for email_address in g.account.email_addresses %}
-        <li class="list-group-item"><img class="m-r img-rounded" src="{{ email_address.gravatar(64) }}" width="32" height="32" /> {{ email_address.email_address }} {% if not email_address.verified %}<a href="#"><span class="m-l label label-warning">Click to verify</span></a>{% endif %}</li>
+        <li class="list-group-item">
+          <img class="m-r img-rounded" src="{{ email_address.gravatar(64) }}" width="32" height="32" />
+          {{ email_address.email_address }}
+          <span class="m-l"></span>
+
+          {% if g.account.primary_email_address == email_address %}
+            <span class="label label-primary">Primary</span>
+          {% endif %}
+
+          {% if not email_address.verified %}
+            <span class="label label-warning">Unverified</span>
+          {% endif %}
+
+          <a href="#" class="pull-right btn btn-danger btn-sm m-l">Delete</a>
+
+          {% if g.account.primary_email_address != email_address %}
+            <a href="#" class="pull-right btn btn-primary btn-sm m-l">Make primary</a>
+          {% endif %}
+
+          {% if not email_address.verified %}
+            <a href="{{ url_for('.account_send_verify_email', id=email_address.id) }}" class="pull-right btn btn-warning btn-sm">Verify</a></li>
+          {% endif %}
       {% endfor %}
     </ul>
 
