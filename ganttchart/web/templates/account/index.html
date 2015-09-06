@@ -74,7 +74,7 @@
             <span class="label label-warning">Unverified</span>
           {% endif %}
 
-          <a href="#" class="pull-right btn btn-danger btn-sm m-l">Delete</a>
+          <a href="{{ url_for('.account_delete_email', id=email_address.id) }}" class="pull-right btn btn-danger btn-sm m-l">Delete</a>
 
           {% if g.account.primary_email_address != email_address %}
             <a href="{{ url_for('.account_primary_email', id=email_address.id) }}" class="pull-right btn btn-primary btn-sm m-l">Make primary</a>

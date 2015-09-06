@@ -72,10 +72,7 @@ class Account(Base):
 class AccountEmailAddress(Base):
     __tablename__ = 'account_email_address'
 
-    account = relationship('Account',
-                           backref=backref('email_addresses',
-                                           cascade='all, delete-orphan'),
-                           cascade='all')
+    account = relationship('Account', backref=backref('email_addresses'))
 
     def __init__(self, email_address, primary=False, verified=False,
                  verify_key=None):

@@ -188,7 +188,8 @@ def account_email_addresses():
 @app.route('/account/email-addresses/<int:id>/send-verify-email')
 def account_send_verify_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
-    email_address.send_verify_email()
+    if email_address.account == flask.g.account:
+        email_address.send_verify_email()
     return flask.redirect(flask.url_for('.account'))
 
 
@@ -199,6 +200,18 @@ def account_primary_email(id):
         flask.g.account.primary_email_address.primary = False
         email_address.primary = True
         flask.g.sql_session.commit()
+    return flask.redirect(flask.url_for('.account'))
+
+
+@app.route('/account/email-addresses/<int:id>/delete')
+def account_delete_email(id):
+    email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
+    if email_address.account == flask.g.account:
+        if flask.g.account.primary_email_address != email_address:
+            flask.g.sql_session.delete(email_address)
+            flask.g.sql_session.commit()
+        else:
+            flask.flash('You cannot delete your primary email address.', 'warning')
     return flask.redirect(flask.url_for('.account'))
 
 
