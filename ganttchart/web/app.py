@@ -47,8 +47,7 @@ def remove_session(*args, **kwargs):
 @app.route('/')
 def home():
     if 'account' in flask.g:
-        projects = list(flask.g.account.projects)
-        return flask.render_template('projects/index.html', projects=projects)
+        return flask.render_template('projects/index.html')
     else:
         return flask.render_template('welcome/index.html')
 

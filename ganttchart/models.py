@@ -69,6 +69,20 @@ class Account(Base):
         for member in self.project_members:
             yield member.project
 
+    @property
+    def my_projects(self):
+        for member in self.project_members:
+            if member.access_level.owner or member.access_level.can_administrate:
+                yield member.project
+
+    @property
+    def shared_projects(self):
+        for member in self.project_members:
+            if (member.access_level.can_view or member.access_level.can_edit) \
+                    and not (member.access_level.owner \
+                        or member.access_level.can_administrate):
+                yield member.project
+
 
 class AccountEmailAddress(Base):
     __tablename__ = 'account_email_address'

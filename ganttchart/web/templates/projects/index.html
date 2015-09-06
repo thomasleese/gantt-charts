@@ -2,36 +2,48 @@
 
 {% block title %}Projects{% endblock %}
 
-{% block page %}
-  {% if projects %}
-    <h1>Projects</h1>
-    <br />
-
-    {% for batch in projects | batch(3) %}
-      <div class="row">
-        {% for project in batch %}
-          <div class="col-sm-4">
-            <div class="card project">
-              <div class="card-block">
-                {% if project.starred_by(g.account) %}
-                  <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="fa fa-star pull-right" style="font-size: 1.6rem"></span></a>
-                {% else %}
-                  <a class="star" href="{{ url_for('.star_project', project_id=project.id) }}"><span class="fa fa-star-o pull-right" style="font-size: 1.6rem"></span></a>
-                {% endif %}
-                <h4 class="card-title">{{ project.name }}</h4>
-                <h6 class="card-subtitle text-muted"><a href="{{ url_for('.view_project_tasks', project_id=project.id) }}">{{ project.tasks | length }} tasks</a> ・ <a href="{{ url_for('.view_project_members', project_id=project.id) }}">{{ project.members | length }} members</a></h6>
-                <p class="card-text"></p>
-                <a href="{{ url_for('.view_project', project_id=project.id) }}" class="card-link">View</a>
-                <a href="#" class="card-link">Edit</a>
-                <a href="#" class="card-link">Delete</a>
-              </div>
+{% macro projects_list(projects) %}
+  {% for batch in projects | batch(3) %}
+    <div class="row">
+      {% for project in batch %}
+        <div class="col-sm-4">
+          <div class="card project">
+            <div class="card-block">
+              {% if project.starred_by(g.account) %}
+                <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="fa fa-star pull-right" style="font-size: 1.6rem"></span></a>
+              {% else %}
+                <a class="star" href="{{ url_for('.star_project', project_id=project.id) }}"><span class="fa fa-star-o pull-right" style="font-size: 1.6rem"></span></a>
+              {% endif %}
+              <h4 class="card-title">{{ project.name }}</h4>
+              <h6 class="card-subtitle text-muted"><a href="{{ url_for('.view_project_tasks', project_id=project.id) }}">{{ project.tasks | length }} tasks</a> ・ <a href="{{ url_for('.view_project_members', project_id=project.id) }}">{{ project.members | length }} members</a></h6>
+              <p class="card-text"></p>
+              <a href="{{ url_for('.view_project', project_id=project.id) }}" class="card-link">View</a>
+              <a href="#" class="card-link">Edit</a>
+              <a href="#" class="card-link">Delete</a>
             </div>
           </div>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
+    </div>
+    <br />
+  {% endfor %}
+{% endmacro %}
 
+{% block page %}
+  {% if g.account.projects | list %}
+    {% if g.account.my_projects | list %}
+      <h1>My Projects</h1>
       <br />
-    {% endfor %}
+
+      {{ projects_list(g.account.my_projects) }}
+    {% endif %}
+
+    {% if g.account.shared_projects | list %}
+      <h1>Projects shared with me</h1>
+      <br />
+
+      {{ projects_list(g.account.shared_projects) }}
+    {% endif %}
 
     <a class="btn btn-primary pull-right" href="{{ url_for('.new_project') }}" role="button"><span class="fa fa-plus m-r"></span>New project</a>
     <div class="clearfix"></div>
