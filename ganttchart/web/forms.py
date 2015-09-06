@@ -125,6 +125,14 @@ class AddTaskDependency(Form):
     dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])
 
 
+class AddMember(Form):
+    email_address = StringField('Email Address',
+                                validators=[DataRequired(), Email(),
+                                            Exists(AccountEmailAddress,
+                                                   'email_address')])
+    access_level = StringField('Access Level', validators=[DataRequired()])
+
+
 class EmailAddress(Form):
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Email(),

@@ -5,8 +5,8 @@ import flask
 
 from .. import database
 from ..chart import Chart
-from ..models import Account, AccountEmailAddress, Project, ProjectStar, \
-    Session as SqlSession, Task, TaskDependency
+from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
+    ProjectMember, ProjectStar, Session as SqlSession, Task, TaskDependency
 from . import forms
 
 
@@ -132,10 +132,23 @@ def view_project_tasks(project_id):
     return flask.render_template('projects/tasks.html', project=project)
 
 
-@app.route('/projects/<int:project_id>/members')
+@app.route('/projects/<int:project_id>/members', methods=['GET', 'POST'])
 def view_project_members(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
-    return flask.render_template('projects/members.html', project=project)
+    if flask.request.method == 'GET':
+        return flask.render_template('projects/members.html', project=project)
+    else:
+        form = forms.AddMember(flask.request.form)
+        if form.validate():
+            members = project.members
+            member = ProjectMember(form.email_address.record.account,
+                                   AccessLevel[form.access_level.data])
+            members.append(member)
+            flask.g.sql_session.commit()
+        else:
+            flask.flash('Member does not exist.', 'danger')
+        return flask.redirect(flask.url_for('.view_project_members',
+                                            project_id=project_id))
 
 
 @app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
