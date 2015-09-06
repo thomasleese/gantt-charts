@@ -13,7 +13,7 @@
     <thead class="thead-default">
       <tr>
         <th>#</th>
-        <th>Email Address</th>
+        <th>Display Name</th>
       <tr>
     </thead>
 
@@ -21,7 +21,7 @@
       {% for member in project.members %}
         <tr>
           <td>{{ loop.index }}</td>
-          <td>{{ member.account.email_addresses[0].email_address }}</td>
+          <td>{{ member.account.display_name }}</td>
         </tr>
       {% endfor %}
     </tbody>

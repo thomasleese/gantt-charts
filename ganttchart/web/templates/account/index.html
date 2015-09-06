@@ -24,6 +24,35 @@
     </div>
   </div>
 
+  <div class="modal fade" id="email-address-modal" tabindex="-1" role="dialog" aria-labelledby="email-address-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title" id="email-address-modal-label">Add email address</h4>
+        </div>
+
+        <div class="modal-body">
+          <p>Enter the email address you would like to add here.</p>
+
+          <form id="email-address-modal-form" action="{{ url_for('.account_email_addresses') }}" method="POST">
+            <div class="form-group">
+              <input type="text" class="form-control" name="email_address" placeholder="Email address" />
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button form="email-address-modal-form" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button form="email-address-modal-form" type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-block">
       <h4 class="card-title">Email addresses</h4>
@@ -37,7 +66,7 @@
     </ul>
 
     <div class="card-block">
-      <a href="#" class="card-link">Add another</a>
+      <a href="#" class="card-link" data-toggle="modal" data-target="#email-address-modal">Add another</a>
     </div>
   </div>
 

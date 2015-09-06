@@ -5,8 +5,8 @@ import flask
 
 from .. import database
 from ..chart import Chart
-from ..models import Account, Project, ProjectStar, Session as SqlSession, \
-    Task, TaskDependency
+from ..models import Account, AccountEmailAddress, Project, ProjectStar, \
+    Session as SqlSession, Task, TaskDependency
 from . import forms
 
 
@@ -68,7 +68,8 @@ def login():
 def signup():
     form = forms.SignUp(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
-        account = Account(form.email_address.data, form.password.data)
+        account = Account(form.display_name.data, form.email_address.data,
+                          form.password.data)
         flask.g.sql_session.add(account)
         flask.g.sql_session.commit()
         return flask.redirect(flask.url_for('.login'))
@@ -170,6 +171,18 @@ def view_task(task_id):
 @app.route('/account')
 def account():
     return flask.render_template('account/index.html')
+
+
+@app.route('/account/email-addresses', methods=['POST'])
+def account_email_addresses():
+    form = forms.EmailAddress(flask.request.form)
+    if form.validate():
+        email_address = AccountEmailAddress(form.email_address.data)
+        flask.g.account.email_addresses.append(email_address)
+        flask.g.sql_session.commit()
+    else:
+        flask.flash('Could not add email address.', 'warning')
+    return flask.redirect(flask.url_for('.account'))
 
 
 @app.route('/api/account', methods=['PATCH'])

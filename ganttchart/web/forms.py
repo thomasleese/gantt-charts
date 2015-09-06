@@ -1,6 +1,7 @@
 import flask
 from wtforms import Form
-from wtforms.fields import IntegerField, SelectField, StringField
+from wtforms.fields import IntegerField, PasswordField, SelectField, \
+    StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
 import wtforms_json
@@ -88,10 +89,11 @@ class PasswordCorrect(object):
 
 
 class SignUp(Form):
+    display_name = StringField('Display Name', validators=[DataRequired()])
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Email(),
                                             Unique(AccountEmailAddress, 'email_address')])
-    password = StringField('Password', validators=[DataRequired(), Length(8)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(8)])
 
 
 class LogIn(Form):
@@ -116,6 +118,12 @@ class AddTaskDependency(Form):
     dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])
 
 
+class EmailAddress(Form):
+    email_address = StringField('Email Address',
+                                validators=[DataRequired(), Email(),
+                                            Unique(AccountEmailAddress,
+                                                   'email_address')])
+
+
 class ApiChangeAccount(Form):
-    display_name = StringField('Display Name', validators=[DataRequired(),
-                                                           Length(2)])
+    display_name = StringField('Display Name', validators=[DataRequired()])

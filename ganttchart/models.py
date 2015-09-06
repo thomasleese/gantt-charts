@@ -34,15 +34,12 @@ def generate_key(length=512):
 class Account(Base):
     __tablename__ = 'account'
 
-    def __init__(self, email_address, password, creation_date=None):
-        super().__init__()
-
-        if creation_date is None:
-            creation_date = datetime.datetime.now()
+    def __init__(self, display_name, email_address, password):
+        super().__init__(display_name=display_name)
 
         self.email_addresses.append(AccountEmailAddress(email_address))
         self.password = password
-        self.creation_date = creation_date
+        self.creation_date = datetime.datetime.now()
 
     @property
     def password(self):
