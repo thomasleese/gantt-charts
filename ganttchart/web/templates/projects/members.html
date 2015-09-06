@@ -4,6 +4,8 @@
 
 {% set current_project = project.id %}
 
+{% block title %}{{ project.name }}{% endblock %}
+
 {% block body %}
   <div class="container">
     {{ project_lead(project, 'members') }}
