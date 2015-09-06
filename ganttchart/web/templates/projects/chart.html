@@ -10,7 +10,7 @@
   {{ project_lead(project, 'gantt-chart') }}
 
   {% if chart %}
-    <table class="table table-sm gantt-chart m-b">
+    <table class="table table-sm gantt-chart">
       {% for block in chart.blocks %}
         <tr>
           <th><a href="{{ url_for('.view_task', task_id=block.task.id) }}">{{ block.task.name }}</a></th>
@@ -27,10 +27,11 @@
           {% endfor %}
         </tr>
       {% endfor %}
-    </table>
 
-    <a class="btn btn-primary pull-right m-t" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
-    <div class="clearfix"></div>
+      <tr>
+        <th colspan="{{ (chart.end - chart.start).days + 1 }}"><a href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+      </tr>
+    </table>
   {% else %}
     <p class="lead text-center">This project hasn't got any tasks.</p>
     <p class="text-center">Click the button below to create one.</p>
