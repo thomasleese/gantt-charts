@@ -125,6 +125,24 @@ class AccessLevel(Enum):
         self.can_edit = can_edit
         self.can_view = can_view
 
+    @property
+    def description(self):
+        if self.owner:
+            return 'Owner'
+        elif self.can_administrate:
+            return 'Administrator'
+        elif self.can_edit:
+            return 'Can edit'
+        elif self.can_view:
+            return 'Can view'
+        else:
+            return 'Banned'
+
+    @property
+    def is_banned(self):
+        return not (self.owner or self.can_administrate or self.can_edit \
+            or self.can_view)
+
 
 class Project(Base):
     __tablename__ = 'project'
@@ -159,11 +177,11 @@ class ProjectMember(Base):
 
     @hybrid_property
     def access_level(self):
-        return AccessLevel(self._access_level)
+        return AccessLevel[self._access_level]
 
     @access_level.setter
     def access_level(self, access_level):
-        self._access_level = access_level.value
+        self._access_level = access_level.name
 
     @access_level.expression
     def access_level(self):

@@ -9,24 +9,19 @@
 {% block page %}
   {{ project_lead(project, 'members') }}
 
-  <table class="table table-striped">
-    <thead class="thead-default">
-      <tr>
-        <th>#</th>
-        <th>Display Name</th>
-      <tr>
-    </thead>
+  <ul class="list-group">
+    {% for member in project.members %}
+      <li class="list-group-item {% if member.access_level.is_banned %}disabled{% endif %}">
+        <img class="img-rounded m-r" src="{{ member.account.primary_email_address.gravatar(64) }}" width="32" height="32" />
 
-    <tbody>
-      {% for member in project.members %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ member.account.display_name }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        {{ member.account.display_name }}
 
-  <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Task</a>
+        <span class="m-l label label-default">{{ member.access_level.description }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <br />
+  <a class="btn btn-primary pull-right" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus"></span> New Member</a>
   <div class="clearfix"></div>
 {% endblock %}
