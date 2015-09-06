@@ -4,10 +4,16 @@ body {
     background-size: 400px 347px;
 }
 
-body > .container {
+.page {
     background: white;
     padding: 2rem;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1rem rgb(200, 200, 200);
+}
+
+.jumbotron {
+    background: rgb(248, 248, 248);
+    border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
 }
 

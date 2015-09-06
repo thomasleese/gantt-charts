@@ -4,12 +4,27 @@
   <div class="container">
     <div class="jumbotron">
       <h1 class="display-3">Yay Gantt Charts!</h1>
-      <p class="lead">Tired of making boring old Gantt Chart's for your UAV project?<br />Want to feed your hunger for Gantt Charts in your life?<br />Need to spice up your Gantt-life?</p>
-      <hr class="m-y-md">
-      <p>Look no further!</p>
-      <p class="lead">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('.signup') }}" role="button">Sign up</a>
+
+      <hr class="m-y-md" />
+
+      <p class="lead" style="line-height: 2;">
+        Tired of making boring old Gantt Charts for your projects?<br />
+        Want to feed that secret hunger for Gantt Charts?<br />
+        Need to spice up your Gantt-life?
       </p>
+
+      <p class="lead">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('.signup') }}" role="button">Sign up now!</a>
+        <a class="btn btn-secondary btn-lg" href="#learnmore" role="button">Learn more</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page" id="learnmore">
+      <h1>What is a Gantt Chart?</h1>
+      <p class="lead">A bar chart, basically.</p>
+      <p>Developed by Henry Gantt in the 1910s. Blah blah blah.</p>
     </div>
   </div>
 {% endblock %}
