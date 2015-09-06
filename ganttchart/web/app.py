@@ -192,6 +192,16 @@ def account_send_verify_email(id):
     return flask.redirect(flask.url_for('.account'))
 
 
+@app.route('/account/email-addresses/<int:id>/primary')
+def account_primary_email(id):
+    email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
+    if email_address.account == flask.g.account:
+        flask.g.account.primary_email_address.primary = False
+        email_address.primary = True
+        flask.g.sql_session.commit()
+    return flask.redirect(flask.url_for('.account'))
+
+
 @app.route('/account/email-addresses/<int:id>/verify/<key>')
 def account_verify_email(id, key):
     email_address = flask.g.sql_session.query(AccountEmailAddress) \
