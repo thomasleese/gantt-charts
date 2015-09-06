@@ -6,4 +6,46 @@
 
 {% block page %}
   <h1>My Account</h1>
+  <p class="lead">Change your account settings here.</p>
+
+  <div class="card">
+    <div class="card-block">
+      <h4 class="card-title">Name</h4>
+      <p class="card-text">Use this form to change your name as shown on the website.</p>
+
+      <form>
+        <fieldset class="form-group">
+          <input type="text" class="form-control" id="name" placeholder="Name" />
+          <small class="text-muted">
+            You can use anything as your name — although we recommend using your real name to make it easy for people to find you.
+          </small>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-block">
+      <h4 class="card-title">Email addresses</h4>
+      <p class="card-text">You can add as many email addresses as you want to your account — allowing people to find you easier.</p>
+    </div>
+
+    <ul class="list-group list-group-flush">
+      {% for email_address in g.account.email_addresses %}
+        <li class="list-group-item">{{ email_address.email_address }} {% if not email_address.verified %}<a href="#"><span class="m-l label label-warning">Click to verify</span></a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+
+    <div class="card-block">
+      <a href="#" class="card-link">Add another</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-block">
+      <h4 class="card-title">Password</h4>
+      <p class="card-text">Fill out the form below to change your password.</p>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
 {% endblock %}
