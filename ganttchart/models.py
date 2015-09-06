@@ -1,6 +1,7 @@
 """Models."""
 
 import datetime
+from enum import Enum
 import hashlib
 import os
 
@@ -111,6 +112,20 @@ def account_created(mapper, connection, email_address):
     email_address.send_verify_email()
 
 
+class AccessLevel(Enum):
+    owner = (True, True, True, True)
+    administrator = (False, True, True, True)
+    editor = (False, False, True, True)
+    viewer = (False, False, False, True)
+    banned = (False, False, False, False)
+
+    def __init__(self, owner, can_administrate, can_edit, can_view):
+        self.owner = owner
+        self.can_administrate = can_administrate
+        self.can_edit = can_edit
+        self.can_view = can_view
+
+
 class Project(Base):
     __tablename__ = 'project'
 
@@ -122,7 +137,7 @@ class Project(Base):
 
         self.creation_date = creation_date
         self.start_date = creation_date.date()
-        self.members.append(ProjectMember(account=creator))
+        self.members.append(ProjectMember(creator, AccessLevel.owner))
 
     def starred_by(self, account):
         for star in self.stars:
@@ -136,6 +151,24 @@ class ProjectMember(Base):
 
     project = relationship('Project', backref='members')
     account = relationship('Account', backref='project_members')
+
+    def __init__(self, account, access_level):
+        super().__init__(account=account, access_level=access_level)
+
+    _access_level = Column('access_level', String)
+
+    @hybrid_property
+    def access_level(self):
+        return AccessLevel(self._access_level)
+
+    @access_level.setter
+    def access_level(self, access_level):
+        self._access_level = access_level.value
+
+    @access_level.expression
+    def access_level(self):
+        return self._access_level
+
 
 
 class ProjectStar(Base):
