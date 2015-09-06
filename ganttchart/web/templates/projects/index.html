@@ -10,7 +10,7 @@
       <div class="row">
         {% for project in batch %}
           <div class="col-sm-4">
-            <div class="card">
+            <div class="card project">
               <div class="card-block">
                 {% if project.starred_by(g.account) %}
                   <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="fa fa-star pull-right" style="font-size: 1.6rem"></span></a>

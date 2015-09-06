@@ -30,3 +30,7 @@ body > .container {
 .orycion {
     margin: 1rem 0;
 }
+
+.card.project .text-muted a {
+    color: rgb(95, 104, 111);
+}
