@@ -1,9 +1,11 @@
-$(function() {
-  $('#display-name-input').change(function(e) {
+(function() {
+  'use strict';
+
+  var updateDisplayName = function() {
     $.ajax({
       url: '/api/account',
       method: 'PATCH',
-      data: JSON.stringify({'display_name': $(this).val()}),
+      data: JSON.stringify({'display_name': $('#display-name-input').val()}),
       contentType: 'application/json',
       success: function(response, textStatus, xhr) {
         $('#display-name-input')
@@ -24,5 +26,14 @@ $(function() {
           .removeClass('has-success');
       },
     });
+  };
+
+  $(function() {
+    $('#display-name-input').change(updateDisplayName);
+    $('#display-name-form').submit(function(e) {
+      e.preventDefault();
+      updateDisplayName();
+      return false;
+    });
   });
-});
+}());
