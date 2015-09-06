@@ -125,12 +125,6 @@ def unstar_project(project_id):
     return flask.redirect(flask.url_for('.home'))
 
 
-@app.route('/projects/<int:project_id>/tasks')
-def view_project_tasks(project_id):
-    project = flask.g.sql_session.query(Project).get(project_id)
-    return flask.render_template('projects/tasks.html', project=project)
-
-
 @app.route('/projects/<int:project_id>/members', methods=['GET', 'POST'])
 def view_project_members(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
