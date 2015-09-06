@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
-    <title>Gantt Chart</title>
+    <title>Ganttable</title>
 
     <link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css" />
     <link href="{{ url_for('static', filename='styles/theme.css') }}" rel="stylesheet" />
@@ -16,7 +16,7 @@
 
   <body>
     <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-      <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Chart &nbsp;<span class="fa fa-home"></span></a>
+      <a class="navbar-brand" href="{{ url_for('.home') }}">Ganttable &nbsp;<span class="fa fa-home"></span></a>
 
       {% if g.account %}
         <ul class="nav navbar-nav">
