@@ -95,7 +95,17 @@
     <div class="card-block">
       <h4 class="card-title">Password</h4>
       <p class="card-text">Fill out the form below to change your password.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <form action="{{ url_for('.account_password') }}" method="POST">
+        <div class="form-group">
+          <input type="password" class="form-control" name="old_password" placeholder="Old password" />
+        </div>
+
+        <div class="form-group">
+          <input type="password" class="form-control" name="new_password" placeholder="New password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
     </div>
   </div>
 {% endblock %}

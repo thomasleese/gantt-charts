@@ -227,6 +227,18 @@ def account_verify_email(id, key):
     return flask.redirect(flask.url_for('.account'))
 
 
+@app.route('/account/password', methods=['POST'])
+def account_password():
+    form = forms.ChangePassword(flask.request.form)
+    if form.validate():
+        flask.g.account.password = form.new_password.data
+        flask.g.sql_session.commit()
+        flask.flash('Password changed.', 'success')
+    else:
+        flask.flash('Old password incorrect.', 'danger')
+    return flask.redirect(flask.url_for('.account'))
+
+
 @app.route('/api/account', methods=['PATCH'])
 def api_change_account():
     form = forms.ApiChangeAccount.from_json(flask.request.json)

@@ -52,11 +52,13 @@ class Exists:
 
 
 class PasswordCorrect(object):
-    def __init__(self, other_field_names, message=None):
+    def __init__(self, other_field_names=None, message=None):
         if isinstance(other_field_names, str):
             self.other_field_names = other_field_names.split(',')
-        else:
+        elif isinstance(other_field_names, list):
             self.other_field_names = other_field_names
+        else:
+            self.other_field_names = []
 
         if message is None:
             message = 'Incorrect password.'
@@ -71,7 +73,10 @@ class PasswordCorrect(object):
             except AttributeError:
                 pass
 
-        return None
+        try:
+            return flask.g.account
+        except AttributeError:
+            return None
 
     def __call__(self, form, field):
         record = self.get_record(form, self.other_field_names)
@@ -127,3 +132,10 @@ class EmailAddress(Form):
 
 class ApiChangeAccount(Form):
     display_name = StringField('Display Name', validators=[DataRequired()])
+
+
+class ChangePassword(Form):
+    old_password = PasswordField('Old Password',
+                                 validators=[DataRequired(), PasswordCorrect()])
+    new_password = PasswordField('New Password',
+                                 validators=[DataRequired(), Length(8)])
