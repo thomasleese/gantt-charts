@@ -32,7 +32,7 @@
 
     <ul class="list-group list-group-flush">
       {% for email_address in g.account.email_addresses %}
-        <li class="list-group-item">{{ email_address.email_address }} {% if not email_address.verified %}<a href="#"><span class="m-l label label-warning">Click to verify</span></a>{% endif %}</li>
+        <li class="list-group-item"><img class="m-r img-rounded" src="{{ email_address.gravatar(64) }}" width="32" height="32" /> {{ email_address.email_address }} {% if not email_address.verified %}<a href="#"><span class="m-l label label-warning">Click to verify</span></a>{% endif %}</li>
       {% endfor %}
     </ul>
 

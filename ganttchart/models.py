@@ -79,6 +79,16 @@ class AccountEmailAddress(Base):
     def __str__(self):
         return self.email_address
 
+    @property
+    def as_md5_string(self):
+        h = hashlib.md5()
+        h.update(self.email_address.lower().encode('utf-8'))
+        return h.hexdigest()
+
+    def gravatar(self, size=40):
+        return 'https://www.gravatar.com/avatar/{}?s={}' \
+               .format(self.as_md5_string, size)
+
 
 class Project(Base):
     __tablename__ = 'project'
