@@ -1,25 +1,12 @@
 {% extends "_includes/page.html" %}
 
+{% from '_includes/macros.html' import project_lead %}
+
 {% set current_project = project.id %}
 
 {% block body %}
   <div class="container">
-    <ul class="nav nav-pills pull-right">
-      <li class="nav-item">
-        <a href="{{ url_for('.view_project', project_id=project.id) }}" class="nav-link">Gantt Chart</a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('.view_project_tasks', project_id=project.id) }}" class="nav-link">Tasks</a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('.view_project_members', project_id=project.id) }}" class="nav-link active">Members</a>
-      </li>
-    </ul>
-
-    <h1>{{ project.name }}’s Members</h1>
-    <p class="lead">A project description.</p>
-
-    <div class="clearfix"></div>
+    {{ project_lead(project, 'members') }}
 
     <table class="table table-striped">
       <thead class="thead-default">
