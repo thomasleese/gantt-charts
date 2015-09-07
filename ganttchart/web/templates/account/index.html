@@ -47,7 +47,7 @@
 
         <div class="modal-footer">
           <button form="email-address-modal-form" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button form="email-address-modal-form" type="submit" class="btn btn-primary">Save</button>
+          <button form="email-address-modal-form" type="submit" class="btn btn-success">Save</button>
         </div>
       </div>
     </div>
@@ -67,7 +67,7 @@
           <span class="m-l"></span>
 
           {% if g.account.primary_email_address == email_address %}
-            <span class="label label-primary">Primary</span>
+            <span class="label label-success">Primary</span>
           {% endif %}
 
           {% if not email_address.verified %}
@@ -79,7 +79,7 @@
           {% endif %}
 
           {% if g.account.primary_email_address != email_address %}
-            <a href="{{ url_for('.account_primary_email', id=email_address.id) }}" class="pull-right btn btn-primary btn-sm m-l">Make primary</a>
+            <a href="{{ url_for('.account_primary_email', id=email_address.id) }}" class="pull-right btn btn-success btn-sm m-l">Make primary</a>
           {% endif %}
 
           {% if not email_address.verified %}
@@ -89,7 +89,7 @@
     </ul>
 
     <div class="card-block">
-      <a href="#" class="card-link" data-toggle="modal" data-target="#email-address-modal">Add another</a>
+      <a href="#" class="btn btn-success" data-toggle="modal" data-target="#email-address-modal">Add another</a>
     </div>
   </div>
 
@@ -106,7 +106,7 @@
           <input type="password" class="form-control" name="new_password" placeholder="New password" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-success">Save</button>
       </form>
     </div>
   </div>
