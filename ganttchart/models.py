@@ -83,6 +83,12 @@ class Account(Base):
                         or member.access_level.can_administrate):
                 yield member.project
 
+    def as_json(self):
+        return {
+            'id': self.id,
+            'display_name': self.display_name,
+        }
+
 
 class AccountEmailAddress(Base):
     __tablename__ = 'account_email_address'
@@ -157,6 +163,15 @@ class AccessLevel(Enum):
         return not (self.owner or self.can_administrate or self.can_edit \
             or self.can_view)
 
+    def as_json(self):
+        return {
+            'description': self.description,
+            'owner': self.owner,
+            'can_administrate': self.can_administrate,
+            'can_edit': self.can_edit,
+            'can_view': self.can_view
+        }
+
 
 class Project(Base):
     __tablename__ = 'project'
@@ -176,6 +191,19 @@ class Project(Base):
             if star.account == account:
                 return True
         return False
+
+    def get_member(self, account):
+        for member in self.members:
+            if member.account == account:
+                return member
+        return None
+
+    def as_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+        }
 
 
 class ProjectMember(Base):
@@ -201,6 +229,11 @@ class ProjectMember(Base):
     def access_level(self):
         return self._access_level
 
+    def as_json(self):
+        return {
+            'account': self.account.as_json(),
+            'access_level': self.access_level.as_json(),
+        }
 
 
 class ProjectStar(Base):
@@ -230,6 +263,18 @@ class Task(Base):
             4 * self.normal_time_estimate + \
             self.pessimistic_time_estimate) / 6
         return datetime.timedelta(seconds=seconds)
+
+    def as_json(self):
+        return {
+            'id': self.id,
+            'time_estimates': {
+                'optimistic': self.optimistic_time_estimate,
+                'normal': self.normal_time_estimate,
+                'pessimistic': self.pessimistic_time_estimate
+            },
+            'expected_time': self.expected_time.total_seconds(),
+            'dependencies': [{'id': d.dependency.id} for d in self.dependencies]
+        }
 
 
 class TaskDependency(Base):

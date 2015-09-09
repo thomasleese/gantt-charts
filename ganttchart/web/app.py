@@ -255,3 +255,41 @@ def api_change_account():
         return flask.jsonify()
     else:
         return flask.jsonify(errors=form.errors), 400
+
+
+def get_project_or_404(project_id):
+    return flask.g.sql_session.query(Project) \
+        .filter(Project.id == project_id).one()
+
+
+def get_project_member_or_403(project):
+    member = project.get_member(flask.g.account)
+    if member is None or not member.access_level.can_view:
+        return flask.abort(403)
+    return member
+
+
+@app.route('/api/projects/<int:project_id>')
+def api_project(project_id):
+    project = get_project_or_404(project_id)
+    member = get_project_member_or_403(project)
+
+    return flask.jsonify(project=project.as_json())
+
+
+@app.route('/api/projects/<int:project_id>/tasks')
+def api_project_tasks(project_id):
+    project = get_project_or_404(project_id)
+    member = get_project_member_or_403(project)
+
+    tasks = [task.as_json() for task in project.tasks]
+    return flask.jsonify(tasks=tasks)
+
+
+@app.route('/api/projects/<int:project_id>/members')
+def api_project_members(project_id):
+    project = get_project_or_404(project_id)
+    member = get_project_member_or_403(project)
+
+    members = [member.as_json() for member in project.members]
+    return flask.jsonify(members=members)
