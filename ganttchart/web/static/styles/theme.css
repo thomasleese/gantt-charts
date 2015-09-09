@@ -25,6 +25,15 @@ body {
     overflow: hidden;
 }
 
+.gantt-chart th a {
+    color: black;
+    padding-right: 1rem;
+}
+
+.gantt-chart td a {
+    color: white;
+}
+
 .star {
     color: rgb(255, 204, 0);
 }
