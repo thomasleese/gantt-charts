@@ -14,32 +14,34 @@
     </ul>
   </template>
 
-<script>
-  var loadMembers = function(id, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/projects/' + id + '/members');
-    xhr.responseType = 'json';
-    xhr.onload = function(e) {
-      callback(e.target.response.members);
+  <script>
+    var loadMembers = function(id, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/projects/' + id + '/members');
+      xhr.responseType = 'json';
+      xhr.onload = function(e) {
+        callback(e.target.response.members);
+      };
+      xhr.send();
     };
-    xhr.send();
-  };
 
-  Polymer({
-    is: 'app-members-list',
-    ready: function() {
+    Polymer({
+      is: 'app-members-list',
+      ready: function() {
 
-    },
-    _projectIdChanged: function(newValue, oldValue) {
-      loadMembers(newValue, function(members) {
-        this.members = members;
-      }.bind(this));
-    },
-    properties: {
-      projectId: {
-        type: Number,
-        observer: '_projectIdChanged'
+      },
+      _projectIdChanged: function(newValue, oldValue) {
+        loadMembers(newValue, function(members) {
+          this.members = members;
+        }.bind(this));
+      },
+      properties: {
+        projectId: {
+          type: Number,
+          observer: '_projectIdChanged'
+        }
       }
-    }
-  });
-</script>
+    });
+  </script>
+
+</dom-module>
