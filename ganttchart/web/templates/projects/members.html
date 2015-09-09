@@ -6,20 +6,14 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
+{% block imports %}
+  <link rel="import" href="{{ url_for('static', filename='components/app-members-list/index.html') }}" />
+{% endblock %}
+
 {% block page %}
   {{ project_lead(project, 'members') }}
 
-  <ul class="list-group">
-    {% for member in project.members %}
-      <li class="list-group-item {% if member.access_level.is_banned %}disabled{% endif %}">
-        <img class="img-rounded m-r" src="{{ member.account.primary_email_address.gravatar(64) }}" width="32" height="32" />
-
-        {{ member.account.display_name }}
-
-        <span class="m-l label label-default">{{ member.access_level.description }}</span>
-      </li>
-    {% endfor %}
-  </ul>
+  <app-members-list project-id="{{ project.id }}"></app-members-list>
 
   {% include "projects/new_member_modal.html" %}
 

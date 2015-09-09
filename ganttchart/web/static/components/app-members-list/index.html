@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<dom-module id="app-members-list">
+
+  <template>
+    <ul class="list-group">
+      <template is="dom-repeat" items="{{members}}">
+        <li class="list-group-item">
+          <img class="img-rounded m-r" src="{{ item.account.photo_url }}" width="32" height="32" />
+          <span>{{item.account.display_name}}</span>
+          <span class="label label-default m-l">{{item.access_level.description}}</span>
+        </li>
+      </template>
+    </ul>
+  </template>
+
+<script>
+  var loadMembers = function(id, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/projects/' + id + '/members');
+    xhr.responseType = 'json';
+    xhr.onload = function(e) {
+      callback(e.target.response.members);
+    };
+    xhr.send();
+  };
+
+  Polymer({
+    is: 'app-members-list',
+    ready: function() {
+
+    },
+    _projectIdChanged: function(newValue, oldValue) {
+      loadMembers(newValue, function(members) {
+        this.members = members;
+      }.bind(this));
+    },
+    properties: {
+      projectId: {
+        type: Number,
+        observer: '_projectIdChanged'
+      }
+    }
+  });
+</script>

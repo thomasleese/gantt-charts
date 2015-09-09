@@ -87,6 +87,7 @@ class Account(Base):
         return {
             'id': self.id,
             'display_name': self.display_name,
+            'photo_url': self.primary_email_address.gravatar(128),
         }
 
 
