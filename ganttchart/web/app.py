@@ -8,7 +8,7 @@ from .. import database
 from ..chart import Chart
 from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
     ProjectMember, ProjectStar, Session as SqlSession, Task, TaskDependency
-from . import forms
+from . import errors, forms
 
 
 app = flask.Flask('ganttchart.web')
@@ -257,15 +257,18 @@ def get_project_member_or_404(member_id):
 
 def get_project_member_or_403(project):
     member = project.get_member(flask.g.account)
-    if member is None or not member.access_level.can_view:
-        return flask.abort(403)
+    if member is None:
+        raise errors.NotAuthenticated()
     return member
 
 
 @app.route('/api/projects/<int:project_id>')
 def api_project(project_id):
     project = get_project_or_404(project_id)
-    member = get_project_member_or_403(project)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_view:
+        raise errors.MissingPermission('can_view')
 
     return flask.jsonify(project=project.as_json())
 
@@ -273,7 +276,10 @@ def api_project(project_id):
 @app.route('/api/projects/<int:project_id>/tasks')
 def api_project_tasks(project_id):
     project = get_project_or_404(project_id)
-    member = get_project_member_or_403(project)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_view:
+        raise errors.MissingPermission('can_view')
 
     tasks = [task.as_json() for task in project.tasks]
     return flask.jsonify(tasks=tasks)
@@ -287,7 +293,7 @@ def api_project_gantt_chart(project_id):
     try:
         chart = Chart(project)
     except RuntimeError:
-        return flask.abort(404)
+        raise errors.NotFound()
 
     return flask.jsonify(gantt_chart=chart.as_json())
 
@@ -302,7 +308,7 @@ def api_project_members(project_id):
         return flask.jsonify(members=members)
     elif flask.request.method == 'POST':
         if not account_member.access_level.can_administrate:
-            return flask.abort(403)
+            raise errors.MissingPermission('can_administrate')
 
         form = forms.ApiAddProjectMember.from_json(flask.request.json)
         if form.validate():
@@ -313,10 +319,10 @@ def api_project_members(project_id):
             try:
                 flask.g.sql_session.commit()
             except sqlalchemy.orm.exc.FlushError:
-                return flask.abort(409)
+                raise errors.AlreadyExists()
             return '', 201
         else:
-            return flask.abort(400)
+            raise errors.InvalidFormData(form)
 
 
 @app.route('/api/projects/<int:project_id>/members/<int:account_id>', methods=['DELETE'])
@@ -324,15 +330,35 @@ def api_project_member(project_id, account_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
     if not account_member.access_level.can_administrate:
-        return flask.abort(403)
+        raise errors.MissingPermission('can_administrate')
 
     target_member = project.get_member(account_id)
     if target_member is None:
-        return flask.abort(404)
+        raise errors.NotFound()
 
     if target_member.access_level.owner:
-        return flask.abort(405)
+        raise errors.MethodNotAllowed()
 
     flask.g.sql_session.delete(target_member)
     flask.g.sql_session.commit()
     return '', 204
+
+
+def error_handler(e):
+    # fill up the error object with a name, description, code and details
+    error = {
+        'name': type(e).__name__,
+        'description': e.description,
+        'code': e.code
+    }
+
+    # not all errors will have details
+    try:
+        error['details'] = e.details
+    except AttributeError:
+        pass
+
+    return flask.jsonify(error=error), e.code
+
+for code in range(400, 499):
+    app.errorhandler(code)(error_handler)
