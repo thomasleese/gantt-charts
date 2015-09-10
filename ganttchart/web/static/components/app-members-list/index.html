@@ -116,32 +116,21 @@
 
   <script>
     var loadMembers = function(id, callback) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', '/api/projects/' + id + '/members');
-      xhr.responseType = 'json';
-      xhr.onload = function(e) {
-        callback(e.target.response.members);
-      };
-      xhr.send();
+      requests.get('/api/projects/' + id + '/members')
+        .go(function(statusCode, response) {
+          callback(response.members);
+        });
     };
 
     var deleteMember = function(projectId, memberId, callback) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('DELETE', '/api/projects/' + projectId + '/members/' + memberId);
-      xhr.onload = function(e) {
-        callback(e.target.status);
-      };
-      xhr.send();
+      requests.delete('/api/projects/' + projectId + '/members/' + memberId)
+        .go(callback);
     };
 
     var newMember = function(projectId, emailAddress, accessLevel, callback) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/projects/' + projectId + '/members');
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.onload = function(e) {
-        callback(e.target.status);
-      };
-      xhr.send(JSON.stringify({'email_address': emailAddress, 'access_level': accessLevel}));
+      requests.post('/api/projects/' + projectId + '/members')
+        .send({'email_address': emailAddress, 'access_level': accessLevel})
+        .go(callback);
     };
 
     Polymer({
