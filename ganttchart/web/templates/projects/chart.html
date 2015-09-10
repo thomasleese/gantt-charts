@@ -45,7 +45,7 @@
     <p class="lead text-center">This project hasn't got any tasks.</p>
     <p class="text-center">Click the button below to create one.</p>
     <p class="text-center">
-      <a class="btn btn-primary" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+      <a class="btn btn-success" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
     </p>
   {% endif %}
 {% endblock %}

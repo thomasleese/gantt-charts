@@ -14,13 +14,4 @@
   {{ project_lead(project, 'members') }}
 
   <app-members-list project-id="{{ project.id }}"></app-members-list>
-
-  {% include "projects/new_member_modal.html" %}
-
-  <br />
-  <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#new-member-modal">
-    <span class="fa fa-plus m-r"></span>New member
-  </button>
-
-  <div class="clearfix"></div>
 {% endblock %}

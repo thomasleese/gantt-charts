@@ -125,7 +125,7 @@ class AddTaskDependency(Form):
     dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])
 
 
-class AddMember(Form):
+class ApiAddProjectMember(Form):
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Email(),
                                             Exists(AccountEmailAddress,

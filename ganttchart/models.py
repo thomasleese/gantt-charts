@@ -194,8 +194,13 @@ class Project(Base):
         return False
 
     def get_member(self, account):
+        try:
+            account_id = account.id
+        except AttributeError:
+            account_id = account
+
         for member in self.members:
-            if member.account == account:
+            if member.account.id == account_id:
                 return member
         return None
 
@@ -232,7 +237,6 @@ class ProjectMember(Base):
 
     def as_json(self):
         return {
-            'id': self.id,
             'account': self.account.as_json(),
             'access_level': self.access_level.as_json(),
         }

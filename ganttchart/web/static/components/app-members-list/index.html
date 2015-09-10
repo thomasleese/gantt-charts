@@ -1,17 +1,117 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-error-modal/index.html" />
+
 <dom-module id="app-members-list">
 
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link type="css" rel="import" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="new-modal" tabindex="-1" role="dialog" aria-labelledby="new-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" id="new-modal-label">New member</h4>
+          </div>
+
+          <div class="modal-body">
+            <p>Enter the email address of the person you wish to enter.</p>
+
+            <form id="new-modal-form" class="form-inline" on-submit="_disableFormSubmit">
+              <div class="form-group">
+                <input type="text" class="form-control" id="new-modal-email-address" placeholder="Email address" />
+              </div>
+
+              <div class="form-group">
+                <select id="new-modal-access-level" class="form-control c-select">
+                  <option value="administrator">Can administrate</option>
+                  <option value="editor">Can edit</option>
+                  <option value="viewer" selected>Can view</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success" on-click="_handleActuallyNewMember">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" id="delete-modal-label">Remove member?</h4>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to remove <span id="delete-modal-who"></span>?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" on-click="_handleActuallyDeleteMember">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" id="delete-modal-label">Remove member?</h4>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to remove <span id="delete-modal-who"></span>?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" on-click="_handleActuallyDeleteMember">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-error-modal id="errorModal"></app-error-modal>
+
     <ul class="list-group">
       <template is="dom-repeat" items="{{members}}">
-        <li class="list-group-item">
+        <li class="list-group-item" data-id$="[[ item.account.id ]]" data-who$="[[ item.account.display_name ]]">
           <img class="img-rounded m-r" src="{{ item.account.photo_url }}" width="32" height="32" />
           <span>{{item.account.display_name}}</span>
           <span class="label label-default m-l">{{item.access_level.description}}</span>
+          <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="fa fa-trash"></span></button>
+          <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="fa fa-pencil"></span></button> -->
         </li>
       </template>
     </ul>
+
+    <br />
+    <button type="button" class="btn btn-success pull-right" on-click="_handleNewMember">
+      <span class="fa fa-plus m-r"></span>New member
+    </button>
+    <div class="clearfix"></div>
   </template>
 
   <script>
@@ -25,13 +125,91 @@
       xhr.send();
     };
 
+    var deleteMember = function(projectId, memberId, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', '/api/projects/' + projectId + '/members/' + memberId);
+      xhr.onload = function(e) {
+        callback(e.target.status);
+      };
+      xhr.send();
+    };
+
+    var newMember = function(projectId, emailAddress, accessLevel, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/projects/' + projectId + '/members');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function(e) {
+        callback(e.target.status);
+      };
+      xhr.send(JSON.stringify({'email_address': emailAddress, 'access_level': accessLevel}));
+    };
+
     Polymer({
       is: 'app-members-list',
       ready: function() {
 
       },
       _projectIdChanged: function(newValue, oldValue) {
-        loadMembers(newValue, function(members) {
+        this.reloadMembers();
+      },
+      _findMemberLi: function(event) {
+        var dom = Polymer.dom(event);
+        for (var i = dom.path.length - 1; i >= 0; i--) {
+          if (dom.path[i] instanceof HTMLLIElement) {
+            return dom.path[i];
+          }
+        }
+      },
+      _disableFormSubmit: function(e) {
+        e.preventDefault();
+        return false;
+      },
+      _handleDeleteMember: function(e) {
+        var li = this._findMemberLi(e);
+        this.$['delete-modal-who'].textContent = li.dataset.who;
+        this._targetMemberForDeletion = li.dataset.id;
+        $(this.$['delete-modal']).modal('show');
+      },
+      _handleActuallyDeleteMember: function(e) {
+        var id = this._targetMemberForDeletion;
+        deleteMember(this.projectId, id, function(status) {
+          if (status === 204) {
+            this.reloadMembers();
+          } else if (status === 405) {
+            this.$.errorModal.show('Owners cannot be deleted.');
+          } else {
+            this.$.errorModal.showUnknownError();
+          }
+        }.bind(this));
+
+        $(this.$['delete-modal']).modal('hide');
+      },
+      _handleNewMember: function(e) {
+        this.$['new-modal-email-address'].value = '';
+        this.$['new-modal-access-level'].value = 'viewer';
+
+        $(this.$['new-modal']).modal('show');
+      },
+      _handleActuallyNewMember: function(e) {
+        var emailAddress = this.$['new-modal-email-address'].value;
+        var accessLevel = this.$['new-modal-access-level'].value;
+
+        newMember(this.projectId, emailAddress, accessLevel, function(status) {
+          if (status === 409) {
+            this.$.errorModal.show('Member with that email address already exists.');
+          } else if (status === 400) {
+            this.$.errorModal.show('No such member for that email address.');
+          } else if (status === 201) {
+            this.reloadMembers();
+          } else {
+            this.$.errorModal.showUnknownError();
+          }
+        }.bind(this));
+
+        $(this.$['new-modal']).modal('hide');
+      },
+      reloadMembers: function() {
+        loadMembers(this.projectId, function(members) {
           this.members = members;
         }.bind(this));
       },

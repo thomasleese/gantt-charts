@@ -2,6 +2,7 @@ import logging
 import os
 
 import flask
+import sqlalchemy
 
 from .. import database
 from ..chart import Chart
@@ -125,23 +126,10 @@ def unstar_project(project_id):
     return flask.redirect(flask.url_for('.home'))
 
 
-@app.route('/projects/<int:project_id>/members', methods=['GET', 'POST'])
+@app.route('/projects/<int:project_id>/members')
 def view_project_members(project_id):
     project = flask.g.sql_session.query(Project).get(project_id)
-    if flask.request.method == 'GET':
-        return flask.render_template('projects/members.html', project=project)
-    else:
-        form = forms.AddMember(flask.request.form)
-        if form.validate():
-            members = project.members
-            member = ProjectMember(form.email_address.record.account,
-                                   AccessLevel[form.access_level.data])
-            members.append(member)
-            flask.g.sql_session.commit()
-        else:
-            flask.flash('Member does not exist.', 'danger')
-        return flask.redirect(flask.url_for('.view_project_members',
-                                            project_id=project_id))
+    return flask.render_template('projects/members.html', project=project)
 
 
 @app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
@@ -262,6 +250,11 @@ def get_project_or_404(project_id):
         .filter(Project.id == project_id).one()
 
 
+def get_project_member_or_404(member_id):
+    return flask.g.sql_session.query(ProjectMember) \
+        .filter(ProjectMember.id == member_id).one()
+
+
 def get_project_member_or_403(project):
     member = project.get_member(flask.g.account)
     if member is None or not member.access_level.can_view:
@@ -286,10 +279,47 @@ def api_project_tasks(project_id):
     return flask.jsonify(tasks=tasks)
 
 
-@app.route('/api/projects/<int:project_id>/members')
+@app.route('/api/projects/<int:project_id>/members', methods=['GET', 'POST'])
 def api_project_members(project_id):
     project = get_project_or_404(project_id)
-    member = get_project_member_or_403(project)
+    account_member = get_project_member_or_403(project)
 
-    members = [member.as_json() for member in project.members]
-    return flask.jsonify(members=members)
+    if flask.request.method == 'GET':
+        members = [member.as_json() for member in project.members]
+        return flask.jsonify(members=members)
+    elif flask.request.method == 'POST':
+        if not account_member.access_level.can_administrate:
+            return flask.abort(403)
+
+        form = forms.ApiAddProjectMember.from_json(flask.request.json)
+        if form.validate():
+            members = project.members
+            member = ProjectMember(form.email_address.record.account,
+                                   AccessLevel[form.access_level.data])
+            members.append(member)
+            try:
+                flask.g.sql_session.commit()
+            except sqlalchemy.orm.exc.FlushError:
+                return flask.abort(409)
+            return '', 201
+        else:
+            return flask.abort(400)
+
+
+@app.route('/api/projects/<int:project_id>/members/<int:account_id>', methods=['DELETE'])
+def api_project_member(project_id, account_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+    if not account_member.access_level.can_administrate:
+        return flask.abort(403)
+
+    target_member = project.get_member(account_id)
+    if target_member is None:
+        return flask.abort(404)
+
+    if target_member.access_level.owner:
+        return flask.abort(405)
+
+    flask.g.sql_session.delete(target_member)
+    flask.g.sql_session.commit()
+    return '', 204
