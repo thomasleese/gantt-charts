@@ -42,6 +42,9 @@
 
         $(this.$.modal).modal('show');
       },
+      showUnknownError: function() {
+        this.show('An unexpected error has occurred, please try again in a few moments.');
+      },
       properties: {
         message: {
           type: String,
