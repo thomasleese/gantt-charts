@@ -273,6 +273,8 @@ class Task(Base):
     def as_json(self):
         return {
             'id': self.id,
+            'name': self.name,
+            'description': self.description,
             'time_estimates': {
                 'optimistic': self.optimistic_time_estimate,
                 'normal': self.normal_time_estimate,

@@ -1,7 +1,16 @@
 from collections import namedtuple
 
 
-Block = namedtuple('Block', ['task', 'start', 'end'])
+_Block = namedtuple('Block', ['task', 'start', 'end'])
+
+
+class Block(_Block):
+    def as_json(self):
+        return {
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+            'task': self.task.as_json(),
+        }
 
 
 class Chart:
@@ -51,6 +60,14 @@ class Chart:
             raise RuntimeError("A cyclic dependency occurred")
 
         return graph_sorted
+
+    def as_json(self):
+        return {
+            'blocks': [b.as_json() for b in self.blocks],
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+            'range': (self.end - self.start).total_seconds(),
+        }
 
 """    def
 

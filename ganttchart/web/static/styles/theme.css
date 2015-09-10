@@ -17,23 +17,6 @@ body {
     box-shadow: 0 0 1rem rgb(200, 200, 200);
 }
 
-.gantt-chart td {
-    width: 2rem;
-    max-width: 2rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.gantt-chart th a {
-    color: black;
-    padding-right: 1rem;
-}
-
-.gantt-chart td a {
-    color: white;
-}
-
 .star {
     color: rgb(255, 204, 0);
 }

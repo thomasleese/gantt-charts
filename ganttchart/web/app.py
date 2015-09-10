@@ -279,6 +279,19 @@ def api_project_tasks(project_id):
     return flask.jsonify(tasks=tasks)
 
 
+@app.route('/api/projects/<int:project_id>/gantt-chart')
+def api_project_gantt_chart(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    try:
+        chart = Chart(project)
+    except RuntimeError:
+        return flask.abort(404)
+
+    return flask.jsonify(gantt_chart=chart.as_json())
+
+
 @app.route('/api/projects/<int:project_id>/members', methods=['GET', 'POST'])
 def api_project_members(project_id):
     project = get_project_or_404(project_id)

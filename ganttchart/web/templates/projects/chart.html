@@ -6,46 +6,12 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
+{% block imports %}
+  <link rel="import" href="{{ url_for('static', filename='components/app-project-gantt-chart/index.html') }}" />
+{% endblock %}
+
 {% block page %}
   {{ project_lead(project, 'gantt-chart') }}
 
-  {% if chart %}
-    <div style="overflow-y: scroll;">
-      <table class="table table-sm gantt-chart">
-        <tr>
-          <th></th>
-          {% for i in range((chart.end - chart.start).days) %}
-            <td>{{ i }}</td>
-          {% endfor %}
-        </tr>
-
-        {% for block in chart.blocks %}
-          <tr>
-            <th><a href="{{ url_for('.view_task', task_id=block.task.id) }}">{{ block.task.name }}</a></th>
-            {% for i in range((block.start - chart.start).days) %}
-              <td></td>
-            {% endfor %}
-
-            <td class="bg-inverse" title="{{ block.task.name }}" style="background: hsl({{ ((loop.index - 1) / chart.blocks | length) * 360 }}, 50%, 50%)" colspan="{{ (block.end - block.start).days }}">
-              <a href="{{ url_for('.view_task', task_id=block.task.id) }}">{{ block.task.name }}</a
-            </td>
-
-            {% for i in range((chart.end - block.end).days) %}
-              <td></td>
-            {% endfor %}
-          </tr>
-        {% endfor %}
-
-        <tr>
-          <th colspan="{{ (chart.end - chart.start).days + 1 }}"><a href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
-        </tr>
-      </table>
-    </div>
-  {% else %}
-    <p class="lead text-center">This project hasn't got any tasks.</p>
-    <p class="text-center">Click the button below to create one.</p>
-    <p class="text-center">
-      <a class="btn btn-success" href="{{ url_for('.new_task', project_id=project.id) }}" role="button"><span class="fa fa-plus m-r"></span>New task</a>
-    </p>
-  {% endif %}
+  <app-project-gantt-chart project-id="{{ project.id }}"></app-project-gantt-chart>
 {% endblock %}

@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<dom-module id="app-project-gantt-chart">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link type="css" rel="import" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .gantt-chart td {
+        width: 2rem;
+        max-width: 2rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .gantt-chart th a {
+        color: black;
+        padding-right: 1rem;
+      }
+
+      .gantt-chart td a {
+        color: white;
+      }
+    </style>
+
+    <template is="dom-if" if="{{hasGanttChart}}">
+      <div style="overflow-y: scroll;">
+        <table class="table table-sm gantt-chart">
+          <tr>
+            <th></th>
+            <template is="dom-repeat" items="{{ _tableHeadings }}">
+              <td>{{item}}</td>
+            </template>
+          </tr>
+
+          <template is="dom-repeat" items="{{ _blocks }}" as="block">
+            <tr>
+              <th><a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a></th>
+
+              <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
+                <td></td>
+              </template>
+
+              <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index) }}">
+                <a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a>
+              </td>
+
+              <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
+                <td></td>
+              </template>
+            </tr>
+          </template>
+
+          <tr>
+            <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+          </tr>
+        </table>
+      </div>
+    </template>
+
+    <template is="dom-if" if="{{!hasGanttChart}}">
+      <p class="lead text-center">This project hasn't got any tasks.</p>
+      <p class="text-center">Click the button below to create one.</p>
+      <p class="text-center">
+        <a class="btn btn-success" href="/tasks/new" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+      </p>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-gantt-chart',
+      properties: {
+        projectId: {
+          type: Number,
+          observer: '_projectIdChanged'
+        }
+      },
+      _projectIdChanged: function(newValue, oldValue) {
+        this.reload();
+      },
+      reload: function() {
+        requests.get('/api/projects/' + this.projectId + '/gantt-chart')
+          .go(function(statusCode, response) {
+            this.ganttChart = response.gantt_chart;
+
+            if (this.ganttChart) {
+              var tableHeadings = [];
+              for (var i = 0; i < this.ganttChart.range / (60 * 60 * 24); i++) {
+                tableHeadings.push(i);
+              }
+              this._tableHeadings = tableHeadings;
+
+              this._blocks = this.ganttChart.blocks;
+            }
+
+            this.hasGanttChart = !!this.ganttChart;
+          }.bind(this));
+      },
+      _asDays: function(seconds) {
+        return seconds / (60 * 60 * 24);
+      },
+      _tableLeftPadding: function(block) {
+        var l = parseInt(this._asDays((new Date(block.start) - new Date(this.ganttChart.start)) / 1000));
+        return new Array(l);
+      },
+      _tableBlockColspan: function(block) {
+        return this._asDays((new Date(block.end) - new Date(block.start)) / 1000);
+      },
+      _tableBlockStyle: function(index) {
+        var hue = ((index - 1) / this.ganttChart.blocks.length) * 360;
+        return 'background: hsl(' + hue + ', 50%, 50%)';
+      },
+      _tableRightPadding: function(block) {
+        var l = parseInt(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
+        return new Array(l);
+      },
+      _tableFullColspan: function(chart) {
+        return this._asDays(chart.range);
+      },
+      _blockUrl: function(block) {
+        return '/tasks/' + block.task.id;
+      }
+    });
+  </script>
+
+</dom-module>

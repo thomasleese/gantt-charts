@@ -36,6 +36,8 @@ def upgrade():
                   primary_key=True, nullable=False),
     )
 
+    # add a constraint that these task_id and dependency_id can't be the same
+
 
 def downgrade():
     op.drop_table('task_dependency')
