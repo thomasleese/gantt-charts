@@ -8,7 +8,7 @@
 
 {% block imports %}
   <link rel="import" href="{{ url_for('static', filename='components/app-project-gantt-chart/index.html') }}" />
-  <link rel="import" href="{{ url_for('static', filename='components/app-members-list/index.html') }}" />
+  <link rel="import" href="{{ url_for('static', filename='components/app-project-members/index.html') }}" />
 {% endblock %}
 
 {% block page %}
@@ -30,7 +30,7 @@
   <div class="clearfix m-b"></div>
 
   <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
-  <app-members-list id="members-list" project-id="{{ project.id }}" hidden></app-members-list>
+  <app-project-members id="members" project-id="{{ project.id }}" hidden></app-project-members>
 {% endblock %}
 
 {% block scripts %}
@@ -40,7 +40,7 @@
       $('#go-to-members').removeClass('active');
 
       $('#gantt-chart').attr('hidden', false);
-      $('#members-list').attr('hidden', true);
+      $('#members').attr('hidden', true);
 
       e.preventDefault();
       return false;
@@ -51,7 +51,7 @@
       $('#go-to-gantt-chart').removeClass('active');
 
       $('#gantt-chart').attr('hidden', true);
-      $('#members-list').attr('hidden', false);
+      $('#members').attr('hidden', false);
 
       e.preventDefault();
       return false;
