@@ -97,13 +97,13 @@ def new_project():
 
 @app.route('/projects/<int:project_id>')
 def view_project(project_id):
-    project = flask.g.sql_session.query(Project).get(project_id)
-    try:
-        chart = Chart(project)
-    except RuntimeError:
-        chart = None
-    return flask.render_template('projects/chart.html', project=project,
-                                 chart=chart)
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_view:
+        raise errors.MissingPermission('can_view')
+
+    return flask.render_template('projects/view.html', project=project)
 
 
 @app.route('/projects/<int:project_id>/star')
@@ -124,12 +124,6 @@ def unstar_project(project_id):
     flask.g.sql_session.delete(star)
     flask.g.sql_session.commit()
     return flask.redirect(flask.url_for('.home'))
-
-
-@app.route('/projects/<int:project_id>/members')
-def view_project_members(project_id):
-    project = flask.g.sql_session.query(Project).get(project_id)
-    return flask.render_template('projects/members.html', project=project)
 
 
 @app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])

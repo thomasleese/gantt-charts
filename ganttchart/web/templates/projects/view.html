@@ -1,0 +1,60 @@
+{% extends "_includes/page.html" %}
+
+{% from '_includes/macros.html' import project_lead %}
+
+{% set current_project = project.id %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block imports %}
+  <link rel="import" href="{{ url_for('static', filename='components/app-project-gantt-chart/index.html') }}" />
+  <link rel="import" href="{{ url_for('static', filename='components/app-members-list/index.html') }}" />
+{% endblock %}
+
+{% block page %}
+  <ul class="nav nav-pills pull-right">
+    <li class="nav-item">
+      <a id="go-to-gantt-chart" href="#" class="nav-link active">Gantt Chart</a>
+    </li>
+    <li class="nav-item">
+      <a id="go-to-members" href="#" class="nav-link">Members</a>
+    </li>
+  </ul>
+
+  <h1>{{ project.name }}</h1>
+
+  {% if project.description %}
+    <p class="lead">{{ project.description }}</p>
+  {% endif %}
+
+  <div class="clearfix m-b"></div>
+
+  <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
+  <app-members-list id="members-list" project-id="{{ project.id }}" hidden></app-members-list>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $('#go-to-gantt-chart').click(function(e) {
+      $('#go-to-gantt-chart').addClass('active');
+      $('#go-to-members').removeClass('active');
+
+      $('#gantt-chart').attr('hidden', false);
+      $('#members-list').attr('hidden', true);
+
+      e.preventDefault();
+      return false;
+    });
+
+    $('#go-to-members').click(function(e) {
+      $('#go-to-members').addClass('active');
+      $('#go-to-gantt-chart').removeClass('active');
+
+      $('#gantt-chart').attr('hidden', true);
+      $('#members-list').attr('hidden', false);
+
+      e.preventDefault();
+      return false;
+    });
+  </script>
+{% endblock %}
