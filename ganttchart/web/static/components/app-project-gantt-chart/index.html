@@ -3,7 +3,7 @@
 <dom-module id="app-project-gantt-chart">
 
   <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
-  <link type="css" rel="import" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+  <link type="css" rel="import" href="../../bower_components/Ionicons/css/ionicons.css" />
 
   <template>
     <style>
@@ -58,7 +58,7 @@
           </template>
 
           <tr>
-            <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+            <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
           </tr>
         </table>
       </div>
@@ -68,7 +68,7 @@
       <p class="lead text-center">This project hasn't got any tasks.</p>
       <p class="text-center">Click the button below to create one.</p>
       <p class="text-center">
-        <a class="btn btn-success" href="/tasks/new" role="button"><span class="fa fa-plus m-r"></span>New task</a>
+        <a class="btn btn-success" href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
       </p>
     </template>
   </template>

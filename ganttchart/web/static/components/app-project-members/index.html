@@ -5,7 +5,7 @@
 <dom-module id="app-project-members">
 
   <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
-  <link type="css" rel="import" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+  <link type="css" rel="import" href="../../bower_components/Ionicons/css/ionicons.css" />
 
   <template>
     <style>
@@ -101,15 +101,15 @@
           <img class="img-rounded m-r" src="{{ item.account.photo_url }}" width="32" height="32" />
           <span>{{item.account.display_name}}</span>
           <span class="label label-default m-l">{{item.access_level.description}}</span>
-          <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="fa fa-trash"></span></button>
-          <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="fa fa-pencil"></span></button> -->
+          <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="ion-trash-a"></span></button>
+          <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
         </li>
       </template>
     </ul>
 
     <br />
     <button type="button" class="btn btn-success pull-right" on-click="_handleNewMember">
-      <span class="fa fa-plus m-r"></span>New member
+      <span class="ion-plus-round m-r"></span>New member
     </button>
     <div class="clearfix"></div>
   </template>
