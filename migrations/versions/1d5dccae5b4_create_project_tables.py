@@ -33,14 +33,19 @@ def upgrade():
     )
 
     op.create_table('project_member',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
         sa.Column('account_id', sa.Integer, sa.ForeignKey('account.id'),
-                  primary_key=True, nullable=False),
+                  nullable=False),
         sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
-                  primary_key=True, nullable=False),
+                  nullable=False),
         sa.Column('access_level', sa.String, nullable=False),
     )
 
+    op.create_unique_constraint('unique_project_member', 'project_member',
+                                ['account_id', 'project_id'])
+
 
 def downgrade():
+    op.drop_table('project_star')
     op.drop_table('project_member')
     op.drop_table('project')

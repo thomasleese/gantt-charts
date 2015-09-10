@@ -232,6 +232,7 @@ class ProjectMember(Base):
 
     def as_json(self):
         return {
+            'id': self.id,
             'account': self.account.as_json(),
             'access_level': self.access_level.as_json(),
         }
