@@ -25,7 +25,7 @@
         border-bottom-right-radius: 0;
         border-bottom: white;
         box-shadow: 0 0 3rem rgb(100, 100, 100);
-        width: 400px;
+        width: 500px;
       }
     </style>
 
@@ -67,18 +67,32 @@
             <label class="control-label">Time estimates (optimistic, normal, pessimistic)</label>
             <div class="row">
               <div class="col-sm-4">
-                <input type="text" id="cardFormOptimistic" class="form-control" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
+                <div class="input-group">
+                  <input type="text" id="cardFormOptimistic" class="form-control text-right" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
+                  <span class="input-group-addon">hours</span>
+                </div>
               </div>
 
               <div class="col-sm-4">
-                <input type="text" id="cardFormNormal" class="form-control" placeholder="Normal" on-change="_handleNormalChange" required />
+                <div class="input-group">
+                  <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
+                  <span class="input-group-addon">hours</span>
+                </div>
               </div>
 
               <div class="col-sm-4">
-                <input type="text" id="cardFormPessimistic" class="form-control" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
+                <div class="input-group">
+                  <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
+                  <span class="input-group-addon">hours</span>
+                </div>
               </div>
             </div>
           </div>
+
+          <hr />
+
+          <button class="btn btn-danger btn-sm pull-right"><span class="ion-trash-a m-r"></span>Delete</button>
+          <div class="clearfix"></div>
         </form>
       </div>
     </div>
