@@ -85,14 +85,14 @@
           <tbody>
             <template is="dom-repeat" items="{{ _blocks }}" as="block">
               <tr>
-                <th><a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a></th>
+                <th><a href="#" on-click="_handleEdit">{{ block.entry.name }}</a></th>
 
                 <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
                   <td></td>
                 </template>
 
-                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index, block) }}">
-                  <a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a>
+                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
+                  <a href="#" on-click="_handleEdit">{{ block.entry.name }}</a>
                 </td>
 
                 <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
@@ -205,6 +205,12 @@
         e.preventDefault();
         return false;
       },
+      _handleEdit: function(e) {
+        console.log(e.model.block);
+
+        e.preventDefault();
+        return false;
+      }
     });
   </script>
 

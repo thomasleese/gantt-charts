@@ -10,7 +10,7 @@ class Block(_Block):
         return {
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'task': self.task.as_json(),
+            'entry': self.task.as_json(),
         }
 
 
