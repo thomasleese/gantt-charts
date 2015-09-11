@@ -19,6 +19,7 @@ setup(
         'Flask >=0.10, <1',
         'passlib >=1.6, <2',
         'SQLAlchemy >=0.9, <1',
+        'pandas >=0.16, <1'
         'psycopg2 >=2.5, <3',
         'alembic >=0.7, <1',
         'WTForms >=2.0, <3',

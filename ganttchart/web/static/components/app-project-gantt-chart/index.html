@@ -94,7 +94,8 @@
 
             if (this.ganttChart) {
               var tableHeadings = [];
-              for (var i = 0; i < this.ganttChart.range / (60 * 60 * 24); i++) {
+              var days = parseInt(this.ganttChart.range / (60 * 60 * 24));
+              for (var i = 0; i < days; i++) {
                 tableHeadings.push(i);
               }
               this._tableHeadings = tableHeadings;
@@ -113,7 +114,7 @@
         return new Array(l);
       },
       _tableBlockColspan: function(block) {
-        return this._asDays((new Date(block.end) - new Date(block.start)) / 1000);
+        return Math.ceil(this._asDays((new Date(block.end) - new Date(block.start)) / 1000));
       },
       _tableBlockStyle: function(index) {
         var hue = ((index - 1) / this.ganttChart.blocks.length) * 360;
@@ -124,7 +125,7 @@
         return new Array(l);
       },
       _tableFullColspan: function(chart) {
-        return this._asDays(chart.range);
+        return parseInt(this._asDays(chart.range));
       },
       _blockUrl: function(block) {
         return '/tasks/' + block.task.id;

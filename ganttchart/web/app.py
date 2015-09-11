@@ -135,9 +135,9 @@ def new_task(project_id):
 
     form = forms.CreateTask(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
-        time_estimates = (form.optimistic_time_estimate.data * 60 * 60 * 24,
-                          form.normal_time_estimate.data * 60 * 60 * 24,
-                          form.pessimistic_time_estimate.data * 60 * 60 * 24)
+        time_estimates = (form.optimistic_time_estimate.data * 60 * 60,
+                          form.normal_time_estimate.data * 60 * 60,
+                          form.pessimistic_time_estimate.data * 60 * 60)
         task = ProjectEntry(form.name.data, form.description.data,
                             ProjectEntryType.task, time_estimates, project)
         flask.g.sql_session.add(task)
@@ -151,7 +151,7 @@ def view_task(task_id):
     task = flask.g.sql_session.query(ProjectEntry).get(task_id)
 
     form = forms.AddTaskDependency(flask.request.form)
-    form.dependency.choices = [(t.id, t.name) for t in task.project.tasks]
+    form.dependency.choices = [(t.id, t.name) for t in task.project.entries]
     if flask.request.method == 'POST' and form.validate():
         task.dependencies.append(ProjectEntryDependency(child_id=form.dependency.data))
         flask.g.sql_session.commit()

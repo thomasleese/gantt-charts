@@ -3,9 +3,11 @@
 import datetime
 from enum import Enum
 import hashlib
+import math
 import os
 
 import flask
+from pandas.tseries.offsets import BusinessHour, CustomBusinessDay
 import sqlalchemy
 from sqlalchemy import event, Column, DateTime, Integer, LargeBinary, \
     MetaData, String, Table, ForeignKey, UniqueConstraint
@@ -230,6 +232,27 @@ class ProjectCalendar(Base):
                          work_starts_at=datetime.time(9),
                          work_ends_at=datetime.time(17))
 
+    @property
+    def business_hour(self):
+        return BusinessHour(start=self.work_starts_at, end=self.work_ends_at)
+
+    @property
+    def business_day(self):
+        weekmask = [self.works_on_monday, self.works_on_tuesday,
+                    self.works_on_wednesday, self.works_on_thursday,
+                    self.works_on_friday, self.works_on_saturday,
+                    self.works_on_sunday]
+        holidays = []
+        for holiday in self.holidays:
+            start_date = holiday.start
+            if holiday.days == 1:
+                holidays.append(start_date)
+            else:
+                for i in range(holiday.days + 1):
+                    holidays.append(start_date + datetime.timedelta(days=i))
+
+        return CustomBusinessDay(holidays=holidays, weekmask=weekmask)
+
     def as_json(self):
         return {
             'working_week': {
@@ -256,6 +279,10 @@ class ProjectCalendarHoliday(Base):
 
     def __init__(self, name, start, end):
         super().__init__(name=name, start=start, end=end)
+
+    @property
+    def days(self):
+        return (self.end - self.start).days
 
     def as_json(self):
         return {
@@ -360,10 +387,10 @@ class ProjectEntry(Base):
 
     @property
     def expected_time(self):
-        seconds = (self.optimistic_time_estimate + \
+        hours = (self.optimistic_time_estimate + \
             4 * self.normal_time_estimate + \
             self.pessimistic_time_estimate) / 6
-        return datetime.timedelta(seconds=seconds)
+        return math.ceil(hours)
 
     def as_json(self):
         return {
@@ -376,7 +403,7 @@ class ProjectEntry(Base):
                 'normal': self.normal_time_estimate,
                 'pessimistic': self.pessimistic_time_estimate
             },
-            'expected_time': self.expected_time.total_seconds(),
+            'expected_time': self.expected_time,
             'dependencies': [{'id': d.child.id} for d in self.dependencies]
         }
 

@@ -1,4 +1,5 @@
 from collections import namedtuple
+import datetime
 
 
 _Block = namedtuple('Block', ['task', 'start', 'end'])
@@ -23,14 +24,31 @@ class Chart:
         start_times = {}
         finish_times = {}
 
+        bday = project.calendar.business_day
+        bhour = project.calendar.business_hour
+
+        today = datetime.date.today()
+        bhour_start = datetime.datetime.combine(today, bhour.start)
+        bhour_end = datetime.datetime.combine(today, bhour.end)
+        business_hours = int((bhour_end - bhour_start).total_seconds() / (60 * 60))
+
+        first_start_date = project.start_date
+        first_start_date = bday.rollforward(first_start_date)
+        first_start_date = bhour.rollforward(first_start_date)
+
         for entry in self.graph:
             task = entry[0]
             if entry[1]:
                 start_times[task] = max(finish_times[t] for t in entry[1])
             else:
-                start_times[task] = task.project.start_date
+                start_times[task] = first_start_date
 
-            finish_times[task] = start_times[task] + task.expected_time
+            expected_time = task.expected_time
+
+            days = expected_time // business_hours
+            hours = (expected_time - days * business_hours)
+
+            finish_times[task] = start_times[task] + days * bday + hours * bhour
 
         self.start = min(start_times.values())
         self.end = max(finish_times.values())
