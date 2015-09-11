@@ -1,0 +1,161 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<link rel="import" href="../app-error-modal/index.html" />
+
+<dom-module id="app-project-entry-editor">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link type="css" rel="import" href="../../bower_components/Ionicons/css/ionicons.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #card {
+        position: fixed;
+        bottom: 0;
+        right: 2rem;
+        z-index: 1000;
+
+        background: white;
+        margin-bottom: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: white;
+        box-shadow: 0 0 3rem rgb(100, 100, 100);
+        width: 400px;
+      }
+    </style>
+
+    <app-error-modal id="errorModal"></app-error-modal>
+
+    <div id="card" class="card">
+      <div class="card-header">
+        <strong id="cardTitle"></strong>
+        <button type="button" class="close" on-click="hide" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+      </div>
+      <div class="card-block">
+        <form on-submit="_disableFormSubmit">
+          <div class="form-group">
+            <label class="c-input c-radio">
+              <input name="type" id="cardFormTypeTask" type="radio" value="task" on-change="_handleTypeTaskChange" />
+              <span class="c-indicator"></span>
+              Task
+            </label>
+            <label class="c-input c-radio">
+              <input name="type" id="cardFormTypeMilestone" type="radio" value="milestone" on-change="_handleTypeMilestoneChange" />
+              <span class="c-indicator"></span>
+              Milestone
+            </label>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="cardFormName" class="form-control" placeholder="Name" on-change="_handleNameChange" required />
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="cardFormDescription" class="form-control" placeholder="Description" on-change="_handleDescriptionChange" required />
+            <small class="text-muted">Enter some words about this entry, or leave it out entirely.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label">Time estimates (optimistic, normal, pessimistic)</label>
+            <div class="row">
+              <div class="col-sm-4">
+                <input type="text" id="cardFormOptimistic" class="form-control" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
+              </div>
+
+              <div class="col-sm-4">
+                <input type="text" id="cardFormNormal" class="form-control" placeholder="Normal" on-change="_handleNormalChange" required />
+              </div>
+
+              <div class="col-sm-4">
+                <input type="text" id="cardFormPessimistic" class="form-control" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-entry-editor',
+      properties: {
+        projectId: Number
+      },
+      _disableFormSubmit: function(e) {
+        e.preventDefault();
+        return false;
+      },
+      _submitEntryChange: function(key, value, callback) {
+        var data = {};
+        data[key] = value;
+
+        requests.patch('/api/projects/' + this.projectId + '/entries/' + this.entryId)
+          .send(data)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              if (callback !== undefined) {
+                callback();
+              }
+              this.fire('entry-changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      _handleTypeTaskChange: function() {
+        this._submitEntryChange('type', 'task');
+      },
+      _handleTypeMilestoneChange: function() {
+        this._submitEntryChange('type', 'milestone');
+      },
+      _handleNameChange: function() {
+        this._submitEntryChange('name', this.$.cardFormName.value, function() {
+          this.$.cardTitle.textContent = this.$.cardFormName.value;
+        }.bind(this));
+      },
+      _handleDescriptionChange: function() {
+        this._submitEntryChange('description', this.$.cardFormDescription.value);
+      },
+      _handleOptimisticChange: function() {
+        this._submitEntryChange('optimistic_time_estimate', this.$.cardFormOptimistic.value);
+      },
+      _handleNormalChange: function() {
+        this._submitEntryChange('normal_time_estimate', this.$.cardFormNormal.value);
+      },
+      _handlePessimisticChange: function() {
+        this._submitEntryChange('pessimistic_time_estimate', this.$.cardFormPessimistic.value);
+      },
+      show: function(entry) {
+        this.entryId = entry.id;
+
+        this.$.cardTitle.textContent = entry.name;
+
+        if (entry.type === 'task') {
+          this.$.cardFormTypeTask.checked = true;
+        } else {
+          this.$.cardFormTypeMilestone.checked = true;
+        }
+        this.$.cardFormName.value = entry.name;
+        this.$.cardFormDescription.value = entry.description;
+        this.$.cardFormOptimistic.value = entry.time_estimates.optimistic;
+        this.$.cardFormNormal.value = entry.time_estimates.normal;
+        this.$.cardFormPessimistic.value = entry.time_estimates.pessimistic;
+
+        this.hidden = false;
+      },
+      hide: function() {
+        this.hidden = true;
+      },
+    });
+  </script>
+
+</dom-module>

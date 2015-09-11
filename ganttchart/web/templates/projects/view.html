@@ -39,11 +39,22 @@
   <app-project-calendar id="calendar" project-id="{{ project.id }}" hidden></app-project-calendar>
   <app-project-members id="members" project-id="{{ project.id }}" hidden></app-project-members>
 
-  <app-project-entry-editor id="entry-editor" project-id="{{ project.id }}"></app-project-entry-editor>
+  <app-project-entry-editor id="entry-editor" project-id="{{ project.id }}" hidden></app-project-entry-editor>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    var ganttChart = document.getElementById('gantt-chart');
+    var entryEditor = document.getElementById('entry-editor');
+
+    ganttChart.addEventListener('edit-entry', function(e) {
+      entryEditor.show(e.detail);
+    });
+
+    entryEditor.addEventListener('entry-changed', function(e) {
+      ganttChart.reload();
+    });
+
     $('#go-to-gantt-chart').click(function(e) {
       $('#go-to-gantt-chart').addClass('active');
       $('#go-to-resources').removeClass('active');

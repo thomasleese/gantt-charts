@@ -122,6 +122,15 @@ class ApiAddProjectEntry(Form):
     pessimistic_time_estimate = IntegerField('Pessimistic Time Estimate', validators=[DataRequired()])
 
 
+class ApiChangeProjectEntry(Form):
+    name = StringField()
+    description = StringField()
+    type = StringField()
+    optimistic_time_estimate = IntegerField()
+    normal_time_estimate = IntegerField()
+    pessimistic_time_estimate = IntegerField()
+
+
 class ApiAddProjectMember(Form):
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Email(),
