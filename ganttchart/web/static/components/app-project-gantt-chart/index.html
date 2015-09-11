@@ -13,12 +13,49 @@
         display: block;
       }
 
-      .gantt-chart td {
+      .gantt-chart {
+        border-collapse: collapse;
+      }
+
+      .gantt-chart th.rotate {
+        height: 75px;
+        white-space: nowrap;
+      }
+
+      .gantt-chart th.rotate > div {
+        transform: translate(3px, 36px) rotate(315deg);
+        width: 30px;
+      }
+
+      .gantt-chart th.rotate > div > span {
+        border-bottom: 1px solid rgb(200, 200, 200);
+        padding: 2px 10px 2px 1.8rem;
+      }
+
+      .gantt-chart tbody th {
+        white-space: nowrap;
+        text-align: right;
+        padding: 4px 10px;
+        border-bottom: 1px solid rgb(200, 200, 200);
+        padding-right: 0.2rem;
+      }
+
+      .gantt-chart tbody td {
+        border: 1px solid rgb(200, 200, 200);
+        padding: 4px 10px;
+        position: relative;
+        z-index: 100;
+        background: white;
+
         width: 2rem;
         max-width: 2rem;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+      }
+
+      .gantt-chart tfoot th {
+        padding: 4px 10px;
       }
 
       .gantt-chart th a {
@@ -33,35 +70,41 @@
 
     <template is="dom-if" if="{{hasGanttChart}}">
       <div style="overflow-y: scroll;">
-        <table class="table table-sm gantt-chart">
-          <tr>
-            <th></th>
-            <template is="dom-repeat" items="{{ _tableHeadings }}">
-              <td>{{item}}</td>
-            </template>
-          </tr>
-
-          <template is="dom-repeat" items="{{ _blocks }}" as="block">
+        <table class="gantt-chart">
+          <thead>
             <tr>
-              <th><a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a></th>
-
-              <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
-                <td></td>
-              </template>
-
-              <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index) }}">
-                <a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a>
-              </td>
-
-              <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
-                <td></td>
+              <th></th>
+              <template is="dom-repeat" items="{{ _tableHeadings }}">
+                <th class="rotate"><div><span>{{ item }}</span></div></th>
               </template>
             </tr>
-          </template>
+          </thead>
 
-          <tr>
-            <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
-          </tr>
+          <tbody>
+            <template is="dom-repeat" items="{{ _blocks }}" as="block">
+              <tr>
+                <th><a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a></th>
+
+                <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
+                  <td></td>
+                </template>
+
+                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index) }}">
+                  <a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a>
+                </td>
+
+                <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
+                  <td></td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </template>
@@ -94,9 +137,12 @@
 
             if (this.ganttChart) {
               var tableHeadings = [];
-              var days = parseInt(this.ganttChart.range / (60 * 60 * 24));
+              var start = new Date(this.ganttChart.start);
+              var days = Math.ceil(this.ganttChart.range / (60 * 60 * 24));
               for (var i = 0; i < days; i++) {
-                tableHeadings.push(i);
+                var d = new Date(start);
+                d.setDate(start.getDate() + i);
+                tableHeadings.push(d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate());
               }
               this._tableHeadings = tableHeadings;
 
@@ -117,15 +163,15 @@
         return Math.ceil(this._asDays((new Date(block.end) - new Date(block.start)) / 1000));
       },
       _tableBlockStyle: function(index) {
-        var hue = ((index - 1) / this.ganttChart.blocks.length) * 360;
+        var hue = (index / this.ganttChart.blocks.length) * 360;
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
       _tableRightPadding: function(block) {
-        var l = parseInt(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
+        var l = Math.ceil(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
         return new Array(l);
       },
       _tableFullColspan: function(chart) {
-        return parseInt(this._asDays(chart.range));
+        return Math.ceil(this._asDays(chart.range));
       },
       _blockUrl: function(block) {
         return '/tasks/' + block.task.id;

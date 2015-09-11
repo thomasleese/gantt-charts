@@ -33,8 +33,6 @@
     <p class="lead">{{ project.description }}</p>
   {% endif %}
 
-  <div class="clearfix m-b"></div>
-
   <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
   <app-project-resources id="resources" project-id="{{ project.id }}" hidden></app-project-resources>
   <app-project-calendar id="calendar" project-id="{{ project.id }}" hidden></app-project-calendar>

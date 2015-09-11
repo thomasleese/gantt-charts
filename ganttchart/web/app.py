@@ -135,9 +135,9 @@ def new_task(project_id):
 
     form = forms.CreateTask(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
-        time_estimates = (form.optimistic_time_estimate.data * 60 * 60,
-                          form.normal_time_estimate.data * 60 * 60,
-                          form.pessimistic_time_estimate.data * 60 * 60)
+        time_estimates = (form.optimistic_time_estimate.data,
+                          form.normal_time_estimate.data,
+                          form.pessimistic_time_estimate.data)
         task = ProjectEntry(form.name.data, form.description.data,
                             ProjectEntryType.task, time_estimates, project)
         flask.g.sql_session.add(task)
