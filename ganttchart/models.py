@@ -254,6 +254,17 @@ class ProjectCalendarHoliday(Base):
 
     calendar = relationship('ProjectCalendar', backref='holidays')
 
+    def __init__(self, name, start, end):
+        super().__init__(name=name, start=start, end=end)
+
+    def as_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+        }
+
 
 class ProjectMember(Base):
     __tablename__ = 'project_member'

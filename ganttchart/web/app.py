@@ -8,8 +8,9 @@ import sqlalchemy
 from .. import database
 from ..chart import Chart
 from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
-    ProjectEntry, ProjectEntryDependency, ProjectEntryType, ProjectMember, \
-    ProjectResource, ProjectStar, Session as SqlSession
+    ProjectCalendarHoliday, ProjectEntry, ProjectEntryDependency, \
+    ProjectEntryType, ProjectMember, ProjectResource, ProjectStar, \
+    Session as SqlSession
 from . import errors, forms
 
 
@@ -308,6 +309,43 @@ def api_project_calendar(project_id):
             return '', 204
         else:
             raise errors.InvalidFormData(form)
+
+
+@app.route('/api/projects/<int:project_id>/calendar/holidays', methods=['POST'])
+def api_project_calendar_holidays(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_administrate:
+        raise errors.MissingPermission('can_administrate')
+
+    form = forms.ApiAddCalendarHoliday.from_json(flask.request.json)
+    if form.validate():
+        holidays = project.calendar.holidays
+        holiday = ProjectCalendarHoliday(form.name.data, form.start.data,
+                                         form.end.data)
+        holidays.append(holiday)
+
+        flask.g.sql_session.commit()
+
+        return '', 201
+    else:
+        raise errors.InvalidFormData(form)
+
+
+@app.route('/api/projects/<int:project_id>/calendar/holidays/<int:holiday_id>', methods=['DELETE'])
+def api_project_calendar_holiday(project_id, holiday_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+    if not account_member.access_level.can_administrate:
+        raise errors.MissingPermission('can_administrate')
+
+    target_holiday = flask.g.sql_session.query(ProjectCalendarHoliday) \
+        .filter(ProjectCalendarHoliday.id == holiday_id).one()
+
+    flask.g.sql_session.delete(target_holiday)
+    flask.g.sql_session.commit()
+    return '', 204
 
 
 @app.route('/api/projects/<int:project_id>/entries')

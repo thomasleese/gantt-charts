@@ -1,6 +1,6 @@
 import flask
 from wtforms import Form
-from wtforms.fields import BooleanField, IntegerField, FormField, \
+from wtforms.fields import BooleanField, DateField, IntegerField, FormField, \
     PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
@@ -159,6 +159,12 @@ class WorkingDay(Form):
 class ApiChangeProjectCalendar(Form):
     working_week = FormField(WorkingWeek)
     working_day = FormField(WorkingDay)
+
+
+class ApiAddCalendarHoliday(Form):
+    name = StringField('Name', validators=[DataRequired()])
+    start = DateField('Start', validators=[DataRequired()])
+    end = DateField('End', validators=[DataRequired()])
 
 
 class EmailAddress(Form):
