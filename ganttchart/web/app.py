@@ -273,16 +273,27 @@ def api_project(project_id):
     return flask.jsonify(project=project.as_json())
 
 
-@app.route('/api/projects/<int:project_id>/tasks')
-def api_project_tasks(project_id):
+@app.route('/api/projects/<int:project_id>/calendar')
+def api_project_calendar(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
 
     if not account_member.access_level.can_view:
         raise errors.MissingPermission('can_view')
 
-    tasks = [task.as_json() for task in project.tasks]
-    return flask.jsonify(tasks=tasks)
+    return flask.jsonify(calendar=project.calendar.as_json())
+
+
+@app.route('/api/projects/<int:project_id>/entries')
+def api_project_entries(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_view:
+        raise errors.MissingPermission('can_view')
+
+    entries = [entry.as_json() for entry in project.entries]
+    return flask.jsonify(entries=entires)
 
 
 @app.route('/api/projects/<int:project_id>/gantt-chart')

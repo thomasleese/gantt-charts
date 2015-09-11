@@ -186,6 +186,7 @@ class Project(Base):
         self.creation_date = creation_date
         self.start_date = creation_date.date()
         self.members.append(ProjectMember(creator, AccessLevel.owner))
+        self.calendar = ProjectCalendar()
 
     def starred_by(self, account):
         for star in self.stars:
@@ -210,6 +211,48 @@ class Project(Base):
             'name': self.name,
             'description': self.description,
         }
+
+
+class ProjectCalendar(Base):
+    __tablename__ = 'project_calendar'
+
+    project = relationship('Project',
+                           backref=backref('calendar', uselist=False))
+
+    def __init__(self):
+        super().__init__(works_on_monday=True,
+                         works_on_tuesday=True,
+                         works_on_wednesday=True,
+                         works_on_thursday=True,
+                         works_on_friday=True,
+                         works_on_saturday=False,
+                         works_on_sunday=False,
+                         work_starts_at=datetime.time(9),
+                         work_ends_at=datetime.time(17))
+
+    def as_json(self):
+        return {
+            'working_week': {
+                'monday': self.works_on_monday,
+                'tuesday': self.works_on_tuesday,
+                'wednesday': self.works_on_wednesday,
+                'thursday': self.works_on_thursday,
+                'friday': self.works_on_friday,
+                'saturday': self.works_on_saturday,
+                'sunday': self.works_on_sunday,
+            },
+            'working_day': {
+                'start': self.work_starts_at.isoformat(),
+                'end': self.work_ends_at.isoformat(),
+            },
+            'holidays': [h.as_json() for h in self.holidays]
+        }
+
+
+class ProjectCalendarHoliday(Base):
+    __tablename__ = 'project_calendar_holiday'
+
+    calendar = relationship('ProjectCalendar', backref='holidays')
 
 
 class ProjectMember(Base):
@@ -278,7 +321,7 @@ class ProjectEntryType(Enum):
 class ProjectEntry(Base):
     __tablename__ = 'project_entry'
 
-    project = relationship('Project', backref='tasks')
+    project = relationship('Project', backref='entries')
 
     def __init__(self, name, description, type, time_estimates, project):
         super().__init__(name=name, description=description)

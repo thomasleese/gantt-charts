@@ -25,6 +25,29 @@ def upgrade():
         sa.Column('start_date', sa.Date, nullable=False),
     )
 
+    op.create_table('project_calendar',
+        sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('works_on_monday', sa.Boolean, nullable=False),
+        sa.Column('works_on_tuesday', sa.Boolean, nullable=False),
+        sa.Column('works_on_wednesday', sa.Boolean, nullable=False),
+        sa.Column('works_on_thursday', sa.Boolean, nullable=False),
+        sa.Column('works_on_friday', sa.Boolean, nullable=False),
+        sa.Column('works_on_saturday', sa.Boolean, nullable=False),
+        sa.Column('works_on_sunday', sa.Boolean, nullable=False),
+        sa.Column('work_starts_at', sa.Time, nullable=False),
+        sa.Column('work_ends_at', sa.Time, nullable=False),
+    )
+
+    op.create_table('project_calendar_holiday',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
+        sa.Column('calendar_id', sa.Integer,
+                  sa.ForeignKey('project_calendar.project_id'), nullable=False),
+        sa.Column('name', sa.String, nullable=False),
+        sa.Column('start', sa.Date, nullable=False),
+        sa.Column('end', sa.Date, nullable=False),
+    )
+
     op.create_table('project_star',
         sa.Column('account_id', sa.Integer, sa.ForeignKey('account.id'),
                   primary_key=True, nullable=False),
@@ -105,5 +128,8 @@ def downgrade():
     op.drop_table('project_member')
 
     op.drop_table('project_star')
+
+    op.drop_table('project_calendar_holiday')
+    op.drop_table('project_calendar')
 
     op.drop_table('project')
