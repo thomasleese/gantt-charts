@@ -349,7 +349,7 @@ def api_project_entries(project_id):
             raise errors.InvalidFormData(form)
 
 
-@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>', methods=['PATCH'])
+@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>', methods=['PATCH', 'DELETE'])
 def api_project_entry(project_id, entry_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
@@ -360,31 +360,37 @@ def api_project_entry(project_id, entry_id):
     entry = flask.g.sql_session.query(ProjectEntry) \
         .filter(ProjectEntry.id == entry_id).one()
 
-    form = forms.ApiChangeProjectEntry.from_json(flask.request.json)
-    if form.validate():
-        if form.name.raw_data:
-            entry.name = form.name.data
+    if flask.request.method == 'PATCH':
+        form = forms.ApiChangeProjectEntry.from_json(flask.request.json)
+        if form.validate():
+            if form.name.raw_data:
+                entry.name = form.name.data
 
-        if form.description.raw_data:
-            entry.description = form.description.data
+            if form.description.raw_data:
+                entry.description = form.description.data
 
-        if form.type.raw_data:
-            entry.type = ProjectEntryType[form.type.data]
+            if form.type.raw_data:
+                entry.type = ProjectEntryType[form.type.data]
 
-        if form.optimistic_time_estimate.raw_data:
-            entry.optimistic_time_estimate = form.optimistic_time_estimate.data
+            if form.optimistic_time_estimate.raw_data:
+                entry.optimistic_time_estimate = form.optimistic_time_estimate.data
 
-        if form.normal_time_estimate.raw_data:
-            entry.normal_time_estimate = form.normal_time_estimate.data
+            if form.normal_time_estimate.raw_data:
+                entry.normal_time_estimate = form.normal_time_estimate.data
 
-        if form.pessimistic_time_estimate.raw_data:
-            entry.pessimistic_time_estimate = form.pessimistic_time_estimate.data
+            if form.pessimistic_time_estimate.raw_data:
+                entry.pessimistic_time_estimate = form.pessimistic_time_estimate.data
 
+            flask.g.sql_session.commit()
+
+            return '', 204
+        else:
+            raise errors.InvalidFormData(form)
+    elif flask.request.method == 'DELETE':
+        flask.g.sql_session.delete(entry)
         flask.g.sql_session.commit()
 
         return '', 204
-    else:
-        raise errors.InvalidFormData(form)
 
 
 @app.route('/api/projects/<int:project_id>/gantt-chart')

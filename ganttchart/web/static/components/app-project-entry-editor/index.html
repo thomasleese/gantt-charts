@@ -88,12 +88,12 @@
               </div>
             </div>
           </div>
-
-          <hr />
-
-          <button class="btn btn-danger btn-sm pull-right"><span class="ion-trash-a m-r"></span>Delete</button>
-          <div class="clearfix"></div>
         </form>
+
+        <hr />
+
+        <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
+        <div class="clearfix"></div>
       </div>
     </div>
   </template>
@@ -147,6 +147,17 @@
       },
       _handlePessimisticChange: function() {
         this._submitEntryChange('pessimistic_time_estimate', this.$.cardFormPessimistic.value);
+      },
+      _handleDelete: function() {
+        requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.fire('entry-changed');
+              this.hide();
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
       },
       show: function(entry) {
         this.entryId = entry.id;
