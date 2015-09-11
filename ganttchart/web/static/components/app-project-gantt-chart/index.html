@@ -29,7 +29,7 @@
 
       .gantt-chart th.rotate > div > span {
         border-bottom: 1px solid rgb(200, 200, 200);
-        padding: 2px 10px 2px 1.8rem;
+        padding: 2px 20px 2px 1.6rem;
       }
 
       .gantt-chart tbody th {
@@ -37,7 +37,7 @@
         text-align: right;
         padding: 4px 10px;
         border-bottom: 1px solid rgb(200, 200, 200);
-        padding-right: 0.2rem;
+        padding-right: 0.1rem;
       }
 
       .gantt-chart tbody td {
@@ -160,14 +160,19 @@
         return new Array(l);
       },
       _tableBlockColspan: function(block) {
-        return Math.ceil(this._asDays((new Date(block.end) - new Date(block.start)) / 1000));
+        var end = new Date(block.end);
+        end.setHours(23);
+        var start = new Date(block.start);
+        start.setHours(0);
+
+        return Math.ceil(this._asDays((end - start) / 1000));
       },
       _tableBlockStyle: function(index) {
         var hue = (index / this.ganttChart.blocks.length) * 360;
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
       _tableRightPadding: function(block) {
-        var l = Math.ceil(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
+        var l = parseInt(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
         return new Array(l);
       },
       _tableFullColspan: function(chart) {
