@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 import datetime
 
 
@@ -61,7 +61,7 @@ class Chart:
     def topolgical_sort(self, graph_unsorted):
         graph_sorted = []
 
-        graph_unsorted = dict(graph_unsorted)
+        graph_unsorted = OrderedDict(graph_unsorted)
 
         acyclic = False
         while graph_unsorted:
