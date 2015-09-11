@@ -33,12 +33,16 @@ def upgrade():
     )
 
     op.create_table('project_member',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
         sa.Column('account_id', sa.Integer, sa.ForeignKey('account.id'),
-                  primary_key=True, nullable=False),
+                  nullable=False),
         sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
-                  primary_key=True, nullable=False),
+                  nullable=False),
         sa.Column('access_level', sa.String, nullable=False),
     )
+
+    op.create_unique_constraint('unique_project_member', 'project_member',
+                                ['account_id', 'project_id'])
 
     op.create_table('project_resource',
         sa.Column('id', sa.Integer, primary_key=True, nullable=False),
@@ -51,9 +55,55 @@ def upgrade():
         sa.Column('reusable', sa.Boolean, nullable=False),
     )
 
+    op.create_table('project_entry',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
+        sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
+                  nullable=False),
+        sa.Column('name', sa.String, nullable=False),
+        sa.Column('description', sa.String, nullable=False),
+        sa.Column('type', sa.String, nullable=False),
+        sa.Column('creation_date', sa.DateTime, nullable=False),
+        sa.Column('optimistic_time_estimate', sa.Integer, nullable=False),
+        sa.Column('normal_time_estimate', sa.Integer, nullable=False),
+        sa.Column('pessimistic_time_estimate', sa.Integer, nullable=False),
+    )
+
+    op.create_table('project_entry_dependency',
+        sa.Column('parent_id', sa.Integer, sa.ForeignKey('project_entry.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('child_id', sa.Integer, sa.ForeignKey('project_entry.id'),
+                  primary_key=True, nullable=False),
+    )
+
+    op.create_check_constraint('no_circle', 'project_entry_dependency',
+                               sa.sql.column('parent_id') != sa.sql.column('child_id'))
+
+    op.create_table('project_entry_member',
+        sa.Column('entry_id', sa.Integer, sa.ForeignKey('project_entry.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('member_id', sa.Integer, sa.ForeignKey('project_member.id'),
+                  primary_key=True, nullable=False),
+    )
+
+    op.create_table('project_entry_resource',
+        sa.Column('entry_id', sa.Integer, sa.ForeignKey('project_entry.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('resource_id', sa.Integer, sa.ForeignKey('project_resource.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('amount', sa.Integer, nullable=False),
+    )
+
 
 def downgrade():
+    op.drop_table('project_entry_resource')
+    op.drop_table('project_entry_member')
+    op.drop_table('project_entry_dependency')
+    op.drop_table('project_entry')
+
     op.drop_table('project_resource')
-    op.drop_table('project_star')
+
     op.drop_table('project_member')
+
+    op.drop_table('project_star')
+
     op.drop_table('project')

@@ -75,11 +75,11 @@
     <app-error-modal id="errorModal"></app-error-modal>
 
     <ul class="list-group">
-      <template is="dom-repeat" items="{{members}}">
-        <li class="list-group-item" data-id$="[[ item.account.id ]]" data-who$="[[ item.account.display_name ]]">
-          <img class="img-rounded m-r" src="{{ item.account.photo_url }}" width="32" height="32" />
-          <span>{{item.account.display_name}}</span>
-          <span class="label label-default m-l">{{item.access_level.description}}</span>
+      <template is="dom-repeat" items="{{ members }}" as="member">
+        <li class="list-group-item">
+          <img class="img-rounded m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
+          <span>{{ member.account.display_name }}</span>
+          <span class="label label-default m-l">{{ member.access_level.description }}</span>
           <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="ion-trash-a"></span></button>
           <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
         </li>
@@ -133,14 +133,14 @@
         return false;
       },
       _handleDeleteMember: function(e) {
-        var li = this._findMemberLi(e);
-        this.$['delete-modal-who'].textContent = li.dataset.who;
-        this._targetMemberForDeletion = li.dataset.id;
+        var member = e.model.member;
+        this.$['delete-modal-who'].textContent = member.account.name;
+        this._targetMemberForDeletion = member;
         $(this.$['delete-modal']).modal('show');
       },
       _handleActuallyDeleteMember: function(e) {
-        var id = this._targetMemberForDeletion;
-        deleteMember(this.projectId, id, function(status) {
+        var member = this._targetMemberForDeletion;
+        deleteMember(this.projectId, member.id, function(status) {
           if (status === 204) {
             this.reloadMembers();
           } else if (status === 405) {

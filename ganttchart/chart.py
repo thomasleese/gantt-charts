@@ -15,7 +15,7 @@ class Block(_Block):
 
 class Chart:
     def __init__(self, project):
-        graph = [(task, [dep.dependency for dep in task.dependencies]) for task in project.tasks]
+        graph = [(task, [dep.child for dep in task.dependencies]) for task in project.tasks]
 
         self.graph = self.topolgical_sort(graph)
         self.blocks = []

@@ -7,8 +7,8 @@ import sqlalchemy
 from .. import database
 from ..chart import Chart
 from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
-    ProjectMember, ProjectResource, ProjectStar, Session as SqlSession, Task, \
-    TaskDependency
+    ProjectEntry, ProjectEntryDependency, ProjectEntryType, ProjectMember, \
+    ProjectResource, ProjectStar, Session as SqlSession
 from . import errors, forms
 
 
@@ -136,8 +136,8 @@ def new_task(project_id):
         time_estimates = (form.optimistic_time_estimate.data * 60 * 60 * 24,
                           form.normal_time_estimate.data * 60 * 60 * 24,
                           form.pessimistic_time_estimate.data * 60 * 60 * 24)
-        task = Task(form.name.data, form.description.data,
-                    time_estimates, project)
+        task = ProjectEntry(form.name.data, form.description.data,
+                            ProjectEntryType.task, time_estimates, project)
         flask.g.sql_session.add(task)
         flask.g.sql_session.commit()
         return flask.redirect(flask.url_for('.view_project', project_id=project.id))
@@ -146,12 +146,12 @@ def new_task(project_id):
 
 @app.route('/tasks/<int:task_id>', methods=['GET', 'POST'])
 def view_task(task_id):
-    task = flask.g.sql_session.query(Task).get(task_id)
+    task = flask.g.sql_session.query(ProjectEntry).get(task_id)
 
     form = forms.AddTaskDependency(flask.request.form)
     form.dependency.choices = [(t.id, t.name) for t in task.project.tasks]
     if flask.request.method == 'POST' and form.validate():
-        task.dependencies.append(TaskDependency(dependency_id=form.dependency.data))
+        task.dependencies.append(ProjectEntryDependency(child_id=form.dependency.data))
         flask.g.sql_session.commit()
         return flask.redirect(flask.url_for('.view_project', project_id=task.project.id))
 

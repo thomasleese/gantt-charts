@@ -237,6 +237,7 @@ class ProjectMember(Base):
 
     def as_json(self):
         return {
+            'id': self.id,
             'account': self.account.as_json(),
             'access_level': self.access_level.as_json(),
         }
@@ -269,19 +270,39 @@ class ProjectStar(Base):
     account = relationship('Account', backref='stars')
 
 
-class Task(Base):
-    __tablename__ = 'task'
+class ProjectEntryType(Enum):
+    task = 'task'
+    milestone = 'milestone'
+
+
+class ProjectEntry(Base):
+    __tablename__ = 'project_entry'
 
     project = relationship('Project', backref='tasks')
 
-    def __init__(self, name, description, time_estimates, project):
+    def __init__(self, name, description, type, time_estimates, project):
         super().__init__(name=name, description=description)
 
+        self.type = type
         self.optimistic_time_estimate = time_estimates[0]
         self.normal_time_estimate = time_estimates[1]
         self.pessimistic_time_estimate = time_estimates[2]
         self.project = project
         self.creation_date = datetime.datetime.now()
+
+    _type = Column('type', String)
+
+    @hybrid_property
+    def type(self):
+        return ProjectEntryType[self._type]
+
+    @type.setter
+    def type(self, type):
+        self._type = type.name
+
+    @type.expression
+    def type(self):
+        return self._type
 
     @property
     def expected_time(self):
@@ -295,20 +316,21 @@ class Task(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
+            'type': self._type,
             'time_estimates': {
                 'optimistic': self.optimistic_time_estimate,
                 'normal': self.normal_time_estimate,
                 'pessimistic': self.pessimistic_time_estimate
             },
             'expected_time': self.expected_time.total_seconds(),
-            'dependencies': [{'id': d.dependency.id} for d in self.dependencies]
+            'dependencies': [{'id': d.child.id} for d in self.dependencies]
         }
 
 
-class TaskDependency(Base):
-    __tablename__ = 'task_dependency'
+class ProjectEntryDependency(Base):
+    __tablename__ = 'project_entry_dependency'
 
-    task = relationship('Task', backref='dependencies',
-                        foreign_keys='TaskDependency.task_id')
-    dependency = relationship('Task',
-                              foreign_keys='TaskDependency.dependency_id')
+    parent = relationship('ProjectEntry', backref='dependencies',
+                          foreign_keys='ProjectEntryDependency.parent_id')
+    child = relationship('ProjectEntry',
+                         foreign_keys='ProjectEntryDependency.child_id')
