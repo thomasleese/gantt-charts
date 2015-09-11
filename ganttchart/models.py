@@ -242,6 +242,26 @@ class ProjectMember(Base):
         }
 
 
+class ProjectResource(Base):
+    __tablename__ = 'project_resource'
+
+    project = relationship('Project', backref='resources')
+
+    def __init__(self, name, description, icon, amount, reusable):
+        super().__init__(name=name, description=description, icon=icon,
+                         amount=amount, reusable=reusable)
+
+    def as_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'icon': self.icon,
+            'amount': self.amount,
+            'reusable': self.reusable,
+        }
+
+
 class ProjectStar(Base):
     __tablename__ = 'project_star'
 

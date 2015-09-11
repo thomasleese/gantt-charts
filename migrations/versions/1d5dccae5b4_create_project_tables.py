@@ -40,8 +40,20 @@ def upgrade():
         sa.Column('access_level', sa.String, nullable=False),
     )
 
+    op.create_table('project_resource',
+        sa.Column('id', sa.Integer, primary_key=True, nullable=False),
+        sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
+                  nullable=False),
+        sa.Column('name', sa.String, nullable=False),
+        sa.Column('description', sa.String, nullable=False),
+        sa.Column('icon', sa.String, nullable=False),
+        sa.Column('amount', sa.String, nullable=False),
+        sa.Column('reusable', sa.Boolean, nullable=False),
+    )
+
 
 def downgrade():
+    op.drop_table('project_resource')
     op.drop_table('project_star')
     op.drop_table('project_member')
     op.drop_table('project')

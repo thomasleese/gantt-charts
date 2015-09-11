@@ -1,7 +1,7 @@
 import flask
 from wtforms import Form
-from wtforms.fields import IntegerField, PasswordField, SelectField, \
-    StringField
+from wtforms.fields import BooleanField, IntegerField, PasswordField, \
+    SelectField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
 import wtforms_json
@@ -131,6 +131,14 @@ class ApiAddProjectMember(Form):
                                             Exists(AccountEmailAddress,
                                                    'email_address')])
     access_level = StringField('Access Level', validators=[DataRequired()])
+
+
+class ApiAddProjectResource(Form):
+    name = StringField('Name', validators=[DataRequired()])
+    description = StringField('Description', validators=[Optional()])
+    icon = StringField('Icon', validators=[DataRequired()])
+    amount = IntegerField('Amount', validators=[DataRequired()])
+    reusable = BooleanField('Reusable')
 
 
 class EmailAddress(Form):

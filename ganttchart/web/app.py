@@ -7,7 +7,8 @@ import sqlalchemy
 from .. import database
 from ..chart import Chart
 from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
-    ProjectMember, ProjectStar, Session as SqlSession, Task, TaskDependency
+    ProjectMember, ProjectResource, ProjectStar, Session as SqlSession, Task, \
+    TaskDependency
 from . import errors, forms
 
 
@@ -249,6 +250,11 @@ def get_project_member_or_404(member_id):
         .filter(ProjectMember.id == member_id).one()
 
 
+def get_project_resource_or_404(resource_id):
+    return flask.g.sql_session.query(ProjectResource) \
+        .filter(ProjectResource.id == resource_id).one()
+
+
 def get_project_member_or_403(project):
     member = project.get_member(flask.g.account)
     if member is None:
@@ -334,6 +340,47 @@ def api_project_member(project_id, account_id):
         raise errors.MethodNotAllowed()
 
     flask.g.sql_session.delete(target_member)
+    flask.g.sql_session.commit()
+    return '', 204
+
+
+@app.route('/api/projects/<int:project_id>/resources', methods=['GET', 'POST'])
+def api_project_resources(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if flask.request.method == 'GET':
+        resources = [res.as_json() for res in project.resources]
+        return flask.jsonify(resources=resources)
+    elif flask.request.method == 'POST':
+        if not account_member.access_level.can_administrate:
+            raise errors.MissingPermission('can_administrate')
+
+        form = forms.ApiAddProjectResource.from_json(flask.request.json)
+        if form.validate():
+            resources = project.resources
+            resource = ProjectResource(form.name.data, form.description.data,
+                                       form.icon.data, form.amount.data,
+                                       form.reusable.data)
+            resources.append(resource)
+            try:
+                flask.g.sql_session.commit()
+            except sqlalchemy.orm.exc.FlushError:
+                raise errors.AlreadyExists()
+            return '', 201
+        else:
+            raise errors.InvalidFormData(form)
+
+
+@app.route('/api/projects/<int:project_id>/resources/<int:resource_id>', methods=['DELETE'])
+def api_project_resource(project_id, resource_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+    if not account_member.access_level.can_administrate:
+        raise errors.MissingPermission('can_administrate')
+
+    target_resource = get_project_resource_or_404(resource_id)
+    flask.g.sql_session.delete(target_resource)
     flask.g.sql_session.commit()
     return '', 204
 

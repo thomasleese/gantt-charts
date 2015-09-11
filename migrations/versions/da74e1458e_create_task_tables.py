@@ -36,9 +36,18 @@ def upgrade():
                   primary_key=True, nullable=False),
     )
 
+    op.create_table('task_resource',
+        sa.Column('task_id', sa.Integer, sa.ForeignKey('task.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('resource_id', sa.Integer, sa.ForeignKey('project_resource.id'),
+                  primary_key=True, nullable=False),
+        sa.Column('amount', sa.Integer, nullable=False),
+    )
+
     # add a constraint that these task_id and dependency_id can't be the same
 
 
 def downgrade():
+    op.drop_table('task_resource')
     op.drop_table('task_dependency')
     op.drop_table('task')

@@ -6,6 +6,7 @@
 
 {% block imports %}
   <link rel="import" href="{{ url_for('static', filename='components/app-project-gantt-chart/index.html') }}" />
+  <link rel="import" href="{{ url_for('static', filename='components/app-project-resources/index.html') }}" />
   <link rel="import" href="{{ url_for('static', filename='components/app-project-members/index.html') }}" />
 {% endblock %}
 
@@ -13,6 +14,9 @@
   <ul class="nav nav-pills pull-right">
     <li class="nav-item">
       <a id="go-to-gantt-chart" href="#" class="nav-link active">Gantt Chart</a>
+    </li>
+    <li class="nav-item">
+      <a id="go-to-resources" href="#" class="nav-link">Resources</a>
     </li>
     <li class="nav-item">
       <a id="go-to-members" href="#" class="nav-link">Members</a>
@@ -28,6 +32,7 @@
   <div class="clearfix m-b"></div>
 
   <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
+  <app-project-resources id="resources" project-id="{{ project.id }}" hidden></app-project-resources>
   <app-project-members id="members" project-id="{{ project.id }}" hidden></app-project-members>
 {% endblock %}
 
@@ -35,9 +40,11 @@
   <script>
     $('#go-to-gantt-chart').click(function(e) {
       $('#go-to-gantt-chart').addClass('active');
+      $('#go-to-resources').removeClass('active');
       $('#go-to-members').removeClass('active');
 
       $('#gantt-chart').attr('hidden', false);
+      $('#resources').attr('hidden', true);
       $('#members').attr('hidden', true);
 
       e.preventDefault();
@@ -45,11 +52,26 @@
     });
 
     $('#go-to-members').click(function(e) {
-      $('#go-to-members').addClass('active');
       $('#go-to-gantt-chart').removeClass('active');
+      $('#go-to-resources').removeClass('active');
+      $('#go-to-members').addClass('active');
 
       $('#gantt-chart').attr('hidden', true);
+      $('#resources').attr('hidden', true);
       $('#members').attr('hidden', false);
+
+      e.preventDefault();
+      return false;
+    });
+
+    $('#go-to-resources').click(function(e) {
+      $('#go-to-gantt-chart').removeClass('active');
+      $('#go-to-resources').addClass('active');
+      $('#go-to-members').removeClass('active');
+
+      $('#gantt-chart').attr('hidden', true);
+      $('#resources').attr('hidden', false);
+      $('#members').attr('hidden', true);
 
       e.preventDefault();
       return false;
