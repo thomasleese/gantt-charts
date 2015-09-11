@@ -129,37 +129,6 @@ def unstar_project(project_id):
     return flask.redirect(flask.url_for('.home'))
 
 
-@app.route('/tasks/new/<int:project_id>', methods=['GET', 'POST'])
-def new_task(project_id):
-    project = flask.g.sql_session.query(Project).get(project_id)
-
-    form = forms.CreateTask(flask.request.form)
-    if flask.request.method == 'POST' and form.validate():
-        time_estimates = (form.optimistic_time_estimate.data,
-                          form.normal_time_estimate.data,
-                          form.pessimistic_time_estimate.data)
-        task = ProjectEntry(form.name.data, form.description.data,
-                            ProjectEntryType.task, time_estimates, project)
-        flask.g.sql_session.add(task)
-        flask.g.sql_session.commit()
-        return flask.redirect(flask.url_for('.view_project', project_id=project.id))
-    return flask.render_template('tasks/create.html', form=form)
-
-
-@app.route('/tasks/<int:task_id>', methods=['GET', 'POST'])
-def view_task(task_id):
-    task = flask.g.sql_session.query(ProjectEntry).get(task_id)
-
-    form = forms.AddTaskDependency(flask.request.form)
-    form.dependency.choices = [(t.id, t.name) for t in task.project.entries]
-    if flask.request.method == 'POST' and form.validate():
-        task.dependencies.append(ProjectEntryDependency(child_id=form.dependency.data))
-        flask.g.sql_session.commit()
-        return flask.redirect(flask.url_for('.view_project', project_id=task.project.id))
-
-    return flask.render_template('tasks/view.html', task=task, form=form)
-
-
 @app.route('/account')
 def account():
     return flask.render_template('account/index.html')
@@ -348,16 +317,36 @@ def api_project_calendar_holiday(project_id, holiday_id):
     return '', 204
 
 
-@app.route('/api/projects/<int:project_id>/entries')
+@app.route('/api/projects/<int:project_id>/entries', methods=['GET', 'POST'])
 def api_project_entries(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
 
-    if not account_member.access_level.can_view:
-        raise errors.MissingPermission('can_view')
+    if flask.request.method == 'GET':
+        if not account_member.access_level.can_view:
+            raise errors.MissingPermission('can_view')
 
-    entries = [entry.as_json() for entry in project.entries]
-    return flask.jsonify(entries=entires)
+        entries = [entry.as_json() for entry in project.entries]
+        return flask.jsonify(entries=entires)
+    elif flask.request.method == 'POST':
+        if not account_member.access_level.can_edit:
+            raise errors.MissingPermission('can_edit')
+
+        form = forms.ApiAddProjectEntry.from_json(flask.request.json)
+        if form.validate():
+            time_estimates = (form.optimistic_time_estimate.data,
+                              form.normal_time_estimate.data,
+                              form.pessimistic_time_estimate.data)
+            entry = ProjectEntry(form.name.data, form.description.data,
+                                 ProjectEntryType[form.type.data],
+                                 time_estimates, project)
+
+            flask.g.sql_session.add(entry)
+            flask.g.sql_session.commit()
+
+            return '', 201
+        else:
+            raise errors.InvalidFormData(form)
 
 
 @app.route('/api/projects/<int:project_id>/gantt-chart')

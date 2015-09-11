@@ -68,6 +68,8 @@
       }
     </style>
 
+    <app-error-modal id="errorModal"></app-error-modal>
+
     <template is="dom-if" if="{{hasGanttChart}}">
       <div style="overflow-y: scroll;">
         <table class="gantt-chart">
@@ -89,7 +91,7 @@
                   <td></td>
                 </template>
 
-                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index) }}">
+                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.task.description }}" style$="{{ _tableBlockStyle(index, block) }}">
                   <a href="{{ _blockUrl(block) }}">{{ block.task.name }}</a>
                 </td>
 
@@ -102,7 +104,7 @@
 
           <tfoot>
             <tr>
-              <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
+              <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="#" on-click="_handleNew"><span class="ion-plus-round m-r"></span>New entry</a></th>
             </tr>
           </tfoot>
         </table>
@@ -113,7 +115,7 @@
       <p class="lead text-center">This project hasn't got any tasks.</p>
       <p class="text-center">Click the button below to create one.</p>
       <p class="text-center">
-        <a class="btn btn-success" href="/tasks/new" role="button"><span class="ion-plus-round m-r"></span>New task</a>
+        <button class="btn btn-success" on-click="_handleNew"><span class="ion-plus-round m-r"></span>New entry</button>
       </p>
     </template>
   </template>
@@ -167,7 +169,7 @@
 
         return Math.ceil(this._asDays((end - start) / 1000));
       },
-      _tableBlockStyle: function(index) {
+      _tableBlockStyle: function(index, block) {
         var hue = (index / this.ganttChart.blocks.length) * 360;
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
@@ -180,7 +182,29 @@
       },
       _blockUrl: function(block) {
         return '/tasks/' + block.task.id;
-      }
+      },
+      _handleNew: function(e) {
+        var entry = {
+          name: 'Unnamed task',
+          type: 'task',
+          optimistic_time_estimate: 1,
+          normal_time_estimate: 1,
+          pessimistic_time_estimate: 1
+        };
+
+        requests.post('/api/projects/' + this.projectId + '/entries')
+          .send(entry)
+          .go(function(statusCode, response) {
+            if (statusCode === 201) {
+              this.reload();
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+
+        e.preventDefault();
+        return false;
+      },
     });
   </script>
 

@@ -113,16 +113,13 @@ class CreateProject(Form):
                               description='Enter a few words about your project — or leave it out entirely.')
 
 
-class CreateTask(Form):
+class ApiAddProjectEntry(Form):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()])
+    type = StringField('Type', validators=[DataRequired()])
     optimistic_time_estimate = IntegerField('Optimistic Time Estimate', validators=[DataRequired()])
     normal_time_estimate = IntegerField('Normal Time Estimate', validators=[DataRequired()])
     pessimistic_time_estimate = IntegerField('Pessimistic Time Estimate', validators=[DataRequired()])
-
-
-class AddTaskDependency(Form):
-    dependency = SelectField('Dependency', coerce=int, validators=[DataRequired()])
 
 
 class ApiAddProjectMember(Form):
