@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -295,6 +296,12 @@ def api_project_calendar(project_id):
                 if getattr(form.working_week, day).raw_data:
                     value = getattr(form.working_week, day).data
                     setattr(project.calendar, 'works_on_' + day, value)
+
+            if form.working_day.start.raw_data:
+                project.calendar.work_starts_at = datetime.datetime.strptime(form.working_day.start.data, '%H:%M').time()
+
+            if form.working_day.end.raw_data:
+                project.calendar.work_ends_at = datetime.datetime.strptime(form.working_day.end.data, '%H:%M').time()
 
             flask.g.sql_session.commit()
 

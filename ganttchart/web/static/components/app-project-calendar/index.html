@@ -58,6 +58,20 @@
             </div>
           </div>
         </div>
+
+        <br />
+
+        <form class="form-inline">
+          <div class="form-group m-r-lg">
+            <label class="control-label"for="workingDayStart">Working day starts at:</label>
+            <input class="form-control" type="time" id="workingDayStart" placeholder="Start of working day" on-change="_handleWorkingDayStartChange" />
+          </div>
+
+          <div class="form-group">
+            <label class="control-label"for="workingDayEnd">Working day ends at:</label>
+            <input class="form-control" type="time" id="workingDayEnd" placeholder="End of working day" on-change="_handleWorkingDayEndChange" />
+          </div>
+        </form>
       </div>
     </div>
   </template>
@@ -86,6 +100,9 @@
             this._setWorkingDay(this.$.worksOnFriday, this.calendar.working_week.friday);
             this._setWorkingDay(this.$.worksOnSaturday, this.calendar.working_week.saturday);
             this._setWorkingDay(this.$.worksOnSunday, this.calendar.working_week.sunday);
+
+            this.$.workingDayStart.value = this.calendar.working_day.start;
+            this.$.workingDayEnd.value = this.calendar.working_day.end;
           }.bind(this));
       },
       _setWorkingDay: function(element, isWorking) {
@@ -133,6 +150,20 @@
       },
       _toggleSunday: function() {
         this._toggleWorkingDay(this.$.worksOnSunday, 'sunday');
+      },
+      _handleWorkingDayStartChange: function() {
+        requests.patch('/api/projects/' + this.projectId + '/calendar')
+          .send({'working_day': {'start': this.$.workingDayStart.value}})
+          .go(function(statusCode, response) {
+
+          }.bind(this));
+      },
+      _handleWorkingDayEndChange: function() {
+        requests.patch('/api/projects/' + this.projectId + '/calendar')
+          .send({'working_day': {'end': this.$.workingDayEnd.value}})
+          .go(function(statusCode, response) {
+
+          }.bind(this));
       },
     });
   </script>

@@ -151,8 +151,14 @@ class WorkingWeek(Form):
     sunday = BooleanField()
 
 
+class WorkingDay(Form):
+    start = StringField()
+    end = StringField()
+
+
 class ApiChangeProjectCalendar(Form):
     working_week = FormField(WorkingWeek)
+    working_day = FormField(WorkingDay)
 
 
 class EmailAddress(Form):
