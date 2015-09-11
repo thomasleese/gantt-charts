@@ -36,6 +36,7 @@ window.requests = (function(requests) {
   };
 
   request.get = request('GET');
+  request.patch = request('PATCH');
   request.post = request('POST');
   request.put = request('PUT');
   request.delete = request('DELETE');

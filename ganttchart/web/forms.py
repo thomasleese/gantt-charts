@@ -1,7 +1,7 @@
 import flask
 from wtforms import Form
-from wtforms.fields import BooleanField, IntegerField, PasswordField, \
-    SelectField, StringField
+from wtforms.fields import BooleanField, IntegerField, FormField, \
+    PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
 import wtforms_json
@@ -139,6 +139,20 @@ class ApiAddProjectResource(Form):
     icon = StringField('Icon', validators=[DataRequired()])
     amount = IntegerField('Amount', validators=[DataRequired()])
     reusable = BooleanField('Reusable')
+
+
+class WorkingWeek(Form):
+    monday = BooleanField()
+    tuesday = BooleanField()
+    wednesday = BooleanField()
+    thursday = BooleanField()
+    friday = BooleanField()
+    saturday = BooleanField()
+    sunday = BooleanField()
+
+
+class ApiChangeProjectCalendar(Form):
+    working_week = FormField(WorkingWeek)
 
 
 class EmailAddress(Form):

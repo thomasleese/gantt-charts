@@ -273,15 +273,34 @@ def api_project(project_id):
     return flask.jsonify(project=project.as_json())
 
 
-@app.route('/api/projects/<int:project_id>/calendar')
+@app.route('/api/projects/<int:project_id>/calendar', methods=['GET', 'PATCH'])
 def api_project_calendar(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
 
-    if not account_member.access_level.can_view:
-        raise errors.MissingPermission('can_view')
+    if flask.request.method == 'GET':
+        if not account_member.access_level.can_view:
+            raise errors.MissingPermission('can_view')
 
-    return flask.jsonify(calendar=project.calendar.as_json())
+        return flask.jsonify(calendar=project.calendar.as_json())
+    elif flask.request.method == 'PATCH':
+        if not account_member.access_level.can_administrate:
+            raise errors.MissingPermission('can_administrate')
+
+        form = forms.ApiChangeProjectCalendar.from_json(flask.request.json)
+        if form.validate():
+            days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+                    'saturday', 'sunday']
+            for day in days:
+                if getattr(form.working_week, day).raw_data:
+                    value = getattr(form.working_week, day).data
+                    setattr(project.calendar, 'works_on_' + day, value)
+
+            flask.g.sql_session.commit()
+
+            return '', 204
+        else:
+            raise errors.InvalidFormData(form)
 
 
 @app.route('/api/projects/<int:project_id>/entries')

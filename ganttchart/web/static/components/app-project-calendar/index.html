@@ -1,0 +1,140 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<dom-module id="app-project-calendar">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link type="css" rel="import" href="../../bower_components/Ionicons/css/ionicons.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .working-week .card {
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">Working week</h4>
+        <p class="card-text">Set the working week for your project here.</p>
+
+        <div class="card-group working-week">
+          <div id="worksOnMonday" class="card text-center" on-click="_toggleMonday">
+            <div class="card-block">
+              <p class="card-text">Monday</p>
+            </div>
+          </div>
+          <div id="worksOnTuesday" class="card text-center" on-click="_toggleTuesday">
+            <div class="card-block">
+              <p class="card-text">Tuesday</p>
+            </div>
+          </div>
+          <div id="worksOnWednesday" class="card text-center" on-click="_toggleWednesday">
+            <div class="card-block">
+              <p class="card-text">Wednesday</p>
+            </div>
+          </div>
+          <div id="worksOnThursday" class="card text-center" on-click="_toggleThursday">
+            <div class="card-block">
+              <p class="card-text">Thursday</p>
+            </div>
+          </div>
+          <div id="worksOnFriday" class="card text-center" on-click="_toggleFriday">
+            <div class="card-block">
+              <p class="card-text">Friday</p>
+            </div>
+          </div>
+          <div id="worksOnSaturday" class="card text-center" on-click="_toggleSaturday">
+            <div class="card-block">
+              <p class="card-text">Saturday</p>
+            </div>
+          </div>
+          <div id="worksOnSunday" class="card text-center" on-click="_toggleSunday">
+            <div class="card-block">
+              <p class="card-text">Sunday</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-calendar',
+      properties: {
+        projectId: {
+          type: Number,
+          observer: '_projectIdChanged'
+        }
+      },
+      _projectIdChanged: function(newValue, oldValue) {
+        this.reload();
+      },
+      reload: function() {
+        requests.get('/api/projects/' + this.projectId + '/calendar')
+          .go(function(statusCode, response) {
+            this.calendar = response.calendar;
+
+            this._setWorkingDay(this.$.worksOnMonday, this.calendar.working_week.monday);
+            this._setWorkingDay(this.$.worksOnTuesday, this.calendar.working_week.tuesday);
+            this._setWorkingDay(this.$.worksOnWednesday, this.calendar.working_week.wednesday);
+            this._setWorkingDay(this.$.worksOnThursday, this.calendar.working_week.thursday);
+            this._setWorkingDay(this.$.worksOnFriday, this.calendar.working_week.friday);
+            this._setWorkingDay(this.$.worksOnSaturday, this.calendar.working_week.saturday);
+            this._setWorkingDay(this.$.worksOnSunday, this.calendar.working_week.sunday);
+          }.bind(this));
+      },
+      _setWorkingDay: function(element, isWorking) {
+        if (isWorking) {
+          element.classList.add('bg-success');
+          element.classList.add('bg-inverse');
+        } else {
+          element.classList.remove('bg-success');
+          element.classList.remove('bg-inverse');
+        }
+      },
+      _toggleWorkingDay: function(element, name) {
+        var oldState = element.classList.contains('bg-inverse');
+        var newState = !oldState;
+        this._setWorkingDay(element, newState);
+
+        var data = {};
+        data[name] = newState;
+
+        requests.patch('/api/projects/' + this.projectId + '/calendar')
+          .send({'working_week': data})
+          .go(function(statusCode, response) {
+            if (statusCode !== 204) {
+              this._setWorkingDay(element, oldState);
+            }
+          }.bind(this));
+      },
+      _toggleMonday: function() {
+        this._toggleWorkingDay(this.$.worksOnMonday, 'monday');
+      },
+      _toggleTuesday: function() {
+        this._toggleWorkingDay(this.$.worksOnTuesday, 'tuesday');
+      },
+      _toggleWednesday: function() {
+        this._toggleWorkingDay(this.$.worksOnWednesday, 'wednesday');
+      },
+      _toggleThursday: function() {
+        this._toggleWorkingDay(this.$.worksOnThursday, 'thursday');
+      },
+      _toggleFriday: function() {
+        this._toggleWorkingDay(this.$.worksOnFriday, 'friday');
+      },
+      _toggleSaturday: function() {
+        this._toggleWorkingDay(this.$.worksOnSaturday, 'saturday');
+      },
+      _toggleSunday: function() {
+        this._toggleWorkingDay(this.$.worksOnSunday, 'sunday');
+      },
+    });
+  </script>
+
+</dom-module>
