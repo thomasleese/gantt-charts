@@ -13,6 +13,10 @@
       :host {
         display: block;
       }
+
+      li {
+        cursor: pointer;
+      }
     </style>
 
     <div class="modal fade" id="new-modal" tabindex="-1" role="dialog" aria-labelledby="new-modal-label" aria-hidden="true">
@@ -56,14 +60,15 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
+    <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a member to change or remove it.</p>
+    <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a member to select it.</p>
+
     <ul class="list-group">
       <template is="dom-repeat" items="{{ members }}" as="member">
-        <li class$="{{ _listItemClass(member.selected) }}" on-click="_handleSelectMember">
+        <li class$="{{ _listItemClass(member.selected) }}" on-click="_handleSelect">
           <img class="img-rounded m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
           <span>{{ member.account.display_name }}</span>
           <span class="label label-default m-l">{{ member.access_level.description }}</span>
-          <button hidden$="[[ isSelecting ]]" class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="ion-trash-a"></span></button>
-          <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
         </li>
       </template>
     </ul>
@@ -84,6 +89,9 @@
           observer: '_projectIdChanged'
         }
       },
+      ready: function() {
+        this.isSelecting = false;
+      },
       _projectIdChanged: function(newValue, oldValue) {
         this.reload();
       },
@@ -91,7 +99,7 @@
         e.preventDefault();
         return false;
       },
-      _handleSelectMember: function(e) {
+      _handleSelect: function(e) {
         if (this.isSelecting) {
           var newState = !e.model.member.selected;
           e.model.set('member.selected', newState);
@@ -101,11 +109,10 @@
           } else {
             this.fire('item-deselected', e.model.member);
           }
+        } else {
+          var member = e.model.member;
+          this.$.deleteModal.show(member.account.display_name, member);
         }
-      },
-      _handleDeleteMember: function(e) {
-        var member = e.model.member;
-        this.$.deleteModal.show(member.account.display_name, member);
       },
       _handleActuallyDelete: function(e) {
         var member = e.detail;
