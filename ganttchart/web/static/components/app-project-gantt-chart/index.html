@@ -102,14 +102,14 @@
               </tr>
             </template>
           </tbody>
-
-          <tfoot>
-            <tr>
-              <th colspan$="{{ _tableFullColspan(ganttChart) }}"><a href="#" on-click="_handleNew"><span class="ion-plus-round m-r"></span>New entry</a></th>
-            </tr>
-          </tfoot>
         </table>
       </div>
+
+      <br />
+      <button type="button" class="btn btn-success pull-right" on-click="_handleNew">
+        <span class="ion-plus-round m-r"></span>New entry
+      </button>
+      <div class="clearfix"></div>
     </template>
 
     <template is="dom-if" if="{{!hasGanttChart}}">
