@@ -45,14 +45,21 @@
 {% block scripts %}
   <script>
     var ganttChart = document.getElementById('gantt-chart');
+    var resources = document.getElementById('resources');
     var entryEditor = document.getElementById('entry-editor');
 
     ganttChart.addEventListener('edit-entry', function(e) {
       entryEditor.show(e.detail);
+
+      resources.startSelecting();
     });
 
     entryEditor.addEventListener('entry-changed', function(e) {
       ganttChart.reload();
+    });
+
+    entryEditor.addEventListener('hidden', function(e) {
+      resources.stopSelecting();
     });
 
     $('#go-to-gantt-chart').click(function(e) {

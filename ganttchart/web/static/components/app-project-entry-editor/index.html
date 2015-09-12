@@ -176,9 +176,11 @@
         this.$.cardFormPessimistic.value = entry.time_estimates.pessimistic;
 
         this.hidden = false;
+        this.fire('shown');
       },
       hide: function() {
         this.hidden = true;
+        this.fire('hidden');
       },
     });
   </script>

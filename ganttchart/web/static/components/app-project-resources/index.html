@@ -128,13 +128,13 @@
     <template is="dom-if" if="{{ hasResources }}">
       <ul class="list-group">
         <template is="dom-repeat" items="{{ resources }}" as="resource">
-          <li class="list-group-item">
-            <span class$="{{ _resourceIconClass(resource) }}" style="font-size: 1.4rem;"></span>
+          <li class$="{{ _listItemClass(resource.selected) }}" on-click="_handleSelectResource">
+            <span class$="{{ _resourceIconClass(resource.icon) }}" style="font-size: 1.4rem;"></span>
             <span>{{ resource.amount }}</span>
             <span>×</span>
             <span>{{ resource.name }}</span>
             <small class="m-l">{{ resource.description }}</small>
-            <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteResource"><span class="ion-trash-a"></span></button>
+            <button hidden$="[[ isSelecting ]]" class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteResource"><span class="ion-trash-a"></span></button>
             <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
           </li>
         </template>
@@ -163,7 +163,7 @@
         projectId: {
           type: Number,
           observer: '_projectIdChanged'
-        }
+        },
       },
       _projectIdChanged: function(newValue, oldValue) {
         this.reload();
@@ -172,12 +172,20 @@
         e.preventDefault();
         return false;
       },
+      _handleSelectResource: function(e) {
+        if (this.isSelecting) {
+          e.model.set('resource.selected', !e.model.resource.selected);
+        }
+      },
       _handleDeleteResource: function(e) {
         var resource = e.model.resource;
 
         this.$.deleteModalWho.textContent = resource.name;
         this._targetResourceForDeletion = resource;
         $(this.$.deleteModal).modal('show');
+
+        e.preventDefault();
+        return false;
       },
       _handleActuallyDeleteMember: function(e) {
         var resource = this._targetResourceForDeletion;
@@ -234,12 +242,50 @@
       reload: function() {
         requests.get('/api/projects/' + this.projectId + '/resources')
           .go(function(statusCode, response) {
-            this.resources = response.resources;
+            var resources = response.resources;
+
+            if (this.hasResources) {
+              var selectedResources = [];
+              this.resources.forEach(function(res) {
+                if (res.selected) {
+                  selectedResources.push(res);
+                }
+              });
+
+              resources.forEach(function(res) {
+                selectedResources.forEach(function(res2) {
+                  if (res.id === res2.id) {
+                    res.selected = res2.selected;
+                  }
+                });
+              });
+            }
+
+            this.resources = resources;
             this.hasResources = !!this.resources.length;
           }.bind(this));
       },
-      _resourceIconClass: function(resource) {
-        return 'ion-' + resource.icon + ' m-r';
+      startSelecting: function() {
+        this.isSelecting = true;
+      },
+      stopSelecting: function() {
+        this.clearSelection();
+        this.isSelecting = false;
+      },
+      clearSelection: function() {
+        for (var i = 0; i < this.resources.length; i++) {
+          this.set('resources.' + i + '.selected', false);
+        }
+      },
+      _resourceIconClass: function(icon) {
+        return 'ion-' + icon + ' m-r';
+      },
+      _listItemClass: function(isSelected) {
+        var s = 'list-group-item';
+        if (isSelected) {
+          s += ' active';
+        }
+        return s;
       }
     });
   </script>
