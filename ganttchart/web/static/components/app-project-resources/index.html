@@ -114,6 +114,9 @@
 
     <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload"></app-project-resource-editor>
 
+    <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a resource to change or remove it.</p>
+    <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a resource to select it.</p>
+
     <template is="dom-if" if="{{ hasResources }}">
       <ul class="list-group">
         <template is="dom-repeat" items="{{ resources }}" as="resource">
@@ -152,6 +155,11 @@
           observer: '_projectIdChanged'
         },
       },
+
+      ready: function() {
+        this.isSelecting = false;
+      },
+
       _projectIdChanged: function(newValue, oldValue) {
         this.reload();
       },

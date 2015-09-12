@@ -70,6 +70,9 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
+    <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a row to change or remove it.</p>
+    <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a row to select it.</p>
+
     <template is="dom-if" if="{{hasGanttChart}}">
       <div style="overflow-y: scroll;">
         <table class="gantt-chart">
@@ -127,6 +130,11 @@
           observer: '_projectIdChanged'
         }
       },
+
+      ready: function() {
+        this.isSelecting = false;
+      },
+
       _projectIdChanged: function(newValue, oldValue) {
         this.reload();
       },
