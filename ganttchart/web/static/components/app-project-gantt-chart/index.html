@@ -32,12 +32,16 @@
         padding: 2px 20px 2px 1.6rem;
       }
 
+      .gantt-chart tbody tr {
+        cursor: pointer;
+      }
+
       .gantt-chart tbody th {
         white-space: nowrap;
         text-align: right;
         padding: 4px 10px;
         border-bottom: 1px solid rgb(200, 200, 200);
-        padding-right: 0.1rem;
+        padding-right: 1rem;
       }
 
       .gantt-chart tbody td {
@@ -62,15 +66,6 @@
       .gantt-chart tfoot th {
         padding: 4px 10px;
       }
-
-      .gantt-chart th a {
-        color: black;
-        padding-right: 1rem;
-      }
-
-      .gantt-chart td a {
-        color: white;
-      }
     </style>
 
     <app-error-modal id="errorModal"></app-error-modal>
@@ -89,16 +84,14 @@
 
           <tbody>
             <template is="dom-repeat" items="{{ blocks }}" as="block">
-              <tr class$="{{ _listItemClass(block.selected) }}">
-                <th><a href="#" on-click="_handleEdit">{{ block.entry.name }}</a></th>
+              <tr class$="{{ _listItemClass(block.selected) }}" on-click="_handleEdit">
+                <th>{{ block.entry.name }}</th>
 
                 <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
                   <td></td>
                 </template>
 
-                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
-                  <a href="#" on-click="_handleEdit">{{ block.entry.name }}</a>
-                </td>
+                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">{{ block.entry.name }}</td>
 
                 <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
                   <td></td>
@@ -235,9 +228,6 @@
             this.fire('item-deselected', e.model.block);
           }
         }
-
-        e.preventDefault();
-        return false;
       },
       startSelecting: function() {
         this.isSelecting = true;
