@@ -2,7 +2,7 @@
 
 <link rel="import" href="../app-thing-editor/index.html" />
 
-<dom-module id="app-project-member-editor">
+<dom-module id="app-project-resource-editor">
 
   <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
 
@@ -13,7 +13,7 @@
       }
     </style>
 
-    <app-delete-modal id="deleteModal" what="member" on-deleted="_handleActuallyDelete"></app-delete-modal>
+    <app-delete-modal id="deleteModal" what="resource" on-deleted="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -25,32 +25,30 @@
 
   <script>
     Polymer({
-      is: 'app-project-member-editor',
+      is: 'app-project-resource-editor',
       properties: {
         projectId: Number,
       },
 
-      show: function(member) {
-        this.member = member;
-        this.$.editor.show(member.account.display_name);
+      show: function(resource) {
+        this.resource = resource;
+        this.$.editor.show(resource.name);
       },
       hide: function() {
-        this.member = undefined;
+        this.resource = undefined;
         this.$.editor.hide();
       },
 
       _handleDelete: function(e) {
-        this.$.deleteModal.show(this.member.account.display_name, this.member);
+        this.$.deleteModal.show(this.resource.name, this.resource);
       },
       _handleActuallyDelete: function(e) {
-        var member = e.detail;
-        requests.delete('/api/projects/' + this.projectId + '/members/' + member.id)
+        var resource = e.detail;
+        requests.delete('/api/projects/' + this.projectId + '/resources/' + resource.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('deleted', member);
+              this.fire('deleted', resource);
               this.hide();
-            } else if (statusCode === 405) {
-              this.$.errorModal.show('Owners cannot be deleted.');
             } else {
               this.$.errorModal.showUnknownError();
             }

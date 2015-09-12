@@ -2,6 +2,7 @@
 
 <link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
+<link rel="import" href="../app-project-resource-editor/index.html" />
 
 <dom-module id="app-project-resources">
 
@@ -12,6 +13,10 @@
     <style>
       :host {
         display: block;
+      }
+
+      li {
+        cursor: pointer;
       }
     </style>
 
@@ -107,6 +112,8 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
+    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload"></app-project-resource-editor>
+
     <template is="dom-if" if="{{ hasResources }}">
       <ul class="list-group">
         <template is="dom-repeat" items="{{ resources }}" as="resource">
@@ -116,8 +123,6 @@
             <span>×</span>
             <span>{{ resource.name }}</span>
             <small class="m-l">{{ resource.description }}</small>
-            <button hidden$="[[ isSelecting ]]" class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteResource"><span class="ion-trash-a"></span></button>
-            <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
           </li>
         </template>
       </ul>
@@ -164,24 +169,9 @@
           } else {
             this.fire('item-deselected', e.model.resource);
           }
+        } else {
+          this.$.editor.show(e.model.resource);
         }
-      },
-      _handleDeleteResource: function(e) {
-        var resource = e.model.resource;
-        this.$.deleteModal.show(resource.name, resource);
-      },
-      _handleActuallyDelete: function(e) {
-        var resource = e.detail;
-        requests.delete('/api/projects/' + this.projectId + '/resources/' + resource.id)
-          .go(function(statusCode, response) {
-            if (statusCode === 204) {
-              this.reload();
-            } else {
-              this.$.errorModal.showUnknownError();
-            }
-          }.bind(this));
-
-        $(this.$.deleteModal).modal('hide');
       },
       _handleNewResource: function(e) {
         this.$.newModalFormName.value = '';
