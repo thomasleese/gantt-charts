@@ -13,6 +13,7 @@
     ],
     "dependencies": {
         "bootstrap": "~4.0.0",
+        "iron-pages": "PolymerElements/iron-pages#~1.0.3",
         "polymer": "~1.1.3"
     },
     "private": true

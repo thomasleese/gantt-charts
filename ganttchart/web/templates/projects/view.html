@@ -5,6 +5,8 @@
 {% block title %}{{ project.name }}{% endblock %}
 
 {% block imports %}
+  <link rel="import" href="{{ url_for('static', filename='bower_components/iron-pages/iron-pages.html') }}" />
+
   <link rel="import" href="{{ url_for('static', filename='components/app-project-gantt-chart/index.html') }}" />
   <link rel="import" href="{{ url_for('static', filename='components/app-project-resources/index.html') }}" />
   <link rel="import" href="{{ url_for('static', filename='components/app-project-calendar/index.html') }}" />
@@ -34,16 +36,20 @@
     <p class="lead">{{ project.description }}</p>
   {% endif %}
 
-  <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
-  <app-project-resources id="resources" project-id="{{ project.id }}" hidden></app-project-resources>
-  <app-project-calendar id="calendar" project-id="{{ project.id }}" hidden></app-project-calendar>
-  <app-project-members id="members" project-id="{{ project.id }}" hidden></app-project-members>
+  <iron-pages id="pages" selected="0">
+    <app-project-gantt-chart id="gantt-chart" project-id="{{ project.id }}"></app-project-gantt-chart>
+    <app-project-resources id="resources" project-id="{{ project.id }}"></app-project-resources>
+    <app-project-calendar id="calendar" project-id="{{ project.id }}"></app-project-calendar>
+    <app-project-members id="members" project-id="{{ project.id }}"></app-project-members>
+  </iron-pages>
 
   <app-project-entry-editor id="entry-editor" project-id="{{ project.id }}" hidden></app-project-entry-editor>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    var pages = document.getElementById('pages');
+
     var ganttChart = document.getElementById('gantt-chart');
     var resources = document.getElementById('resources');
     var members = document.getElementById('members');
@@ -109,10 +115,7 @@
       $('#go-to-calendar').removeClass('active');
       $('#go-to-members').removeClass('active');
 
-      $('#gantt-chart').attr('hidden', false);
-      $('#resources').attr('hidden', true);
-      $('#calendar').attr('hidden', true);
-      $('#members').attr('hidden', true);
+      pages.select(0);
 
       e.preventDefault();
       return false;
@@ -124,10 +127,7 @@
       $('#go-to-calendar').removeClass('active');
       $('#go-to-members').removeClass('active');
 
-      $('#gantt-chart').attr('hidden', true);
-      $('#resources').attr('hidden', false);
-      $('#calendar').attr('hidden', true);
-      $('#members').attr('hidden', true);
+      pages.select(1);
 
       e.preventDefault();
       return false;
@@ -139,10 +139,7 @@
       $('#go-to-calendar').addClass('active');
       $('#go-to-members').removeClass('active');
 
-      $('#gantt-chart').attr('hidden', true);
-      $('#resources').attr('hidden', true);
-      $('#calendar').attr('hidden', false);
-      $('#members').attr('hidden', true);
+      pages.select(2);
 
       e.preventDefault();
       return false;
@@ -154,10 +151,7 @@
       $('#go-to-calendar').removeClass('active');
       $('#go-to-members').addClass('active');
 
-      $('#gantt-chart').attr('hidden', true);
-      $('#resources').attr('hidden', true);
-      $('#calendar').attr('hidden', true);
-      $('#members').attr('hidden', false);
+      pages.select(3);
 
       e.preventDefault();
       return false;
