@@ -76,24 +76,6 @@
   </template>
 
   <script>
-    var loadMembers = function(id, callback) {
-      requests.get('/api/projects/' + id + '/members')
-        .go(function(statusCode, response) {
-          callback(response.members);
-        });
-    };
-
-    var deleteMember = function(projectId, memberId, callback) {
-      requests.delete('/api/projects/' + projectId + '/members/' + memberId)
-        .go(callback);
-    };
-
-    var newMember = function(projectId, emailAddress, accessLevel, callback) {
-      requests.post('/api/projects/' + projectId + '/members')
-        .send({'email_address': emailAddress, 'access_level': accessLevel})
-        .go(callback);
-    };
-
     Polymer({
       is: 'app-project-members',
       properties: {
@@ -127,17 +109,16 @@
       },
       _handleActuallyDelete: function(e) {
         var member = e.detail;
-        deleteMember(this.projectId, member.id, function(status) {
-          if (status === 204) {
-            this.reload();
-          } else if (status === 405) {
-            this.$.errorModal.show('Owners cannot be deleted.');
-          } else {
-            this.$.errorModal.showUnknownError();
-          }
-        }.bind(this));
-
-        $(this.$['delete-modal']).modal('hide');
+        requests.delete('/api/projects/' + this.projectId + '/members/' + member.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.reload();
+            } else if (statusCode === 405) {
+              this.$.errorModal.show('Owners cannot be deleted.');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
       },
       _handleNewMember: function(e) {
         this.$['new-modal-email-address'].value = '';
@@ -149,26 +130,27 @@
         var emailAddress = this.$['new-modal-email-address'].value;
         var accessLevel = this.$['new-modal-access-level'].value;
 
-        newMember(this.projectId, emailAddress, accessLevel, function(status) {
-          if (status === 409) {
-            this.$.errorModal.show('Member with that email address already exists.');
-          } else if (status === 400) {
-            this.$.errorModal.show('No such member for that email address.');
-          } else if (status === 201) {
-            this.reload();
-          } else {
-            this.$.errorModal.showUnknownError();
-          }
-        }.bind(this));
+        requests.post('/api/projects/' + this.projectId + '/members')
+          .send({'email_address': emailAddress, 'access_level': accessLevel})
+          .go(function(statusCode, response) {
+            if (statusCode === 409) {
+              this.$.errorModal.show('Member with that email address already exists.');
+            } else if (statusCode === 400) {
+              this.$.errorModal.show('No such member for that email address.');
+            } else if (statusCode === 201) {
+              this.reload();
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
 
         $(this.$['new-modal']).modal('hide');
       },
       reload: function() {
-        loadMembers(this.projectId, function(members) {
-          this.members = members;
-
-          // TODO save selected
-        }.bind(this));
+        requests.get('/api/projects/' + this.projectId + '/members')
+          .go(function(statusCode, response) {
+            this.members = response.members;
+          }.bind(this));
       },
       startSelecting: function() {
         this.isSelecting = true;
