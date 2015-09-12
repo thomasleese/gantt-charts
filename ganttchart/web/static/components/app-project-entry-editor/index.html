@@ -2,6 +2,7 @@
 
 <link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
+<link rel="import" href="../app-thing-editor/index.html" />
 
 <dom-module id="app-project-entry-editor">
 
@@ -13,20 +14,6 @@
       :host {
         display: block;
       }
-
-      #card {
-        position: fixed;
-        bottom: 0;
-        right: 2rem;
-        z-index: 1000;
-
-        background: white;
-        margin-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-bottom: white;
-        box-shadow: 0 0 3rem rgb(100, 100, 100);
-        width: 500px;
       }
     </style>
 
@@ -34,75 +21,66 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <div id="card" class="card">
-      <div class="card-header">
-        <strong id="cardTitle"></strong>
-        <button type="button" class="close" on-click="hide" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-      </div>
-      <div class="card-block">
-        <form on-submit="_disableFormSubmit">
-          <div class="form-group">
-            <label class="c-input c-radio">
-              <input name="type" id="cardFormTypeTask" type="radio" value="task" on-change="_handleTypeTaskChange" />
-              <span class="c-indicator"></span>
-              Task
-            </label>
-            <label class="c-input c-radio">
-              <input name="type" id="cardFormTypeMilestone" type="radio" value="milestone" on-change="_handleTypeMilestoneChange" />
-              <span class="c-indicator"></span>
-              Milestone
-            </label>
-          </div>
+    <app-thing-editor id="editor" hidden>
+      <form on-submit="_disableFormSubmit">
+        <div class="form-group">
+          <label class="c-input c-radio">
+            <input name="type" id="cardFormTypeTask" type="radio" value="task" on-change="_handleTypeTaskChange" />
+            <span class="c-indicator"></span>
+            Task
+          </label>
+          <label class="c-input c-radio">
+            <input name="type" id="cardFormTypeMilestone" type="radio" value="milestone" on-change="_handleTypeMilestoneChange" />
+            <span class="c-indicator"></span>
+            Milestone
+          </label>
+        </div>
 
-          <div class="form-group">
-            <input type="text" id="cardFormName" class="form-control" placeholder="Name" on-change="_handleNameChange" required />
-          </div>
+        <div class="form-group">
+          <input type="text" id="cardFormName" class="form-control" placeholder="Name" on-change="_handleNameChange" required />
+        </div>
 
-          <div class="form-group">
-            <input type="text" id="cardFormDescription" class="form-control" placeholder="Description" on-change="_handleDescriptionChange" />
-            <small class="text-muted">Enter some words about this entry, or leave it out entirely.</small>
-          </div>
+        <div class="form-group">
+          <input type="text" id="cardFormDescription" class="form-control" placeholder="Description" on-change="_handleDescriptionChange" />
+          <small class="text-muted">Enter some words about this entry, or leave it out entirely.</small>
+        </div>
 
-          <div class="form-group">
-            <label class="control-label">Time estimates (optimistic, normal, pessimistic)</label>
-            <div class="row">
-              <div class="col-sm-4">
-                <div class="input-group">
-                  <input type="text" id="cardFormOptimistic" class="form-control text-right" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
-                  <span class="input-group-addon">hours</span>
-                </div>
+        <div class="form-group">
+          <label class="control-label">Time estimates (optimistic, normal, pessimistic)</label>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="cardFormOptimistic" class="form-control text-right" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
+                <span class="input-group-addon">hours</span>
               </div>
+            </div>
 
-              <div class="col-sm-4">
-                <div class="input-group">
-                  <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
-                  <span class="input-group-addon">hours</span>
-                </div>
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
+                <span class="input-group-addon">hours</span>
               </div>
+            </div>
 
-              <div class="col-sm-4">
-                <div class="input-group">
-                  <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
-                  <span class="input-group-addon">hours</span>
-                </div>
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
+                <span class="input-group-addon">hours</span>
               </div>
             </div>
           </div>
-        </form>
+        </div>
+      </form>
 
-        <hr />
+      <hr />
 
-        <p class="text-muted">Use the “Resources” and “Members” tabs to modify those.</p>
+      <p class="text-muted">Use the “Resources” and “Members” tabs to modify those.</p>
 
-        <hr />
+      <hr />
 
-        <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
-        <div class="clearfix"></div>
-      </div>
-    </div>
+      <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
+      <div class="clearfix"></div>
+    </app-thing-editor>
   </template>
 
   <script>
@@ -172,8 +150,6 @@
       show: function(entry) {
         this.entryId = entry.id;
 
-        this.$.cardTitle.textContent = entry.name;
-
         if (entry.type === 'task') {
           this.$.cardFormTypeTask.checked = true;
         } else {
@@ -185,11 +161,11 @@
         this.$.cardFormNormal.value = entry.time_estimates.normal;
         this.$.cardFormPessimistic.value = entry.time_estimates.pessimistic;
 
-        this.hidden = false;
+        this.$.editor.show(entry.name);
         this.fire('shown');
       },
       hide: function() {
-        this.hidden = true;
+        this.$.editor.hide();
         this.fire('hidden');
       },
       resourceSelected: function(resource) {
