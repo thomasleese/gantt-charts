@@ -174,7 +174,14 @@
       },
       _handleSelectResource: function(e) {
         if (this.isSelecting) {
-          e.model.set('resource.selected', !e.model.resource.selected);
+          var newState = !e.model.resource.selected;
+          e.model.set('resource.selected', newState);
+
+          if (newState) {
+            this.fire('item-selected', e.model.resource);
+          } else {
+            this.fire('item-deselected', e.model.resource);
+          }
         }
       },
       _handleDeleteResource: function(e) {
@@ -275,6 +282,13 @@
       clearSelection: function() {
         for (var i = 0; i < this.resources.length; i++) {
           this.set('resources.' + i + '.selected', false);
+        }
+      },
+      selectItem: function(resource) {
+        for (var i = 0; i < this.resources.length; i++) {
+          if (this.resources[i].id === resource.id) {
+            this.set('resources.' + i + '.selected', true);
+          }
         }
       },
       _resourceIconClass: function(icon) {

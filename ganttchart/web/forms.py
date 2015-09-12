@@ -173,6 +173,10 @@ class ApiAddCalendarHoliday(Form):
     end = DateField('End', validators=[DataRequired()])
 
 
+class ApiAddProjectEntryResource(Form):
+    amount = IntegerField(validators=[DataRequired()])
+
+
 class EmailAddress(Form):
     email_address = StringField('Email Address',
                                 validators=[DataRequired(), Email(),

@@ -92,6 +92,10 @@
 
         <hr />
 
+        <p class="text-muted">Use the “Resources” and “Members” tabs to modify those.</p>
+
+        <hr />
+
         <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
         <div class="clearfix"></div>
       </div>
@@ -182,6 +186,27 @@
         this.hidden = true;
         this.fire('hidden');
       },
+      resourceSelected: function(resource) {
+        requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
+          .send({'amount': 1})
+          .go(function(statusCode, response) {
+            if (statusCode === 201) {
+              this.fire('entry-changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      resourceDeselected: function(resource) {
+        requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.fire('entry-changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      }
     });
   </script>
 

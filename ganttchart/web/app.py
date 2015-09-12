@@ -9,8 +9,8 @@ from .. import database
 from ..chart import Chart
 from ..models import AccessLevel, Account, AccountEmailAddress, Project, \
     ProjectCalendarHoliday, ProjectEntry, ProjectEntryDependency, \
-    ProjectEntryType, ProjectMember, ProjectResource, ProjectStar, \
-    Session as SqlSession
+    ProjectEntryMember, ProjectEntryType, ProjectEntryResource, \
+    ProjectMember, ProjectResource, ProjectStar, Session as SqlSession
 from . import errors, forms
 
 
@@ -388,6 +388,42 @@ def api_project_entry(project_id, entry_id):
             raise errors.InvalidFormData(form)
     elif flask.request.method == 'DELETE':
         flask.g.sql_session.delete(entry)
+        flask.g.sql_session.commit()
+
+        return '', 204
+
+
+@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>/resources/<int:resource_id>', methods=['PUT', 'DELETE'])
+def api_project_entry_resource(project_id, entry_id, resource_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_edit:
+        raise errors.MissingPermission('can_edit')
+
+    if flask.request.method == 'PUT':
+        form = forms.ApiAddProjectEntryResource.from_json(flask.request.json)
+        if form.validate():
+            entry_resource = ProjectEntryResource(entry_id=entry_id,
+                                                  resource_id=resource_id,
+                                                  amount=form.amount.data)
+
+            flask.g.sql_session.add(entry_resource)
+            flask.g.sql_session.commit()
+
+            return '', 201
+        else:
+            raise errors.InvalidFormData(form)
+    elif flask.request.method == 'DELETE':
+        try:
+            entry_resource = flask.g.sql_session.query(ProjectEntryResource) \
+                .filter(ProjectEntryResource.entry_id == entry_id) \
+                .filter(ProjectEntryResource.resource_id == resource_id) \
+                .one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise errors.NotFound()
+
+        flask.g.sql_session.delete(entry_resource)
         flask.g.sql_session.commit()
 
         return '', 204

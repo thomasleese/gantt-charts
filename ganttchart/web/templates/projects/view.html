@@ -52,6 +52,10 @@
       entryEditor.show(e.detail);
 
       resources.startSelecting();
+
+      e.detail.resources.forEach(function(res) {
+        resources.selectItem(res.resource);
+      });
     });
 
     entryEditor.addEventListener('entry-changed', function(e) {
@@ -60,6 +64,14 @@
 
     entryEditor.addEventListener('hidden', function(e) {
       resources.stopSelecting();
+    });
+
+    resources.addEventListener('item-selected', function(e) {
+      entryEditor.resourceSelected(e.detail);
+    });
+
+    resources.addEventListener('item-deselected', function(e) {
+      entryEditor.resourceDeselected(e.detail);
     });
 
     $('#go-to-gantt-chart').click(function(e) {

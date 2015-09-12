@@ -404,7 +404,8 @@ class ProjectEntry(Base):
                 'pessimistic': self.pessimistic_time_estimate
             },
             'expected_time': self.expected_time,
-            'dependencies': [{'id': d.child.id} for d in self.dependencies]
+            'dependencies': [{'id': d.child.id} for d in self.dependencies],
+            'resources': [res.as_json() for res in self.resources]
         }
 
 
@@ -415,3 +416,29 @@ class ProjectEntryDependency(Base):
                           foreign_keys='ProjectEntryDependency.parent_id')
     child = relationship('ProjectEntry',
                          foreign_keys='ProjectEntryDependency.child_id')
+
+
+class ProjectEntryMember(Base):
+    __tablename__ = 'project_entry_member'
+
+    entry = relationship('ProjectEntry', backref='members')
+    member = relationship('ProjectMember', backref='entries')
+
+    def as_json(self):
+        return {
+            'member': {'id': self.member_id},
+            'entry': {'id': self.entry_id},
+        }
+
+
+class ProjectEntryResource(Base):
+    __tablename__ = 'project_entry_resource'
+
+    entry = relationship('ProjectEntry', backref='resources')
+    resource = relationship('ProjectResource', backref='entries')
+
+    def as_json(self):
+        return {
+            'amount': self.amount,
+            'resource': {'id': self.resource_id}
+        }
