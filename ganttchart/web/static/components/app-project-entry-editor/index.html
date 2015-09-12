@@ -209,7 +209,6 @@
       },
       memberSelected: function(member) {
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/members/' + member.id)
-          .send({'amount': 1})
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('entry-changed');
@@ -220,6 +219,26 @@
       },
       memberDeselected: function(member) {
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/members/' + member.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.fire('entry-changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      dependencySelected: function(entry) {
+        requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/dependencies/' + entry.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 201) {
+              this.fire('entry-changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      dependencyDeselected: function(entry) {
+        requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/dependencies/' + entry.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
               this.fire('entry-changed');

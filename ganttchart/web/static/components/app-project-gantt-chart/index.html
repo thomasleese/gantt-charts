@@ -54,6 +54,11 @@
         overflow: hidden;
       }
 
+      .gantt-chart tbody tr.active,
+      .gantt-chart tbody tr.active td {
+        background: rgb(255, 228, 124);
+      }
+
       .gantt-chart tfoot th {
         padding: 4px 10px;
       }
@@ -83,8 +88,8 @@
           </thead>
 
           <tbody>
-            <template is="dom-repeat" items="{{ _blocks }}" as="block">
-              <tr>
+            <template is="dom-repeat" items="{{ blocks }}" as="block">
+              <tr class$="{{ _listItemClass(block.selected) }}">
                 <th><a href="#" on-click="_handleEdit">{{ block.entry.name }}</a></th>
 
                 <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
@@ -135,23 +140,37 @@
       reload: function() {
         requests.get('/api/projects/' + this.projectId + '/gantt-chart')
           .go(function(statusCode, response) {
-            this.ganttChart = response.gantt_chart;
+            var ganttChart = response.gantt_chart;
 
-            if (this.ganttChart) {
-              var tableHeadings = [];
-              var start = new Date(this.ganttChart.start);
-              var days = Math.ceil(this.ganttChart.range / (60 * 60 * 24));
-              for (var i = 0; i < days; i++) {
-                var d = new Date(start);
-                d.setDate(start.getDate() + i);
-                tableHeadings.push(d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate());
-              }
-              this._tableHeadings = tableHeadings;
+            var tableHeadings = [];
+            var start = new Date(ganttChart.start);
+            var days = Math.ceil(ganttChart.range / (60 * 60 * 24));
+            for (var i = 0; i < days; i++) {
+              var d = new Date(start);
+              d.setDate(start.getDate() + i);
+              tableHeadings.push(d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate());
+            }
+            this._tableHeadings = tableHeadings;
 
-              this._blocks = this.ganttChart.blocks;
+            if (this.hasGanttChart) {
+              var oldBlocks = this.blocks;
+              var newBlocks = ganttChart.blocks;
+
+              newBlocks.forEach(function(a) {
+                oldBlocks.forEach(function(b) {
+                  if (a.entry.id === b.entry.id) {
+                    a.selected = b.selected;
+                  }
+                });
+              });
+
+              this.blocks = newBlocks;
+            } else {
+              this.blocks = ganttChart.blocks;
             }
 
-            this.hasGanttChart = !!this.ganttChart;
+            this.ganttChart = ganttChart;
+            this.hasGanttChart = !!this.blocks.length;
           }.bind(this));
       },
       _asDays: function(seconds) {
@@ -203,11 +222,44 @@
         return false;
       },
       _handleEdit: function(e) {
-        var entry = e.model.block.entry;
-        this.fire('edit-entry', entry);
+        if (!this.isSelecting) {
+          var entry = e.model.block.entry;
+          this.fire('edit-entry', entry);
+        } else {
+          var newState = !e.model.block.selected;
+          e.model.set('block.selected', newState);
+
+          if (newState) {
+            this.fire('item-selected', e.model.block);
+          } else {
+            this.fire('item-deselected', e.model.block);
+          }
+        }
 
         e.preventDefault();
         return false;
+      },
+      startSelecting: function() {
+        this.isSelecting = true;
+      },
+      stopSelecting: function() {
+        this.clearSelection();
+        this.isSelecting = false;
+      },
+      clearSelection: function() {
+        for (var i = 0; i < this.blocks.length; i++) {
+          this.set('blocks.' + i + '.selected', false);
+        }
+      },
+      selectItem: function(entry) {
+        for (var i = 0; i < this.blocks.length; i++) {
+          if (this.blocks[i].entry.id === entry.id) {
+            this.set('blocks.' + i + '.selected', true);
+          }
+        }
+      },
+      _listItemClass: function(isSelected) {
+        return isSelected ? 'active' : '';
       }
     });
   </script>

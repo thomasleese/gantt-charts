@@ -194,6 +194,8 @@
       reload: function() {
         loadMembers(this.projectId, function(members) {
           this.members = members;
+
+          // TODO save selected
         }.bind(this));
       },
       startSelecting: function() {

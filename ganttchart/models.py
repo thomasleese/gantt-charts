@@ -404,7 +404,7 @@ class ProjectEntry(Base):
                 'pessimistic': self.pessimistic_time_estimate
             },
             'expected_time': self.expected_time,
-            'dependencies': [{'id': d.child.id} for d in self.dependencies],
+            'dependencies': [dep.as_json() for dep in self.dependencies],
             'resources': [res.as_json() for res in self.resources],
             'members': [member.as_json() for member in self.members],
         }
@@ -417,6 +417,12 @@ class ProjectEntryDependency(Base):
                           foreign_keys='ProjectEntryDependency.parent_id')
     child = relationship('ProjectEntry',
                          foreign_keys='ProjectEntryDependency.child_id')
+
+    def as_json(self):
+        return {
+            'parent': {'id': self.parent_id},
+            'child': {'id': self.child_id},
+        }
 
 
 class ProjectEntryMember(Base):

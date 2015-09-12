@@ -460,6 +460,37 @@ def api_project_entry_member(project_id, entry_id, member_id):
         return '', 204
 
 
+@app.route('/api/projects/<int:project_id>/entries/<int:parent_id>/dependencies/<int:child_id>', methods=['PUT', 'DELETE'])
+def api_project_entry_dependency(project_id, parent_id, child_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_edit:
+        raise errors.MissingPermission('can_edit')
+
+    if flask.request.method == 'PUT':
+        dependency = ProjectEntryDependency(parent_id=parent_id,
+                                                  child_id=child_id)
+
+        flask.g.sql_session.add(dependency)
+        flask.g.sql_session.commit()
+
+        return '', 201
+    elif flask.request.method == 'DELETE':
+        try:
+            dependency = flask.g.sql_session.query(ProjectEntryDependency) \
+                .filter(ProjectEntryDependency.parent_id == parent_id) \
+                .filter(ProjectEntryDependency.child_id == child_id) \
+                .one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise errors.NotFound()
+
+        flask.g.sql_session.delete(dependency)
+        flask.g.sql_session.commit()
+
+        return '', 204
+
+
 @app.route('/api/projects/<int:project_id>/gantt-chart')
 def api_project_gantt_chart(project_id):
     project = get_project_or_404(project_id)

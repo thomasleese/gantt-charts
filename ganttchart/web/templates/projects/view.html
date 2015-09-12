@@ -54,6 +54,7 @@
 
       resources.startSelecting();
       members.startSelecting();
+      ganttChart.startSelecting();
 
       e.detail.resources.forEach(function(res) {
         resources.selectItem(res.resource);
@@ -61,6 +62,10 @@
 
       e.detail.members.forEach(function(member) {
         members.selectItem(member.member);
+      });
+
+      e.detail.dependencies.forEach(function(dependency) {
+        ganttChart.selectItem(dependency.child);
       });
     });
 
@@ -71,6 +76,7 @@
     entryEditor.addEventListener('hidden', function(e) {
       resources.stopSelecting();
       members.stopSelecting();
+      ganttChart.stopSelecting();
     });
 
     resources.addEventListener('item-selected', function(e) {
@@ -87,6 +93,14 @@
 
     members.addEventListener('item-deselected', function(e) {
       entryEditor.memberDeselected(e.detail);
+    });
+
+    ganttChart.addEventListener('item-selected', function(e) {
+      entryEditor.dependencySelected(e.detail.entry);
+    });
+
+    ganttChart.addEventListener('item-deselected', function(e) {
+      entryEditor.dependencyDeselected(e.detail.entry);
     });
 
     $('#go-to-gantt-chart').click(function(e) {
