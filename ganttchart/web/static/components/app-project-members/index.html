@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
 
 <dom-module id="app-project-members">
@@ -51,26 +52,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              <span class="sr-only">Close</span>
-            </button>
-            <h4 class="modal-title" id="delete-modal-label">Remove member?</h4>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to remove <span id="delete-modal-who"></span>?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-danger" on-click="_handleActuallyDeleteMember">Remove</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-delete-modal id="deleteModal" what="member" on-deleted="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -123,14 +105,6 @@
       _projectIdChanged: function(newValue, oldValue) {
         this.reload();
       },
-      _findMemberLi: function(event) {
-        var dom = Polymer.dom(event);
-        for (var i = dom.path.length - 1; i >= 0; i--) {
-          if (dom.path[i] instanceof HTMLLIElement) {
-            return dom.path[i];
-          }
-        }
-      },
       _disableFormSubmit: function(e) {
         e.preventDefault();
         return false;
@@ -149,12 +123,10 @@
       },
       _handleDeleteMember: function(e) {
         var member = e.model.member;
-        this.$['delete-modal-who'].textContent = member.account.name;
-        this._targetMemberForDeletion = member;
-        $(this.$['delete-modal']).modal('show');
+        this.$.deleteModal.show(member.account.display_name, member);
       },
-      _handleActuallyDeleteMember: function(e) {
-        var member = this._targetMemberForDeletion;
+      _handleActuallyDelete: function(e) {
+        var member = e.detail;
         deleteMember(this.projectId, member.id, function(status) {
           if (status === 204) {
             this.reload();

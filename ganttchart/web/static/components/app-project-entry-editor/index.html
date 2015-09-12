@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
 
 <dom-module id="app-project-entry-editor">
@@ -28,6 +29,8 @@
         width: 500px;
       }
     </style>
+
+    <app-delete-modal id="deleteModal" what="entry" on-deleted="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -152,7 +155,10 @@
       _handlePessimisticChange: function() {
         this._submitEntryChange('pessimistic_time_estimate', this.$.cardFormPessimistic.value);
       },
-      _handleDelete: function() {
+      _handleDelete: function(e) {
+        this.$.deleteModal.show(this.$.cardFormName.value, this.entryId);
+      },
+      _handleActuallyDelete: function(e) {
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId)
           .go(function(statusCode, response) {
             if (statusCode === 204) {

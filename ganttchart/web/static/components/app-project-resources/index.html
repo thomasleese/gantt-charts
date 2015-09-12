@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
 
 <dom-module id="app-project-resources">
@@ -102,26 +103,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              <span class="sr-only">Close</span>
-            </button>
-            <h4 class="modal-title" id="delete-modal-label">Delete resource?</h4>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to remove <span id="deleteModalWho"></span>?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-danger" on-click="_handleActuallyDeleteMember">Remove</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-delete-modal id="deleteModal" what="resource" on-deleted="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -186,16 +168,10 @@
       },
       _handleDeleteResource: function(e) {
         var resource = e.model.resource;
-
-        this.$.deleteModalWho.textContent = resource.name;
-        this._targetResourceForDeletion = resource;
-        $(this.$.deleteModal).modal('show');
-
-        e.preventDefault();
-        return false;
+        this.$.deleteModal.show(resource.name, resource);
       },
-      _handleActuallyDeleteMember: function(e) {
-        var resource = this._targetResourceForDeletion;
+      _handleActuallyDelete: function(e) {
+        var resource = e.detail;
         requests.delete('/api/projects/' + this.projectId + '/resources/' + resource.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
