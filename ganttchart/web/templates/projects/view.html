@@ -46,15 +46,21 @@
   <script>
     var ganttChart = document.getElementById('gantt-chart');
     var resources = document.getElementById('resources');
+    var members = document.getElementById('members');
     var entryEditor = document.getElementById('entry-editor');
 
     ganttChart.addEventListener('edit-entry', function(e) {
       entryEditor.show(e.detail);
 
       resources.startSelecting();
+      members.startSelecting();
 
       e.detail.resources.forEach(function(res) {
         resources.selectItem(res.resource);
+      });
+
+      e.detail.members.forEach(function(member) {
+        members.selectItem(member.member);
       });
     });
 
@@ -64,6 +70,7 @@
 
     entryEditor.addEventListener('hidden', function(e) {
       resources.stopSelecting();
+      members.stopSelecting();
     });
 
     resources.addEventListener('item-selected', function(e) {
@@ -72,6 +79,14 @@
 
     resources.addEventListener('item-deselected', function(e) {
       entryEditor.resourceDeselected(e.detail);
+    });
+
+    members.addEventListener('item-selected', function(e) {
+      entryEditor.memberSelected(e.detail);
+    });
+
+    members.addEventListener('item-deselected', function(e) {
+      entryEditor.memberDeselected(e.detail);
     });
 
     $('#go-to-gantt-chart').click(function(e) {

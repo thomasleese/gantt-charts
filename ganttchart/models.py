@@ -405,7 +405,8 @@ class ProjectEntry(Base):
             },
             'expected_time': self.expected_time,
             'dependencies': [{'id': d.child.id} for d in self.dependencies],
-            'resources': [res.as_json() for res in self.resources]
+            'resources': [res.as_json() for res in self.resources],
+            'members': [member.as_json() for member in self.members],
         }
 
 
@@ -440,5 +441,6 @@ class ProjectEntryResource(Base):
     def as_json(self):
         return {
             'amount': self.amount,
-            'resource': {'id': self.resource_id}
+            'resource': {'id': self.resource_id},
+            'entry': {'id': self.entry_id},
         }

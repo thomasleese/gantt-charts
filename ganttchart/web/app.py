@@ -429,6 +429,37 @@ def api_project_entry_resource(project_id, entry_id, resource_id):
         return '', 204
 
 
+@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>/members/<int:member_id>', methods=['PUT', 'DELETE'])
+def api_project_entry_member(project_id, entry_id, member_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    if not account_member.access_level.can_edit:
+        raise errors.MissingPermission('can_edit')
+
+    if flask.request.method == 'PUT':
+        entry_member = ProjectEntryMember(entry_id=entry_id,
+                                          member_id=member_id)
+
+        flask.g.sql_session.add(entry_member)
+        flask.g.sql_session.commit()
+
+        return '', 201
+    elif flask.request.method == 'DELETE':
+        try:
+            entry_member = flask.g.sql_session.query(ProjectEntryMember) \
+                .filter(ProjectEntryMember.entry_id == entry_id) \
+                .filter(ProjectEntryMember.member_id == member_id) \
+                .one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise errors.NotFound()
+
+        flask.g.sql_session.delete(entry_member)
+        flask.g.sql_session.commit()
+
+        return '', 204
+
+
 @app.route('/api/projects/<int:project_id>/gantt-chart')
 def api_project_gantt_chart(project_id):
     project = get_project_or_404(project_id)

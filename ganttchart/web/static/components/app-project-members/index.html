@@ -76,11 +76,11 @@
 
     <ul class="list-group">
       <template is="dom-repeat" items="{{ members }}" as="member">
-        <li class="list-group-item">
+        <li class$="{{ _listItemClass(member.selected) }}" on-click="_handleSelectMember">
           <img class="img-rounded m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
           <span>{{ member.account.display_name }}</span>
           <span class="label label-default m-l">{{ member.access_level.description }}</span>
-          <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="ion-trash-a"></span></button>
+          <button hidden$="[[ isSelecting ]]" class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteMember"><span class="ion-trash-a"></span></button>
           <!-- <button class="btn btn-sm btn-warning pull-right m-r"><span class="ion-edit"></span></button> -->
         </li>
       </template>
@@ -114,11 +114,14 @@
 
     Polymer({
       is: 'app-project-members',
-      ready: function() {
-
+      properties: {
+        projectId: {
+          type: Number,
+          observer: '_projectIdChanged'
+        }
       },
       _projectIdChanged: function(newValue, oldValue) {
-        this.reloadMembers();
+        this.reload();
       },
       _findMemberLi: function(event) {
         var dom = Polymer.dom(event);
@@ -132,6 +135,18 @@
         e.preventDefault();
         return false;
       },
+      _handleSelectMember: function(e) {
+        if (this.isSelecting) {
+          var newState = !e.model.member.selected;
+          e.model.set('member.selected', newState);
+
+          if (newState) {
+            this.fire('item-selected', e.model.member);
+          } else {
+            this.fire('item-deselected', e.model.member);
+          }
+        }
+      },
       _handleDeleteMember: function(e) {
         var member = e.model.member;
         this.$['delete-modal-who'].textContent = member.account.name;
@@ -142,7 +157,7 @@
         var member = this._targetMemberForDeletion;
         deleteMember(this.projectId, member.id, function(status) {
           if (status === 204) {
-            this.reloadMembers();
+            this.reload();
           } else if (status === 405) {
             this.$.errorModal.show('Owners cannot be deleted.');
           } else {
@@ -168,7 +183,7 @@
           } else if (status === 400) {
             this.$.errorModal.show('No such member for that email address.');
           } else if (status === 201) {
-            this.reloadMembers();
+            this.reload();
           } else {
             this.$.errorModal.showUnknownError();
           }
@@ -176,17 +191,37 @@
 
         $(this.$['new-modal']).modal('hide');
       },
-      reloadMembers: function() {
+      reload: function() {
         loadMembers(this.projectId, function(members) {
           this.members = members;
         }.bind(this));
       },
-      properties: {
-        projectId: {
-          type: Number,
-          observer: '_projectIdChanged'
+      startSelecting: function() {
+        this.isSelecting = true;
+      },
+      stopSelecting: function() {
+        this.clearSelection();
+        this.isSelecting = false;
+      },
+      clearSelection: function() {
+        for (var i = 0; i < this.members.length; i++) {
+          this.set('members.' + i + '.selected', false);
         }
-      }
+      },
+      selectItem: function(member) {
+        for (var i = 0; i < this.members.length; i++) {
+          if (this.members[i].id === member.id) {
+            this.set('members.' + i + '.selected', true);
+          }
+        }
+      },
+      _listItemClass: function(isSelected) {
+        var s = 'list-group-item';
+        if (isSelected) {
+          s += ' active';
+        }
+        return s;
+      },
     });
   </script>
 
