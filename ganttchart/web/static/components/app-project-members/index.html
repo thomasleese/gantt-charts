@@ -2,6 +2,7 @@
 
 <link rel="import" href="../app-delete-modal/index.html" />
 <link rel="import" href="../app-error-modal/index.html" />
+<link rel="import" href="../app-project-member-editor/index.html" />
 
 <dom-module id="app-project-members">
 
@@ -60,6 +61,8 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
+    <app-project-member-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload"></app-project-member-editor>
+
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a member to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a member to select it.</p>
 
@@ -110,22 +113,8 @@
             this.fire('item-deselected', e.model.member);
           }
         } else {
-          var member = e.model.member;
-          this.$.deleteModal.show(member.account.display_name, member);
+          this.$.editor.show(e.model.member);
         }
-      },
-      _handleActuallyDelete: function(e) {
-        var member = e.detail;
-        requests.delete('/api/projects/' + this.projectId + '/members/' + member.id)
-          .go(function(statusCode, response) {
-            if (statusCode === 204) {
-              this.reload();
-            } else if (statusCode === 405) {
-              this.$.errorModal.show('Owners cannot be deleted.');
-            } else {
-              this.$.errorModal.showUnknownError();
-            }
-          }.bind(this));
       },
       _handleNewMember: function(e) {
         this.$['new-modal-email-address'].value = '';
@@ -161,6 +150,7 @@
       },
       startSelecting: function() {
         this.isSelecting = true;
+        this.$.editor.hide();
       },
       stopSelecting: function() {
         this.clearSelection();

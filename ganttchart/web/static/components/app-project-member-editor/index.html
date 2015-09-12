@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<link rel="import" href="../app-thing-editor/index.html" />
+
+<dom-module id="app-project-member-editor">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-delete-modal id="deleteModal" what="member" on-deleted="_handleActuallyDelete"></app-delete-modal>
+
+    <app-error-modal id="errorModal"></app-error-modal>
+
+    <app-thing-editor id="editor" hidden>
+      <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
+      <div class="clearfix"></div>
+    </app-thing-editor>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-member-editor',
+      properties: {
+        projectId: Number,
+      },
+
+      show: function(member) {
+        this.member = member;
+        this.$.editor.show(member.account.display_name);
+      },
+      hide: function() {
+        this.$.editor.hide();
+      },
+
+      _handleDelete: function(e) {
+        this.$.deleteModal.show(this.member.account.display_name, this.member);
+      },
+      _handleActuallyDelete: function(e) {
+        var member = e.detail;
+        requests.delete('/api/projects/' + this.projectId + '/members/' + member.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.fire('deleted', member);
+              this.hide();
+            } else if (statusCode === 405) {
+              this.$.errorModal.show('Owners cannot be deleted.');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+    });
+  </script>
+
+</dom-module>
