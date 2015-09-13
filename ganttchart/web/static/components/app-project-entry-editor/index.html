@@ -118,7 +118,7 @@
       },
       _handleNameChange: function() {
         this._submitEntryChange('name', this.$.cardFormName.value, function() {
-          this.$.cardTitle.textContent = this.$.cardFormName.value;
+          this.$.editor.title = this.$.cardFormName.value;
         }.bind(this));
       },
       _handleDescriptionChange: function() {
