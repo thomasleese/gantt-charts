@@ -11,11 +11,17 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
     && rm /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
 
+# Node, NPM and Bower
+RUN apt-get update && apt-get install -y nodejs nodejs-legacy npm
+RUN npm install -g bower grunt-cli
+
 # ganttchart
 RUN mkdir /code
 WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
+COPY bower.json /code/
+RUN bower install --allow-root
 COPY . /code
 RUN pip install -e .
 

@@ -2,3 +2,4 @@
 venv
 ganttchart.egg-info
 *.pyc
+*/bower_components
