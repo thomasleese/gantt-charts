@@ -147,6 +147,14 @@ class ApiAddProjectResource(Form):
     reusable = BooleanField('Reusable')
 
 
+class ApiUpdateProjectResource(Form):
+    name = StringField('Name')
+    description = StringField('Description')
+    icon = StringField('Icon')
+    amount = IntegerField('Amount')
+    reusable = BooleanField('Reusable')
+
+
 class WorkingWeek(Form):
     monday = BooleanField()
     tuesday = BooleanField()

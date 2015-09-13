@@ -20,99 +20,9 @@
       }
     </style>
 
-    <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="new-modal-label" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              <span class="sr-only">Close</span>
-            </button>
-            <h4 class="modal-title" id="new-modal-label">New resource</h4>
-          </div>
-
-          <div class="modal-body">
-            <p>Enter the details of the new resource.</p>
-
-            <form id="newModalForm" class="form" on-submit="_disableFormSubmit">
-              <div class="form-group">
-                <input type="text" class="form-control" id="newModalFormName" placeholder="Name" required />
-              </div>
-
-              <div class="form-group">
-                <input type="text" class="form-control" id="newModalFormDescription" placeholder="Description" required />
-              </div>
-
-              <div class="form-group">
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="cash" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-cash"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="settings" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-settings"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="person-stalker" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-person-stalker"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="speakerphone" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-speakerphone"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="email" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-email"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="map" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-map"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="chatbubble" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-chatbubbles"></span>
-                </label>
-                <label class="c-input c-radio">
-                  <input name="icon" type="radio" value="university" />
-                  <span class="c-indicator"></span>
-                  <span class="ion-university"></span>
-                </label>
-              </div>
-
-              <div class="form-group">
-                <input type="number" class="form-control" id="newModalFormAmount" placeholder="Amount" required />
-              </div>
-
-              <div class="form-group">
-                <label class="c-input c-checkbox">
-                  <input id="newModalFormReusable" type="checkbox" />
-                  <span class="c-indicator"></span>
-                  Reusable
-                </label>
-              </div>
-            </form>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-success" on-click="_handleActuallyNewResource">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <app-delete-modal id="deleteModal" what="resource" on-deleted="_handleActuallyDelete"></app-delete-modal>
-
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload"></app-project-resource-editor>
+    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload" on-changed="reload"></app-project-resource-editor>
 
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a resource to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a resource to select it.</p>
@@ -182,43 +92,23 @@
         }
       },
       _handleNewResource: function(e) {
-        this.$.newModalFormName.value = '';
-        this.$.newModalFormDescription.value = '';
-        this.$.newModalForm.icon[0].checked = true;
-        this.$.newModalFormAmount.value = '0';
-        this.$.newModalFormReusable.checked = false;
-
-        $(this.$.newModal).modal('show');
-      },
-      _handleActuallyNewResource: function(e) {
-        var icon;
-        for (var i = 0; i < this.$.newModalForm.icon.length; i++) {
-          if (this.$.newModalForm.icon[i].checked) {
-            icon = this.$.newModalForm.icon[i].value;
-          }
-        }
-
         var resource = {
-          name: this.$.newModalFormName.value,
-          description: this.$.newModalFormDescription.value,
-          icon: icon,
-          amount: this.$.newModalFormAmount.value,
-          reusable: this.$.newModalFormReusable.checked,
+          name: 'Untitled Resource',
+          description: '',
+          icon: 'help',
+          amount: 1,
+          reusable: false,
         };
 
         requests.post('/api/projects/' + this.projectId + '/resources')
           .send(resource)
           .go(function(statusCode, response) {
-            if (statusCode === 400) {
-              $(this.$.newModal).modal('show');
-            } else if (statusCode === 201) {
+            if (statusCode === 201) {
               this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
-
-        $(this.$.newModal).modal('hide');
       },
       reload: function() {
         requests.get('/api/projects/' + this.projectId + '/resources')

@@ -589,17 +589,43 @@ def api_project_resources(project_id):
             raise errors.InvalidFormData(form)
 
 
-@app.route('/api/projects/<int:project_id>/resources/<int:resource_id>', methods=['DELETE'])
+@app.route('/api/projects/<int:project_id>/resources/<int:resource_id>', methods=['PATCH', 'DELETE'])
 def api_project_resource(project_id, resource_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
+
     if not account_member.access_level.can_administrate:
         raise errors.MissingPermission('can_administrate')
 
-    target_resource = get_project_resource_or_404(resource_id)
-    flask.g.sql_session.delete(target_resource)
-    flask.g.sql_session.commit()
-    return '', 204
+    resource = get_project_resource_or_404(resource_id)
+
+    if flask.request.method == 'PATCH':
+        form = forms.ApiUpdateProjectResource.from_json(flask.request.json)
+        if form.validate():
+            if form.name.raw_data:
+                resource.name = form.name.data
+
+            if form.description.raw_data:
+                resource.description = form.description.data
+
+            if form.icon.raw_data:
+                resource.icon = form.icon.data
+
+            if form.amount.raw_data:
+                resource.amount = form.amount.data
+
+            if form.reusable.raw_data:
+                resource.reusable = form.reusable.data
+
+            flask.g.sql_session.commit()
+
+            return '', 204
+        else:
+            raise errors.InvalidFormData(form)
+    elif flask.request.method == 'DELETE':
+        flask.g.sql_session.delete(resource)
+        flask.g.sql_session.commit()
+        return '', 204
 
 
 def error_handler(e):

@@ -18,6 +18,73 @@
     <app-error-modal id="errorModal"></app-error-modal>
 
     <app-thing-editor id="editor" hidden>
+      <form id="form" class="form" on-submit="_preventDefault">
+        <div class="form-group">
+          <input type="text" class="form-control" id="formName" placeholder="Name" required on-change="_handleNameChange" />
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="formDescription" placeholder="Description" required on-change="_handleDescriptionChange" />
+        </div>
+
+        <div class="form-group">
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="cash" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-cash"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="settings" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-settings"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="person-stalker" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-person-stalker"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="speakerphone" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-speakerphone"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="email" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-email"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="map" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-map"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="chatbubble" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-chatbubbles"></span>
+          </label>
+          <label class="c-input c-radio">
+            <input name="icon" type="radio" value="university" on-change="_handleIconChange" />
+            <span class="c-indicator"></span>
+            <span class="ion-university"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control" id="formAmount" placeholder="Amount" required on-change="_handleAmountChange" />
+        </div>
+
+        <div class="form-group">
+          <label class="c-input c-checkbox">
+            <input id="formReusable" type="checkbox" on-change="_handleReusableChange" />
+            <span class="c-indicator"></span>
+            Reusable
+          </label>
+        </div>
+      </form>
+
+      <hr />
+
       <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
       <div class="clearfix"></div>
     </app-thing-editor>
@@ -33,10 +100,57 @@
       show: function(resource) {
         this.resource = resource;
         this.$.editor.show(resource.name);
+
+        this.$.formName.value = resource.name;
+        this.$.formDescription.value = resource.description;
+        this.$.form.icon.value = resource.icon;
+        this.$.formAmount.value = resource.amount;
+        this.$.formReusable.checked = resource.reusable;
       },
       hide: function() {
         this.resource = undefined;
         this.$.editor.hide();
+      },
+      submitChange: function(key, value, callback) {
+        var data = {};
+        data[key] = value;
+
+        requests.patch('/api/projects/' + this.projectId + '/resources/' + this.resource.id)
+          .send(data)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              if (callback !== undefined) {
+                callback();
+              }
+              this.fire('changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+
+      _preventDefault: function(e) {
+        e.preventDefault();
+        return false;
+      },
+
+      _handleNameChange: function() {
+        var newName = this.$.formName.value;
+        this.submitChange('name', newName, function() {
+          this.$.editor.title = newName;
+        }.bind(this));
+      },
+      _handleDescriptionChange: function() {
+        this.submitChange('description', this.$.formDescription.value);
+      },
+      _handleIconChange: function() {
+        this.submitChange('icon', this.$.form.icon.value);
+      },
+      _handleAmountChange: function() {
+        this.submitChange('amount', this.$.formAmount.value);
+      },
+      _handleReusableChange: function() {
+        this.submitChange('reusable', this.$.formReusable.checked);
       },
 
       _handleDelete: function(e) {
