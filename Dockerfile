@@ -22,7 +22,12 @@ COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY bower.json /code/
 COPY .bowerrc /code/
-RUN bower install --allow-root --force
+RUN bower install --allow-root --force && \
+    cd ganttchart/web/static/bower_components/bootstrap && \
+    npm install
+COPY ganttchart/web/static/bootstrap_variables.scss ganttchart/web/static/bower_components/bootstrap/scss/_variables.scss
+RUN cd ganttchart/web/static/bower_components/bootstrap && \
+    grunt dist
 COPY . /code
 RUN pip install -e .
 
