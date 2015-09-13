@@ -273,6 +273,9 @@ def api_project_calendar(project_id):
             if form.working_day.end.raw_data:
                 project.calendar.work_ends_at = datetime.datetime.strptime(form.working_day.end.data, '%H:%M').time()
 
+            if form.start_date.raw_data:
+                project.calendar.start_date = form.start_date.data
+
             flask.g.sql_session.commit()
 
             return '', 204

@@ -32,7 +32,7 @@ class Chart:
         bhour_end = datetime.datetime.combine(today, bhour.end)
         business_hours = int((bhour_end - bhour_start).total_seconds() / (60 * 60))
 
-        first_start_date = project.start_date
+        first_start_date = project.calendar.start_date
         first_start_date = bday.rollforward(first_start_date)
         first_start_date = bhour.rollforward(first_start_date)
 

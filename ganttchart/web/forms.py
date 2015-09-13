@@ -177,6 +177,7 @@ class WorkingDay(Form):
 class ApiChangeProjectCalendar(Form):
     working_week = FormField(WorkingWeek)
     working_day = FormField(WorkingDay)
+    start_date = DateField()
 
 
 class ApiAddCalendarHoliday(Form):

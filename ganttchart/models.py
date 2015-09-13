@@ -256,6 +256,7 @@ class ProjectCalendar(Base):
 
     def as_json(self):
         return {
+            'start_date': self.start_date.isoformat(),
             'working_week': {
                 'monday': self.works_on_monday,
                 'tuesday': self.works_on_tuesday,

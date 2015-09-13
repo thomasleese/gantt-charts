@@ -18,6 +18,20 @@
 
     <div class="card">
       <div class="card-block">
+        <h4 class="card-title">Project start</h4>
+        <p class="card-text">Set the start date for your project here.</p>
+
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="control-label" for="startDate">Project starts on:</label>
+            <input class="form-control" type="date" id="startDate" placeholder="Start date" on-change="_handleStartDateChange" />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-block">
         <h4 class="card-title">Working week</h4>
         <p class="card-text">Set the working week for your project here.</p>
 
@@ -194,6 +208,8 @@
             this._setWorkingDay(this.$.worksOnSaturday, this.calendar.working_week.saturday);
             this._setWorkingDay(this.$.worksOnSunday, this.calendar.working_week.sunday);
 
+            this.$.startDate.value = this.calendar.start_date;
+
             this.$.workingDayStart.value = this.calendar.working_day.start;
             this.$.workingDayEnd.value = this.calendar.working_day.end;
           }.bind(this));
@@ -248,14 +264,27 @@
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'working_day': {'start': this.$.workingDayStart.value}})
           .go(function(statusCode, response) {
-
+            if (statusCode !== 204) {
+              this.$.errorModal.showUnknownError();
+            }
           }.bind(this));
       },
       _handleWorkingDayEndChange: function() {
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'working_day': {'end': this.$.workingDayEnd.value}})
           .go(function(statusCode, response) {
-
+            if (statusCode !== 204) {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      _handleStartDateChange: function() {
+        requests.patch('/api/projects/' + this.projectId + '/calendar')
+          .send({'start_date': this.$.startDate.value})
+          .go(function(statusCode, response) {
+            if (statusCode !== 204) {
+              this.$.errorModal.showUnknownError();
+            }
           }.bind(this));
       },
       _disableFormSubmit: function(e) {

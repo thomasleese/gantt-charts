@@ -22,12 +22,12 @@ def upgrade():
         sa.Column('name', sa.String, nullable=False),
         sa.Column('description', sa.String, nullable=False),
         sa.Column('creation_date', sa.DateTime, nullable=False),
-        sa.Column('start_date', sa.Date, nullable=False),
     )
 
     op.create_table('project_calendar',
         sa.Column('project_id', sa.Integer, sa.ForeignKey('project.id'),
                   primary_key=True, nullable=False),
+        sa.Column('start_date', sa.Date, nullable=False),
         sa.Column('works_on_monday', sa.Boolean, nullable=False),
         sa.Column('works_on_tuesday', sa.Boolean, nullable=False),
         sa.Column('works_on_wednesday', sa.Boolean, nullable=False),
