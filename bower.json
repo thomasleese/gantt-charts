@@ -1,20 +1,21 @@
 {
-    "name": "gantt-chart",
-    "authors": [
-        "Tom Leese <inbox@tomleese.me.uk>"
-    ],
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "ganttchart/web/static/bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "bootstrap": "~4.0.0",
-        "iron-pages": "PolymerElements/iron-pages#~1.0.3",
-        "polymer": "~1.1.3"
-    },
-    "private": true
+  "name": "gantt-chart",
+  "authors": [
+    "Tom Leese <inbox@tomleese.me.uk>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "ganttchart/web/static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~4.0.0",
+    "iron-pages": "PolymerElements/iron-pages#~1.0.3",
+    "moment": "~2.10.6",
+    "polymer": "~1.1.3"
+  },
+  "private": true
 }

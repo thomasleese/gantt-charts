@@ -2,6 +2,8 @@
 
 <link rel="import" href="../app-error-modal/index.html" />
 
+<script src="../../bower_components/moment/moment.js"></script>
+
 <dom-module id="app-project-gantt-chart">
 
   <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
@@ -18,18 +20,18 @@
       }
 
       .gantt-chart th.rotate {
-        height: 75px;
+        height: 85px;
         white-space: nowrap;
       }
 
       .gantt-chart th.rotate > div {
-        transform: translate(3px, 36px) rotate(315deg);
-        width: 30px;
+        transform: translate(3px, 41px) rotate(315deg);
+        width: 2rem;
       }
 
       .gantt-chart th.rotate > div > span {
         border-bottom: 1px solid rgb(200, 200, 200);
-        padding: 2px 20px 2px 1.6rem;
+        padding: 2px 100px 2px 1.8rem;
       }
 
       .gantt-chart tbody tr {
@@ -149,7 +151,8 @@
             for (var i = 0; i < days; i++) {
               var d = new Date(start);
               d.setDate(start.getDate() + i);
-              tableHeadings.push(d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate());
+
+              tableHeadings.push(moment(d).format('D MMM YYYY'));
             }
             this._tableHeadings = tableHeadings;
 
