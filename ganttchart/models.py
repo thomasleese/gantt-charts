@@ -359,7 +359,7 @@ class ProjectEntryType(Enum):
 class ProjectEntry(Base):
     __tablename__ = 'project_entry'
 
-    project = relationship('Project', backref='entries')
+    project = relationship('Project', backref=backref('entries', order_by='ProjectEntry.creation_date'))
 
     def __init__(self, name, description, type, time_estimates, project):
         super().__init__(name=name, description=description)
