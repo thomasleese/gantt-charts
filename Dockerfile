@@ -21,7 +21,8 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY bower.json /code/
-RUN bower install --allow-root
+COPY .bowerrc /code/
+RUN bower install --allow-root --force
 COPY . /code
 RUN pip install -e .
 
