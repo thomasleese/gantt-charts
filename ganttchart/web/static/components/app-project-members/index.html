@@ -34,17 +34,9 @@
           <div class="modal-body">
             <p>Enter the email address of the person you wish to enter.</p>
 
-            <form id="new-modal-form" class="form-inline" on-submit="_disableFormSubmit">
+            <form id="new-modal-form" class="form" on-submit="_disableFormSubmit">
               <div class="form-group">
                 <input type="text" class="form-control" id="new-modal-email-address" placeholder="Email address" />
-              </div>
-
-              <div class="form-group">
-                <select id="new-modal-access-level" class="form-control c-select">
-                  <option value="administrator">Can administrate</option>
-                  <option value="editor">Can edit</option>
-                  <option value="viewer" selected>Can view</option>
-                </select>
               </div>
             </form>
           </div>
@@ -61,7 +53,7 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-project-member-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload"></app-project-member-editor>
+    <app-project-member-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload" on-changed="reload"></app-project-member-editor>
 
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a member to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a member to select it.</p>
@@ -118,16 +110,14 @@
       },
       _handleNewMember: function(e) {
         this.$['new-modal-email-address'].value = '';
-        this.$['new-modal-access-level'].value = 'viewer';
 
         $(this.$['new-modal']).modal('show');
       },
       _handleActuallyNewMember: function(e) {
         var emailAddress = this.$['new-modal-email-address'].value;
-        var accessLevel = this.$['new-modal-access-level'].value;
 
         requests.post('/api/projects/' + this.projectId + '/members')
-          .send({'email_address': emailAddress, 'access_level': accessLevel})
+          .send({'email_address': emailAddress, 'access_level': 'viewer'})
           .go(function(statusCode, response) {
             if (statusCode === 409) {
               this.$.errorModal.show('Member with that email address already exists.');

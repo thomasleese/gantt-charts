@@ -168,6 +168,7 @@ class AccessLevel(Enum):
 
     def as_json(self):
         return {
+            'id': self.name,
             'description': self.description,
             'owner': self.owner,
             'can_administrate': self.can_administrate,

@@ -139,6 +139,10 @@ class ApiAddProjectMember(Form):
     access_level = StringField('Access Level', validators=[DataRequired()])
 
 
+class ApiUpdateProjectMember(Form):
+    access_level = StringField('Access Level')
+
+
 class ApiAddProjectResource(Form):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()])

@@ -18,6 +18,19 @@
     <app-error-modal id="errorModal"></app-error-modal>
 
     <app-thing-editor id="editor" hidden>
+      <form id="form" class="form-inline" on-submit="_preventDefault">
+        <div class="form-group">
+          <select id="formAccessLevel" class="form-control c-select" on-change="_handleAccessLevelChange">
+            <option value="owner">Owner</option>
+            <option value="administrator">Can administrate</option>
+            <option value="editor">Can edit</option>
+            <option value="viewer" selected>Can view</option>
+          </select>
+        </div>
+      </form>
+
+      <hr />
+
       <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
       <div class="clearfix"></div>
     </app-thing-editor>
@@ -33,12 +46,35 @@
       show: function(member) {
         this.member = member;
         this.$.editor.show(member.account.display_name);
+
+        this.$.formAccessLevel.value = member.access_level.id;
       },
       hide: function() {
         this.member = undefined;
         this.$.editor.hide();
       },
+      submitChange: function(key, value, callback) {
+        var data = {};
+        data[key] = value;
 
+        requests.patch('/api/projects/' + this.projectId + '/members/' + this.member.id)
+          .send(data)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              if (callback !== undefined) {
+                callback();
+              }
+              this.fire('changed');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+
+      _preventDefault: function(e) {
+        e.preventDefault();
+        return false;
+      },
       _handleDelete: function(e) {
         this.$.deleteModal.show(this.member.account.display_name, this.member);
       },
@@ -56,6 +92,9 @@
             }
           }.bind(this));
       },
+      _handleAccessLevelChange: function() {
+        this.submitChange('access_level', this.$.formAccessLevel.value);
+      }
     });
   </script>
 

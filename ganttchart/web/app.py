@@ -359,6 +359,8 @@ def api_project_entry(project_id, entry_id):
 
     entry = flask.g.sql_session.query(ProjectEntry) \
         .filter(ProjectEntry.id == entry_id).one()
+    if entry.project != project:
+        raise errors.NotFound()
 
     if flask.request.method == 'PATCH':
         form = forms.ApiChangeProjectEntry.from_json(flask.request.json)
@@ -542,23 +544,43 @@ def api_project_members(project_id):
             raise errors.InvalidFormData(form)
 
 
-@app.route('/api/projects/<int:project_id>/members/<int:account_id>', methods=['DELETE'])
-def api_project_member(project_id, account_id):
+@app.route('/api/projects/<int:project_id>/members/<int:member_id>', methods=['PATCH', 'DELETE'])
+def api_project_member(project_id, member_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
+
     if not account_member.access_level.can_administrate:
         raise errors.MissingPermission('can_administrate')
 
-    target_member = project.get_member(account_id)
-    if target_member is None:
+    member = flask.g.sql_session.query(ProjectMember) \
+        .filter(ProjectMember.id == member_id).one()
+    if member.project != project:
         raise errors.NotFound()
 
-    if target_member.access_level.owner:
-        raise errors.MethodNotAllowed()
+    if flask.request.method == 'PATCH':
+        form = forms.ApiUpdateProjectMember.from_json(flask.request.json)
+        if form.validate():
+            if form.access_level.raw_data:
+                new_access_level = AccessLevel[form.access_level.data]
+                if new_access_level.owner:
+                    if not account_member.access_level.owner:
+                        raise errors.MissingPermission('owner')
 
-    flask.g.sql_session.delete(target_member)
-    flask.g.sql_session.commit()
-    return '', 204
+                member.access_level = new_access_level
+
+            flask.g.sql_session.commit()
+
+            return '', 204
+        else:
+            raise errors.InvalidFormData(form)
+    elif flask.request.method == 'DELETE':
+        if member.access_level.owner:
+            raise errors.MethodNotAllowed()
+
+        flask.g.sql_session.delete(member)
+        flask.g.sql_session.commit()
+
+        return '', 204
 
 
 @app.route('/api/projects/<int:project_id>/resources', methods=['GET', 'POST'])
