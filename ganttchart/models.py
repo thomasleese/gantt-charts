@@ -187,7 +187,6 @@ class Project(Base):
             creation_date = datetime.datetime.now()
 
         self.creation_date = creation_date
-        self.start_date = creation_date.date()
         self.members.append(ProjectMember(creator, AccessLevel.owner))
         self.calendar = ProjectCalendar()
 
@@ -231,7 +230,8 @@ class ProjectCalendar(Base):
                          works_on_saturday=False,
                          works_on_sunday=False,
                          work_starts_at=datetime.time(9),
-                         work_ends_at=datetime.time(17))
+                         work_ends_at=datetime.time(17),
+                         start_date=datetime.datetime.now())
 
     @property
     def business_hour(self):
