@@ -178,7 +178,12 @@
         return seconds / (60 * 60 * 24);
       },
       _tableLeftPadding: function(block) {
-        var l = parseInt(this._asDays((new Date(block.start) - new Date(this.ganttChart.start)) / 1000));
+        var end = new Date(block.start);
+        end.setHours(23);
+        var start = new Date(this.ganttChart.start);
+        start.setHours(0);
+
+        var l = Math.floor(this._asDays((end - start) / 1000));
         return new Array(l);
       },
       _tableBlockColspan: function(block) {
@@ -194,7 +199,12 @@
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
       _tableRightPadding: function(block) {
-        var l = parseInt(this._asDays((new Date(this.ganttChart.end) - new Date(block.end)) / 1000));
+        var end = new Date(this.ganttChart.end);
+        end.setHours(23);
+        var start = new Date(block.end);
+        start.setHours(0);
+
+        var l = Math.floor(this._asDays((end - start) / 1000));
         return new Array(l);
       },
       _tableFullColspan: function(chart) {
