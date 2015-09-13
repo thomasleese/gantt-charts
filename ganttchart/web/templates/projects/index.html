@@ -10,16 +10,13 @@
           <div class="card project">
             <div class="card-block">
               {% if project.starred_by(g.account) %}
-                <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="ion-android-star pull-right" style="font-size: 1.6rem"></span></a>
+                <a class="star" href="{{ url_for('.unstar_project', project_id=project.id) }}"><span class="ion-android-star pull-right" style="font-size: 1.6rem; line-height: 0.5;"></span></a>
               {% else %}
-                <a class="star" href="{{ url_for('.star_project', project_id=project.id) }}"><span class="ion-android-star-outline pull-right" style="font-size: 1.6rem"></span></a>
+                <a class="star" href="{{ url_for('.star_project', project_id=project.id) }}"><span class="ion-android-star-outline pull-right" style="font-size: 1.6rem; line-height: 0.5;"></span></a>
               {% endif %}
-              <h4 class="card-title">{{ project.name }}</h4>
-              <h6 class="card-subtitle text-muted">{{ project.tasks | length }} tasks ・ <a href="{{ url_for('.view_project', project_id=project.id) }}">{{ project.members | length }} members</a></h6>
-              <p class="card-text"></p>
-              <a href="{{ url_for('.view_project', project_id=project.id) }}" class="card-link">View</a>
-              <a href="#" class="card-link">Edit</a>
-              <a href="#" class="card-link">Delete</a>
+
+              <h4 class="card-title"><a href="{{ url_for('.view_project', project_id=project.id ) }}">{{ project.name }}</a></h4>
+              <h6 class="card-subtitle text-muted m-t">{{ project.entries | length }} entries ・ {{ project.members | length }} members</h6>
             </div>
           </div>
         </div>
@@ -45,7 +42,7 @@
       {{ projects_list(g.account.shared_projects) }}
     {% endif %}
 
-    <a class="btn btn-primary pull-right" href="{{ url_for('.new_project') }}" role="button"><span class="ion-plus-round m-r"></span>New project</a>
+    <a class="btn btn-success pull-right" href="{{ url_for('.new_project') }}" role="button"><span class="ion-plus-round m-r"></span>New project</a>
     <div class="clearfix"></div>
   {% else %}
     <p class="lead text-center">It looks like you don't have any projects. (lazy!)</p>
