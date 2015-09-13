@@ -318,12 +318,16 @@ class ProjectMember(Base):
     def access_level(self):
         return self._access_level
 
-    def as_json(self):
-        return {
+    def as_json(self, minimal=False):
+        json = {
             'id': self.id,
             'account': self.account.as_json(),
-            'access_level': self.access_level.as_json(),
         }
+
+        if not minimal:
+            json['access_level'] = self.access_level.as_json()
+
+        return json
 
 
 class ProjectResource(Base):
@@ -435,7 +439,7 @@ class ProjectEntryMember(Base):
 
     def as_json(self):
         return {
-            'member': {'id': self.member_id},
+            'member': self.member.as_json(minimal=True),
             'entry': {'id': self.entry_id},
         }
 
@@ -449,6 +453,6 @@ class ProjectEntryResource(Base):
     def as_json(self):
         return {
             'amount': self.amount,
-            'resource': {'id': self.resource_id},
+            'resource': self.resource.as_json(),
             'entry': {'id': self.entry_id},
         }

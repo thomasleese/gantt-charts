@@ -54,10 +54,16 @@
         background: white;
 
         width: 2rem;
+        height: 2rem;
         max-width: 2rem;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+      }
+
+      .gantt-chart tbody td img {
+        height: 1.8rem;
+        margin: 0.1rem;
       }
 
       .gantt-chart tbody tr.active,
@@ -96,7 +102,17 @@
                   <td></td>
                 </template>
 
-                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">{{ block.entry.name }}</td>
+                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
+                  <template is="dom-repeat" items="{{ block.entry.members }}" as="member">
+                    <img src="{{ member.member.account.photo_url }}" />
+                  </template>
+
+                  <span class="m-r">{{ block.entry.name }}</span>
+
+                  <template is="dom-repeat" items="{{ block.entry.resources }}" as="resource">
+                    <span class$="[[ _iconClass(resource.resource.icon) ]]"></span>
+                  </template>
+                </td>
 
                 <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
                   <td></td>
@@ -278,7 +294,10 @@
       },
       _listItemClass: function(isSelected) {
         return isSelected ? 'active' : '';
-      }
+      },
+      _iconClass: function(icon) {
+        return 'ion-' + icon;
+      },
     });
   </script>
 
