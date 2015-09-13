@@ -74,8 +74,8 @@ class Chart:
                     del graph_unsorted[node]
                     graph_sorted.append((node, edges))
 
-        if not acyclic:
-            raise RuntimeError("A cyclic dependency occurred")
+            if not acyclic:
+                raise ValueError("A cyclic dependency occurred")
 
         return graph_sorted
 

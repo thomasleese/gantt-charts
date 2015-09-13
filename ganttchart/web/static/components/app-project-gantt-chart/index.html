@@ -256,6 +256,13 @@
           }
         }
       },
+      unselectItem: function(entry) {
+        for (var i = 0; i < this.blocks.length; i++) {
+          if (this.blocks[i].entry.id === entry.id) {
+            this.set('blocks.' + i + '.selected', false);
+          }
+        }
+      },
       _listItemClass: function(isSelected) {
         return isSelected ? 'active' : '';
       }

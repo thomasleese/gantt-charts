@@ -209,13 +209,17 @@
             }
           }.bind(this));
       },
-      dependencySelected: function(entry) {
+      dependencySelected: function(entry, callback) {
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/dependencies/' + entry.id)
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('entry-changed');
+              callback(true);
+            } else if (statusCode === 409) {
+              callback(false);
             } else {
               this.$.errorModal.showUnknownError();
+              callback(false);
             }
           }.bind(this));
       },

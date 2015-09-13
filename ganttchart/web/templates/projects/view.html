@@ -102,7 +102,11 @@
     });
 
     ganttChart.addEventListener('item-selected', function(e) {
-      entryEditor.dependencySelected(e.detail.entry);
+      entryEditor.dependencySelected(e.detail.entry, function(worked) {
+        if (!worked) {
+          ganttChart.unselectItem(e.detail.entry);
+        }
+      });
     });
 
     ganttChart.addEventListener('item-deselected', function(e) {

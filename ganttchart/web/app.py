@@ -470,12 +470,23 @@ def api_project_entry_dependency(project_id, parent_id, child_id):
 
     if flask.request.method == 'PUT':
         dependency = ProjectEntryDependency(parent_id=parent_id,
-                                                  child_id=child_id)
+                                            child_id=child_id)
 
         flask.g.sql_session.add(dependency)
-        flask.g.sql_session.commit()
 
-        return '', 201
+        try:
+            flask.g.sql_session.flush()
+        except sqlalchemy.exc.IntegrityError:
+            flask.g.sql_session.rollback()
+            raise errors.InvalidGraph()
+
+        try:
+            chart = Chart(project)
+            flask.g.sql_session.commit()
+            return '', 201
+        except ValueError:
+            flask.g.sql_session.rollback()
+            raise errors.InvalidGraph()
     elif flask.request.method == 'DELETE':
         try:
             dependency = flask.g.sql_session.query(ProjectEntryDependency) \

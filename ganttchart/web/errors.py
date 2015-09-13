@@ -47,3 +47,7 @@ class NotFound(BaseNotFound):
 # 409
 class AlreadyExists(Conflict):
     description = 'Resource already exists.'
+
+
+class InvalidGraph(Conflict):
+    description = 'This would make an invalid graph.'
