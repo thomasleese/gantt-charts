@@ -1,0 +1,41 @@
+{% extends "_includes/page.html" %}
+
+{% block title %}Reset password{% endblock %}
+
+{% block page %}
+  <h1>Reset password</h1>
+
+  {% if stage == 1 %}
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        There is no account with that email address.
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      <fieldset class="form-group">
+        <label class="control-label" for="email_address">Email address</label>
+        <input type="email" class="form-control" name="email_address" id="email_address" placeholder="Email address" value="{{ request.form.get('email_address', '') }}" />
+      </fieldset>
+
+      <button type="submit" class="btn btn-success">Reset password</button>
+      <a class="btn btn-secondary pull-right" href="{{ url_for('.login') }}">Back to log in</a>
+      <div class="clearfix"></div>
+    </form>
+  {% elif stage == 2 %}
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        Your new password is not valid — try making it longer.
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      <fieldset class="form-group">
+        <label class="control-label" for="new_password">New password</label>
+        <input type="password" class="form-control" name="new_password" id="new_password" placeholder="New password" />
+      </fieldset>
+
+      <button type="submit" class="btn btn-success">Reset password</button>
+    </form>
+  {% endif %}
+{% endblock %}

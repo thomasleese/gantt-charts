@@ -107,6 +107,18 @@ class LogIn(Form):
     password = StringField('Password', validators=[DataRequired(), PasswordCorrect('email_address')])
 
 
+class AccountReset1(Form):
+    email_address = StringField('Email Address',
+                                validators=[DataRequired(), Email(),
+                                            Exists(AccountEmailAddress,
+                                                   'email_address')])
+
+
+class AccountReset2(Form):
+    new_password = StringField('New Password',
+                                validators=[DataRequired(), Length(8)])
+
+
 class CreateProject(Form):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()],

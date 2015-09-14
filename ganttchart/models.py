@@ -85,6 +85,42 @@ class Account(Base):
                         or member.access_level.can_administrate):
                 yield member.project
 
+    @property
+    def should_send_password_reset_email(self):
+        if self.reset_password_key is None \
+                or self.reset_password_key_expiration_date is None:
+            return False
+
+        if self.last_reset_password_email_date is None:
+            return True
+
+        one_day_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+        if self.last_reset_password_email_date < one_day_ago:
+            return True
+
+        return False
+
+    def send_reset_password_email(self):
+        if not self.should_send_password_reset_email:
+            return
+
+        url = flask.url_for('.account_reset', account_id=self.id,
+                            reset_password_key=self.reset_password_key,
+                            _external=True)
+        email = emails.ResetPassword(self, url)
+        with emails.Mailer() as mailer:
+            mailer.send(email)
+
+        self.last_reset_password_email_date = datetime.datetime.now()
+
+    def reset_password(self):
+        self.reset_password_key = generate_key()
+        self.reset_password_key_creation_date = datetime.datetime.now()
+        self.reset_password_key_expiration_date = datetime.datetime.now() \
+            + datetime.timedelta(hours=2)
+
+        self.send_reset_password_email()
+
     def as_json(self):
         return {
             'id': self.id,

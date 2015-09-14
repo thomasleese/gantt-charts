@@ -41,3 +41,11 @@ class VerifyEmailAddress(Email):
         super().__init__('verify_email_address', context)
 
         self['To'] = email_address
+
+
+class ResetPassword(Email):
+    def __init__(self, account, url):
+        context = {'account': account, 'url': url}
+        super().__init__('reset_password', context)
+
+        self['To'] = account.primary_email_address.email_address

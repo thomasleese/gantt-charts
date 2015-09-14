@@ -1,0 +1,7 @@
+{% extends "_includes/base.txt" %}
+
+{% block content %}
+Dear {{ account.display_name }},
+
+Please go to {{ url }} to reset your password.
+{% endblock %}

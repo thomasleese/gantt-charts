@@ -146,6 +146,38 @@ def account_email_addresses():
     return flask.redirect(flask.url_for('.account'))
 
 
+@app.route('/account/reset', methods=['GET', 'POST'])
+@app.route('/account/reset/<int:account_id>/<reset_password_key>', methods=['GET', 'POST'])
+def account_reset(account_id=None, reset_password_key=None):
+    if account_id is not None and reset_password_key is not None:
+        account = flask.g.sql_session.query(Account) \
+            .filter(Account.id == account_id) \
+            .filter(Account.reset_password_key == reset_password_key) \
+            .filter(Account.reset_password_key_expiration_date >= datetime.datetime.now()) \
+            .one()
+
+        form = forms.AccountReset2(flask.request.form)
+        if flask.request.method == 'POST' and form.validate():
+            account.password = form.new_password.data
+            account.reset_password_key = None
+            account.reset_password_key_expiration_date = None
+            flask.g.sql_session.commit()
+
+            flask.flash('Your password has been changed.', 'success')
+            return flask.redirect(flask.url_for('.login'))
+
+        return flask.render_template('account/reset.html', stage=2, form=form)
+    else:
+        form = forms.AccountReset1(flask.request.form)
+        if flask.request.method == 'POST' and form.validate():
+            account = form.email_address.record.account
+            account.reset_password()
+            flask.g.sql_session.commit()
+            flask.flash('Password reset email sent.', 'success')
+            return flask.redirect(flask.url_for('.account_reset'))
+        return flask.render_template('account/reset.html', stage=1, form=form)
+
+
 @app.route('/account/email-addresses/<int:id>/send-verify-email')
 def account_send_verify_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
