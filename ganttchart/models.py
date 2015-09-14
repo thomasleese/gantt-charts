@@ -350,7 +350,7 @@ class ProjectCalendarHoliday(Base):
 class ProjectMember(Base):
     __tablename__ = 'project_member'
 
-    project = relationship('Project', backref='members')
+    project = relationship('Project', backref=backref('members', order_by='ProjectMember.account_id'))
     account = relationship('Account', backref='project_members')
 
     def __init__(self, account, access_level):
@@ -385,7 +385,7 @@ class ProjectMember(Base):
 class ProjectResource(Base):
     __tablename__ = 'project_resource'
 
-    project = relationship('Project', backref='resources')
+    project = relationship('Project', backref=backref('resources', order_by='ProjectResource.name'))
 
     def __init__(self, name, description, icon, amount, reusable):
         super().__init__(name=name, description=description, icon=icon,
