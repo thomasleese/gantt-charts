@@ -109,8 +109,22 @@ class AccountEmailAddress(Base):
     def __str__(self):
         return self.email_address
 
-    def send_verify_email(self):
+    @property
+    def should_send_verification_email(self):
         if self.verified:
+            return False
+
+        if self.last_verification_email_date is None:
+            return True
+
+        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+        if self.last_verification_email_date < one_day_ago:
+            return True
+
+        return False
+
+    def send_verify_email(self):
+        if not self.should_send_verification_email:
             return
 
         url = flask.url_for('.account_verify_email', id=self.id,
@@ -118,6 +132,8 @@ class AccountEmailAddress(Base):
         email = emails.VerifyEmailAddress(self.email_address, url)
         with emails.Mailer() as mailer:
             mailer.send(email)
+
+        self.last_verification_email_date = datetime.datetime.now()
 
     @property
     def as_md5_string(self):

@@ -151,6 +151,8 @@ def account_send_verify_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
     if email_address.account == flask.g.account:
         email_address.send_verify_email()
+        flask.g.sql_session.commit()
+        flask.flash('Email sent, please check your inbox.', 'info')
     return flask.redirect(flask.url_for('.account'))
 
 
