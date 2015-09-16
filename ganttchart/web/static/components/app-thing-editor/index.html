@@ -23,6 +23,13 @@
         border-bottom: white;
         box-shadow: 0 0 3rem rgb(100, 100, 100);
         width: 500px;
+
+        transform: translateY(550px);
+        transition: transform 600ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
+      }
+
+      #card.visible {
+        transform: translateY(0px);
       }
     </style>
 
@@ -55,11 +62,11 @@
           this.title = title;
         }
 
-        this.hidden = false;
+        this.toggleClass('visible', true, this.$.card);
         this.fire('shown');
       },
       hide: function() {
-        this.hidden = true;
+        this.toggleClass('visible', false, this.$.card);
         this.fire('hidden');
       },
     });
