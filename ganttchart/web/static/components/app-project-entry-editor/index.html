@@ -20,7 +20,7 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-thing-editor id="editor">
+    <app-thing-editor id="editor" what="Entry">
       <form on-submit="_disableFormSubmit">
         <div class="form-group">
           <label class="c-input c-radio">
@@ -110,10 +110,14 @@
           }.bind(this));
       },
       _handleTypeTaskChange: function() {
-        this._submitEntryChange('type', 'task');
+        this._submitEntryChange('type', 'task', function() {
+          this.$.editor.what = 'Task';
+        }.bind(this));
       },
       _handleTypeMilestoneChange: function() {
-        this._submitEntryChange('type', 'milestone');
+        this._submitEntryChange('type', 'milestone', function() {
+          this.$.editor.what = 'Milestone';
+        }.bind(this));
       },
       _handleNameChange: function() {
         this._submitEntryChange('name', this.$.cardFormName.value, function() {
@@ -151,8 +155,10 @@
 
         if (entry.type === 'task') {
           this.$.cardFormTypeTask.checked = true;
-        } else {
+          this.$.editor.what = 'Task';
+        } else if (entry.type === 'milestone') {
           this.$.cardFormTypeMilestone.checked = true;
+          this.$.editor.what = 'Milestone';
         }
         this.$.cardFormName.value = entry.name;
         this.$.cardFormDescription.value = entry.description;

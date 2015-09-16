@@ -35,7 +35,7 @@
 
     <div id="card" class="card">
       <div class="card-header">
-        <strong>{{ title }}</strong>
+        <strong><span>{{ what }}</span>: <span>{{ title }}</span></strong>
         <button type="button" class="close" on-click="hide" aria-label="Close">
           <span aria-hidden="true"><span class="icon ion-arrow-down-b"></span></span>
           <span class="sr-only">Close</span>
@@ -56,6 +56,10 @@
           type: String,
           reflectToAttribute: true,
         },
+        what: {
+          type: String,
+          reflectToAttribute: true,
+        }
       },
       show: function(title) {
         if (title !== undefined) {
