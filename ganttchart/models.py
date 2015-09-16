@@ -443,12 +443,6 @@ class ProjectEntry(Base):
     def type(self):
         return self._type
 
-    @property
-    def expected_time(self):
-        hours = (4 * self.normal_time_estimate + \
-            self.pessimistic_time_estimate) / 5
-        return math.ceil(hours)
-
     def as_json(self):
         return {
             'id': self.id,
@@ -459,7 +453,6 @@ class ProjectEntry(Base):
                 'normal': self.normal_time_estimate,
                 'pessimistic': self.pessimistic_time_estimate
             },
-            'expected_time': self.expected_time,
             'dependencies': [dep.as_json() for dep in self.dependencies],
             'resources': [res.as_json() for res in self.resources],
             'members': [member.as_json() for member in self.members],

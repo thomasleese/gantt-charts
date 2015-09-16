@@ -43,7 +43,7 @@ class Chart:
             else:
                 start_times[task] = first_start_date
 
-            expected_time = task.expected_time
+            expected_time = task.normal_time_estimate
 
             days = expected_time // business_hours
             hours = (expected_time - days * business_hours)
