@@ -371,12 +371,10 @@ def api_project_entries(project_id):
 
         form = forms.ApiAddProjectEntry.from_json(flask.request.json)
         if form.validate():
-            time_estimates = (form.optimistic_time_estimate.data,
-                              form.normal_time_estimate.data,
-                              form.pessimistic_time_estimate.data)
             entry = ProjectEntry(form.name.data, form.description.data,
                                  ProjectEntryType[form.type.data],
-                                 time_estimates, project)
+                                 form.normal_time_estimate.data,
+                                 form.pessimistic_time_estimate.data, project)
 
             flask.g.sql_session.add(entry)
             flask.g.sql_session.commit()
@@ -410,9 +408,6 @@ def api_project_entry(project_id, entry_id):
 
             if form.type.raw_data:
                 entry.type = ProjectEntryType[form.type.data]
-
-            if form.optimistic_time_estimate.raw_data:
-                entry.optimistic_time_estimate = form.optimistic_time_estimate.data
 
             if form.normal_time_estimate.raw_data:
                 entry.normal_time_estimate = form.normal_time_estimate.data

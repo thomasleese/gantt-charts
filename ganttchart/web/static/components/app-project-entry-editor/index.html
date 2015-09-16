@@ -45,23 +45,16 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label">Time estimates (optimistic, normal, pessimistic)</label>
+          <label class="control-label">Time estimates (normal and pessimistic)</label>
           <div class="row">
-            <div class="col-sm-4">
-              <div class="input-group">
-                <input type="text" id="cardFormOptimistic" class="form-control text-right" placeholder="Optimistic" on-change="_handleOptimisticChange" required />
-                <span class="input-group-addon">hours</span>
-              </div>
-            </div>
-
-            <div class="col-sm-4">
+            <div class="col-sm-6">
               <div class="input-group">
                 <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
                 <span class="input-group-addon">hours</span>
               </div>
             </div>
 
-            <div class="col-sm-4">
+            <div class="col-sm-6">
               <div class="input-group">
                 <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
                 <span class="input-group-addon">hours</span>
@@ -127,9 +120,6 @@
       _handleDescriptionChange: function() {
         this._submitEntryChange('description', this.$.cardFormDescription.value);
       },
-      _handleOptimisticChange: function() {
-        this._submitEntryChange('optimistic_time_estimate', this.$.cardFormOptimistic.value);
-      },
       _handleNormalChange: function() {
         this._submitEntryChange('normal_time_estimate', this.$.cardFormNormal.value);
       },
@@ -162,7 +152,6 @@
         }
         this.$.cardFormName.value = entry.name;
         this.$.cardFormDescription.value = entry.description;
-        this.$.cardFormOptimistic.value = entry.time_estimates.optimistic;
         this.$.cardFormNormal.value = entry.time_estimates.normal;
         this.$.cardFormPessimistic.value = entry.time_estimates.pessimistic;
 

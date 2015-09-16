@@ -129,7 +129,6 @@ class ApiAddProjectEntry(Form):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()])
     type = StringField('Type', validators=[DataRequired()])
-    optimistic_time_estimate = IntegerField('Optimistic Time Estimate', validators=[DataRequired()])
     normal_time_estimate = IntegerField('Normal Time Estimate', validators=[DataRequired()])
     pessimistic_time_estimate = IntegerField('Pessimistic Time Estimate', validators=[DataRequired()])
 
@@ -138,7 +137,6 @@ class ApiChangeProjectEntry(Form):
     name = StringField()
     description = StringField()
     type = StringField()
-    optimistic_time_estimate = IntegerField()
     normal_time_estimate = IntegerField()
     pessimistic_time_estimate = IntegerField()
 

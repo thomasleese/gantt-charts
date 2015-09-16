@@ -419,13 +419,13 @@ class ProjectEntry(Base):
 
     project = relationship('Project', backref=backref('entries', order_by='ProjectEntry.creation_date'))
 
-    def __init__(self, name, description, type, time_estimates, project):
+    def __init__(self, name, description, type, normal_time_estimate,
+                 pessimistic_time_estimate, project):
         super().__init__(name=name, description=description)
 
         self.type = type
-        self.optimistic_time_estimate = time_estimates[0]
-        self.normal_time_estimate = time_estimates[1]
-        self.pessimistic_time_estimate = time_estimates[2]
+        self.normal_time_estimate = normal_time_estimate
+        self.pessimistic_time_estimate = pessimistic_time_estimate
         self.project = project
         self.creation_date = datetime.datetime.now()
 
@@ -445,9 +445,8 @@ class ProjectEntry(Base):
 
     @property
     def expected_time(self):
-        hours = (self.optimistic_time_estimate + \
-            4 * self.normal_time_estimate + \
-            self.pessimistic_time_estimate) / 6
+        hours = (4 * self.normal_time_estimate + \
+            self.pessimistic_time_estimate) / 5
         return math.ceil(hours)
 
     def as_json(self):
@@ -457,7 +456,6 @@ class ProjectEntry(Base):
             'description': self.description,
             'type': self._type,
             'time_estimates': {
-                'optimistic': self.optimistic_time_estimate,
                 'normal': self.normal_time_estimate,
                 'pessimistic': self.pessimistic_time_estimate
             },
