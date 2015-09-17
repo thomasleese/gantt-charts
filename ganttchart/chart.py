@@ -66,6 +66,10 @@ class Chart:
         if start_times and finish_times:
             self.start = min(start_times.values())
             self.end = max(finish_times.values())
+
+            self.end = self.end.replace(hour=bhour.end.hour,
+                                        minute=bhour.end.minute,
+                                        second=bhour.end.second)
         else:
             self.start = None
             self.end = None
