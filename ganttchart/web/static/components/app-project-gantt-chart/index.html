@@ -92,7 +92,7 @@
             <tr>
               <th></th>
               <template is="dom-repeat" items="{{ _tableHeadings }}">
-                <th class="rotate"><div><span>{{ item }}</span></div></th>
+                <th class="rotate" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
               </template>
             </tr>
           </thead>
@@ -150,7 +150,8 @@
         projectId: {
           type: Number,
           observer: 'reload'
-        }
+        },
+        calendar: Object,
       },
 
       ready: function() {
@@ -158,44 +159,50 @@
       },
 
       reload: function() {
-        requests.get('/api/projects/' + this.projectId + '/gantt-chart')
+        requests.get('/api/projects/' + this.projectId + '/calendar')
           .go(function(statusCode, response) {
-            var ganttChart = response.gantt_chart;
+            this.calendar = response.calendar;
 
-            var tableHeadings = [];
-            var start = new Date(ganttChart.start);
-            var end = new Date(ganttChart.end);
+            requests.get('/api/projects/' + this.projectId + '/gantt-chart')
+              .go(function(statusCode, response) {
+                var ganttChart = response.gantt_chart;
 
-            var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-            for (var i = 0; i < days + 1; i++) {
-              var d = new Date(start);
-              d.setDate(start.getDate() + i);
+                var tableHeadings = [];
+                var start = new Date(ganttChart.start);
+                var end = new Date(ganttChart.end);
 
-              tableHeadings.push(moment(d).format('D MMM YYYY'));
-            }
-            this._tableHeadings = tableHeadings;
+                var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                for (var i = 0; i < days + 1; i++) {
+                  var d = new Date(start);
+                  d.setDate(start.getDate() + i);
 
-            if (this.hasGanttChart) {
-              var oldBlocks = this.blocks;
-              var newBlocks = ganttChart.blocks;
+                  tableHeadings.push(moment(d).format('D MMM YYYY'));
+                }
+                this._tableHeadings = tableHeadings;
 
-              newBlocks.forEach(function(a) {
-                oldBlocks.forEach(function(b) {
-                  if (a.entry.id === b.entry.id) {
-                    a.selected = b.selected;
-                  }
-                });
-              });
+                if (this.hasGanttChart) {
+                  var oldBlocks = this.blocks;
+                  var newBlocks = ganttChart.blocks;
 
-              this.blocks = newBlocks;
-            } else {
-              this.blocks = ganttChart.blocks;
-            }
+                  newBlocks.forEach(function(a) {
+                    oldBlocks.forEach(function(b) {
+                      if (a.entry.id === b.entry.id) {
+                        a.selected = b.selected;
+                      }
+                    });
+                  });
 
-            this.ganttChart = ganttChart;
-            this.hasGanttChart = !!this.blocks.length;
+                  this.blocks = newBlocks;
+                } else {
+                  this.blocks = ganttChart.blocks;
+                }
+
+                this.ganttChart = ganttChart;
+                this.hasGanttChart = !!this.blocks.length;
+              }.bind(this));
           }.bind(this));
       },
+
       _asDays: function(seconds) {
         return seconds / (60 * 60 * 24);
       },
@@ -206,7 +213,7 @@
         start.setHours(0);
 
         var l = Math.floor(this._asDays((end - start) / 1000));
-        return new Array(l);
+        return new Array(l * this.calendar.working_day.length);
       },
       _tableBlockColspan: function(block) {
         var end = new Date(block.end);
@@ -214,7 +221,7 @@
         var start = new Date(block.start);
         start.setHours(0);
 
-        return Math.ceil(this._asDays((end - start) / 1000));
+        return Math.ceil(this._asDays((end - start) / 1000)) * this.calendar.working_day.length;
       },
       _tableBlockStyle: function(index, block) {
         var hue = (index / this.ganttChart.blocks.length) * 360;
@@ -227,11 +234,9 @@
         start.setHours(0);
 
         var l = Math.floor(this._asDays((end - start) / 1000));
-        return new Array(l);
+        return new Array(l * this.calendar.working_day.length);
       },
-      _tableFullColspan: function(chart) {
-        return Math.ceil(this._asDays(chart.range));
-      },
+
       _handleNew: function(e) {
         var entry = {
           name: 'Unnamed task',
