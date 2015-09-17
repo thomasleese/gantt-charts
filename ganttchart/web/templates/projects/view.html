@@ -80,33 +80,37 @@
       });
     });
 
-    entryEditor.addEventListener('entry-changed', function(e) {
+    entryEditor.addEventListener('change', function(e) {
       ganttChart.reload();
     });
 
-    entryEditor.addEventListener('hidden', function(e) {
+    entryEditor.addEventListener('delete', function(e) {
+      ganttChart.reload();
+    });
+
+    entryEditor.addEventListener('hide', function(e) {
       resources.stopSelecting();
       members.stopSelecting();
       ganttChart.stopSelecting();
     });
 
-    resources.addEventListener('item-selected', function(e) {
+    resources.addEventListener('select', function(e) {
       entryEditor.resourceSelected(e.detail);
     });
 
-    resources.addEventListener('item-deselected', function(e) {
+    resources.addEventListener('deselect', function(e) {
       entryEditor.resourceDeselected(e.detail);
     });
 
-    members.addEventListener('item-selected', function(e) {
+    members.addEventListener('select', function(e) {
       entryEditor.memberSelected(e.detail);
     });
 
-    members.addEventListener('item-deselected', function(e) {
+    members.addEventListener('deselect', function(e) {
       entryEditor.memberDeselected(e.detail);
     });
 
-    ganttChart.addEventListener('item-selected', function(e) {
+    ganttChart.addEventListener('select', function(e) {
       entryEditor.dependencySelected(e.detail.entry, function(worked) {
         if (!worked) {
           ganttChart.unselectItem(e.detail.entry);
@@ -114,7 +118,7 @@
       });
     });
 
-    ganttChart.addEventListener('item-deselected', function(e) {
+    ganttChart.addEventListener('deselect', function(e) {
       entryEditor.dependencyDeselected(e.detail.entry);
     });
 

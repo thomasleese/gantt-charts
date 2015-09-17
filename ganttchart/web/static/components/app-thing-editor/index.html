@@ -67,11 +67,11 @@
         }
 
         this.toggleClass('visible', true, this.$.card);
-        this.fire('shown');
+        this.fire('show');
       },
       hide: function() {
         this.toggleClass('visible', false, this.$.card);
-        this.fire('hidden');
+        this.fire('hide');
       },
     });
   </script>

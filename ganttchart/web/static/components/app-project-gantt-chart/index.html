@@ -261,9 +261,9 @@
           e.model.set('block.selected', newState);
 
           if (newState) {
-            this.fire('item-selected', e.model.block);
+            this.fire('select', e.model.block);
           } else {
-            this.fire('item-deselected', e.model.block);
+            this.fire('deselect', e.model.block);
           }
         }
       },

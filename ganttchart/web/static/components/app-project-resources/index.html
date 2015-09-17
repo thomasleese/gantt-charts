@@ -22,7 +22,7 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-deleted="reload" on-changed="reload"></app-project-resource-editor>
+    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-delete="reload" on-change="reload"></app-project-resource-editor>
 
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a resource to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a resource to select it.</p>
@@ -84,9 +84,9 @@
           e.model.set('resource.selected', newState);
 
           if (newState) {
-            this.fire('item-selected', e.model.resource);
+            this.fire('select', e.model.resource);
           } else {
-            this.fire('item-deselected', e.model.resource);
+            this.fire('deselect', e.model.resource);
           }
         } else {
           this.$.editor.show(e.model.resource);

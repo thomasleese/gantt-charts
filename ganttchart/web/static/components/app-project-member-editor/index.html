@@ -13,7 +13,7 @@
       }
     </style>
 
-    <app-delete-modal id="deleteModal" what="member" on-deleted="_handleActuallyDelete"></app-delete-modal>
+    <app-delete-modal id="deleteModal" what="member" on-delete="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -64,7 +64,7 @@
               if (callback !== undefined) {
                 callback();
               }
-              this.fire('changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -83,7 +83,7 @@
         requests.delete('/api/projects/' + this.projectId + '/members/' + member.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('deleted', member);
+              this.fire('delete', member);
               this.hide();
             } else if (statusCode === 405) {
               this.$.errorModal.show('Owners cannot be deleted.');

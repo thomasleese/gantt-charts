@@ -13,7 +13,7 @@
       }
     </style>
 
-    <app-delete-modal id="deleteModal" what="resource" on-deleted="_handleActuallyDelete"></app-delete-modal>
+    <app-delete-modal id="deleteModal" what="resource" on-delete="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -122,7 +122,7 @@
               if (callback !== undefined) {
                 callback();
               }
-              this.fire('changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -161,7 +161,7 @@
         requests.delete('/api/projects/' + this.projectId + '/resources/' + resource.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('deleted', resource);
+              this.fire('delete', resource);
               this.hide();
             } else {
               this.$.errorModal.showUnknownError();

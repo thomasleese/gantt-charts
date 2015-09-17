@@ -29,7 +29,7 @@
       }
     </style>
 
-    <app-delete-modal id="deleteModal" what="entry" on-deleted="_handleActuallyDelete"></app-delete-modal>
+    <app-delete-modal id="deleteModal" what="entry" on-delete="_handleActuallyDelete"></app-delete-modal>
 
     <app-error-modal id="errorModal"></app-error-modal>
 
@@ -123,7 +123,7 @@
               if (callback !== undefined) {
                 callback();
               }
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -193,7 +193,7 @@
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('entry-changed');
+              this.fire('delete');
               this.hide();
             } else {
               this.$.errorModal.showUnknownError();
@@ -222,18 +222,18 @@
         this.$.formPessimisticUnits.value = pessimisticUnits;
 
         this.$.editor.show(entry.name);
-        this.fire('shown');
+        this.fire('show');
       },
       hide: function() {
         this.$.editor.hide();
-        this.fire('hidden');
+        this.fire('hide');
       },
       resourceSelected: function(resource) {
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
           .send({'amount': 1})
           .go(function(statusCode, response) {
             if (statusCode === 201) {
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -243,7 +243,7 @@
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -253,7 +253,7 @@
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/members/' + member.id)
           .go(function(statusCode, response) {
             if (statusCode === 201) {
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -263,7 +263,7 @@
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/members/' + member.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -273,7 +273,7 @@
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/dependencies/' + entry.id)
           .go(function(statusCode, response) {
             if (statusCode === 201) {
-              this.fire('entry-changed');
+              this.fire('change');
               callback(true);
             } else if (statusCode === 409) {
               callback(false);
@@ -287,7 +287,7 @@
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/dependencies/' + entry.id)
           .go(function(statusCode, response) {
             if (statusCode === 204) {
-              this.fire('entry-changed');
+              this.fire('change');
             } else {
               this.$.errorModal.showUnknownError();
             }

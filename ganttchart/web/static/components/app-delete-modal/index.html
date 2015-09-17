@@ -48,7 +48,7 @@
       _handleDelete: function() {
         console.log('Deleting ' + this.what + ':', this.instance);
 
-        this.fire('deleted', this.instance);
+        this.fire('delete', this.instance);
         $(this.$.modal).modal('hide');
       },
     });
