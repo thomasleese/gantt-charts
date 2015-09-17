@@ -60,6 +60,7 @@
           <img class="img-rounded m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
           <span>{{ member.account.display_name }}</span>
           <span class="label label-default m-l">{{ member.access_level.description }}</span>
+          <button class="btn btn-danger btn-sm pull-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
         </li>
       </template>
     </ul>
@@ -102,6 +103,10 @@
         } else {
           this.fire('open', e.model.member);
         }
+      },
+      _handleDelete: function(e) {
+        this.fire('delete', e.model.member);
+        e.stopPropagation();
       },
       _handleNewMember: function(e) {
         this.$['new-modal-email-address'].value = '';

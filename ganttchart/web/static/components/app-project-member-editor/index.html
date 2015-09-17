@@ -70,13 +70,16 @@
             }
           }.bind(this));
       },
+      delete: function(member) {
+        this.$.deleteModal.show(member.account.display_name, member);
+      },
 
       _preventDefault: function(e) {
         e.preventDefault();
         return false;
       },
       _handleDelete: function(e) {
-        this.$.deleteModal.show(this.member.account.display_name, this.member);
+        this.delete(this.member);
       },
       _handleActuallyDelete: function(e) {
         var member = e.detail;

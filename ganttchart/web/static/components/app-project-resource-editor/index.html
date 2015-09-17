@@ -128,6 +128,9 @@
             }
           }.bind(this));
       },
+      delete: function(resource) {
+        this.$.deleteModal.show(resource.name, resource);
+      },
 
       _preventDefault: function(e) {
         e.preventDefault();
@@ -154,7 +157,7 @@
       },
 
       _handleDelete: function(e) {
-        this.$.deleteModal.show(this.resource.name, this.resource);
+        this.delete(this.resource);
       },
       _handleActuallyDelete: function(e) {
         var resource = e.detail;

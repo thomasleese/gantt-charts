@@ -70,8 +70,16 @@
       resourceEditor.show(e.detail);
     });
 
+    resources.addEventListener('delete', function(e) {
+      resourceEditor.delete(e.detail);
+    });
+
     members.addEventListener('open', function(e) {
       memberEditor.show(e.detail);
+    });
+
+    members.addEventListener('delete', function(e) {
+      memberEditor.delete(e.detail);
     });
 
     ganttChart.addEventListener('open', function(e) {

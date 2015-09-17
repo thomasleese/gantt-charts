@@ -35,6 +35,7 @@
             <span>{{ resource.name }}</span>
             <small class="m-l">{{ resource.description }}</small>
             <span class="label label-default m-l" hidden$="{{ !resource.reusable }}">Reusable</span>
+            <button class="btn btn-danger btn-sm pull-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
           </li>
         </template>
       </ul>
@@ -102,6 +103,10 @@
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
+      },
+      _handleDelete: function(e) {
+        this.fire('delete', e.model.resource);
+        e.stopPropagation();
       },
       reload: function() {
         requests.get('/api/projects/' + this.projectId + '/resources')
