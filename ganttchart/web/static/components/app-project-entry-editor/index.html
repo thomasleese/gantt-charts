@@ -33,7 +33,7 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-thing-editor id="editor" what="Entry">
+    <app-thing-editor id="editor" what="Entry" on-show="_stopPropagation">
       <form on-submit="_disableFormSubmit">
         <div class="form-group">
           <label class="c-input c-radio">
@@ -200,6 +200,9 @@
             }
           }.bind(this));
       },
+      _stopPropagation: function(e) {
+        e.stopPropagation();
+      },
       show: function(entry) {
         this.entryId = entry.id;
 
@@ -226,7 +229,6 @@
       },
       hide: function() {
         this.$.editor.hide();
-        this.fire('hide');
       },
       resourceSelected: function(resource) {
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
