@@ -290,11 +290,14 @@ class ProjectCalendar(Base):
         return BusinessHour(start=self.work_starts_at, end=self.work_ends_at)
 
     @property
+    def _weekmask(self):
+        return [self.works_on_monday, self.works_on_tuesday,
+                self.works_on_wednesday, self.works_on_thursday,
+                self.works_on_friday, self.works_on_saturday,
+                self.works_on_sunday]
+
+    @property
     def business_day(self):
-        weekmask = [self.works_on_monday, self.works_on_tuesday,
-                    self.works_on_wednesday, self.works_on_thursday,
-                    self.works_on_friday, self.works_on_saturday,
-                    self.works_on_sunday]
         holidays = []
         for holiday in self.holidays:
             start_date = holiday.start
@@ -304,7 +307,18 @@ class ProjectCalendar(Base):
                 for i in range(holiday.days + 1):
                     holidays.append(start_date + datetime.timedelta(days=i))
 
-        return CustomBusinessDay(holidays=holidays, weekmask=weekmask)
+        return CustomBusinessDay(holidays=holidays, weekmask=self._weekmask)
+
+    @property
+    def business_day_length(self):
+        today = datetime.date.today()
+        start = datetime.datetime.combine(today, self.work_starts_at)
+        end = datetime.datetime.combine(today, self.work_ends_at)
+        return int((end - start).total_seconds() / (60 * 60))
+
+    @property
+    def number_working_days(self):
+        return sum([1 if x is True else 0 for x in self._weekmask])
 
     def as_json(self):
         return {
@@ -317,10 +331,12 @@ class ProjectCalendar(Base):
                 'friday': self.works_on_friday,
                 'saturday': self.works_on_saturday,
                 'sunday': self.works_on_sunday,
+                'length': self.number_working_days,
             },
             'working_day': {
                 'start': self.work_starts_at.isoformat(),
                 'end': self.work_ends_at.isoformat(),
+                'length': self.business_day_length,
             },
             'holidays': [h.as_json() for h in self.holidays]
         }

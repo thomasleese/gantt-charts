@@ -212,6 +212,8 @@
 
             this.$.workingDayStart.value = this.calendar.working_day.start;
             this.$.workingDayEnd.value = this.calendar.working_day.end;
+
+            this.fire('load', this.calendar);
           }.bind(this));
       },
       _setWorkingDay: function(element, isWorking) {

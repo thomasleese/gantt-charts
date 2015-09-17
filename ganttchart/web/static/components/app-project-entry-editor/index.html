@@ -14,6 +14,19 @@
       :host {
         display: block;
       }
+
+      .group-time-estimates input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        width: 100%;
+      }
+
+      .group-time-estimates select {
+        border-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        width: 100%;
+      }
     </style>
 
     <app-delete-modal id="deleteModal" what="entry" on-deleted="_handleActuallyDelete"></app-delete-modal>
@@ -44,21 +57,31 @@
           <small class="text-muted">Enter some words about this entry, or leave it out entirely.</small>
         </div>
 
-        <div class="form-group">
+        <div class="form-group group-time-estimates">
           <label class="control-label">Time estimates (normal and pessimistic)</label>
           <div class="row">
-            <div class="col-sm-6">
-              <div class="input-group">
-                <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
-                <span class="input-group-addon">hours</span>
-              </div>
+            <div class="col-sm-3 p-r-0">
+              <input type="text" id="cardFormNormal" class="form-control text-right" placeholder="Normal" on-change="_handleNormalChange" required />
             </div>
 
-            <div class="col-sm-6">
-              <div class="input-group">
-                <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
-                <span class="input-group-addon">hours</span>
-              </div>
+            <div class="col-sm-3 p-l-0">
+              <select class="c-select" id="formNormalUnits" on-change="_handleNormalChange">
+                <option value="hours">Hours</option>
+                <option value="days">Days</option>
+                <option value="weeks">Weeks</option>
+              </select>
+            </div>
+
+            <div class="col-sm-3 p-r-0">
+              <input type="text" id="cardFormPessimistic" class="form-control text-right" placeholder="Pessimistic" on-change="_handlePessimisticChange" required />
+            </div>
+
+            <div class="col-sm-3 p-l-0">
+              <select class="c-select" id="formPessimisticUnits" on-change="_handlePessimisticChange">
+                <option value="hours">Hours</option>
+                <option value="days">Days</option>
+                <option value="weeks">Weeks</option>
+              </select>
             </div>
           </div>
         </div>
@@ -79,7 +102,11 @@
     Polymer({
       is: 'app-project-entry-editor',
       properties: {
-        projectId: Number
+        projectId: Number,
+        calendar: {
+          type: Object,
+          reflectToAttribute: true,
+        },
       },
       _disableFormSubmit: function(e) {
         e.preventDefault();
@@ -121,13 +148,46 @@
         this._submitEntryChange('description', this.$.cardFormDescription.value);
       },
       _handleNormalChange: function() {
-        this._submitEntryChange('normal_time_estimate', this.$.cardFormNormal.value);
+        var value = this._applyUnits(this.$.cardFormNormal.value, this.$.formNormalUnits.value);
+        this._submitEntryChange('normal_time_estimate', value);
       },
       _handlePessimisticChange: function() {
-        this._submitEntryChange('pessimistic_time_estimate', this.$.cardFormPessimistic.value);
+        var value = this._applyUnits(this.$.cardFormPessimistic.value, this.$.formPessimisticUnits.value);
+        this._submitEntryChange('pessimistic_time_estimate', value);
       },
       _handleDelete: function(e) {
         this.$.deleteModal.show(this.$.cardFormName.value, this.entryId);
+      },
+      _applyUnits: function(value, units) {
+        if (units === 'weeks') {
+          return value * this.calendar.working_day.length * this.calendar.working_week.length;
+        } else if (units === 'days') {
+          return value * this.calendar.working_day.length;
+        } else if (units === 'hours') {
+          return value;
+        }
+      },
+      _unapplyUnits: function(value, units) {
+        if (units === 'weeks') {
+          return value / (this.calendar.working_day.length * this.calendar.working_week.length);
+        } else if (units === 'days') {
+          return value / this.calendar.working_day.length;
+        } else if (units === 'hours') {
+          return value;
+        }
+      },
+      _guessUnits: function(hours) {
+        var weeks = this._unapplyUnits(hours, 'weeks');
+        if (weeks === parseInt(weeks)) {
+          return 'weeks';
+        }
+
+        var days = this._unapplyUnits(hours, 'days');
+        if (days === parseInt(days)) {
+          return 'days';
+        }
+
+        return 'hours';
       },
       _handleActuallyDelete: function(e) {
         requests.delete('/api/projects/' + this.projectId + '/entries/' + this.entryId)
@@ -152,8 +212,14 @@
         }
         this.$.cardFormName.value = entry.name;
         this.$.cardFormDescription.value = entry.description;
-        this.$.cardFormNormal.value = entry.time_estimates.normal;
-        this.$.cardFormPessimistic.value = entry.time_estimates.pessimistic;
+
+        var normalUnits = this._guessUnits(entry.time_estimates.normal);
+        this.$.cardFormNormal.value = this._unapplyUnits(entry.time_estimates.normal, normalUnits);
+        this.$.formNormalUnits.value = normalUnits;
+
+        var pessimisticUnits = this._guessUnits(entry.time_estimates.pessimistic);
+        this.$.cardFormPessimistic.value = this._unapplyUnits(entry.time_estimates.pessimistic, pessimisticUnits);
+        this.$.formPessimisticUnits.value = pessimisticUnits;
 
         this.$.editor.show(entry.name);
         this.fire('shown');

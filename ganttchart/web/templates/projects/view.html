@@ -52,8 +52,13 @@
 
     var ganttChart = document.getElementById('gantt-chart');
     var resources = document.getElementById('resources');
+    var calendar = document.getElementById('calendar');
     var members = document.getElementById('members');
     var entryEditor = document.getElementById('entry-editor');
+
+    calendar.addEventListener('load', function(e) {
+      entryEditor.calendar = e.detail;
+    });
 
     ganttChart.addEventListener('edit-entry', function(e) {
       entryEditor.show(e.detail);
