@@ -56,6 +56,8 @@
     var members = document.getElementById('members');
     var entryEditor = document.getElementById('entry-editor');
 
+    entryEditor.calendar = calendar.calendar;
+
     calendar.addEventListener('load', function(e) {
       entryEditor.calendar = e.detail;
     });

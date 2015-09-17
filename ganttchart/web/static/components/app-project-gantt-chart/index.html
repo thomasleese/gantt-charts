@@ -51,14 +51,12 @@
 
       .gantt-chart tbody td {
         border: 1px solid rgb(200, 200, 200);
-        padding: 4px 10px;
+        padding: 0.2rem 0.4rem;
         position: relative;
         z-index: 10;
         background: white;
 
-        width: 2rem;
-        height: 2rem;
-        max-width: 2rem;
+        max-width: 0.8rem;  /* sum of paddings above */
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -207,34 +205,49 @@
         return seconds / (60 * 60 * 24);
       },
       _tableLeftPadding: function(block) {
-        var end = new Date(block.start);
-        end.setHours(23);
-        var start = new Date(this.ganttChart.start);
-        start.setHours(0);
+        var blockStart = moment(block.start).utc();
+        var ganttChartStart = moment(this.ganttChart.start).utc();
 
-        var l = Math.floor(this._asDays((end - start) / 1000));
-        return new Array(l * this.calendar.working_day.length);
+        var days = blockStart.diff(ganttChartStart, 'days');
+        var hours = blockStart.diff(ganttChartStart, 'hours');
+
+        hours -= (days * 24);
+
+        var l = days * this.calendar.working_day.length + hours;
+        return new Array(l);
       },
       _tableBlockColspan: function(block) {
-        var end = new Date(block.end);
-        end.setHours(23);
-        var start = new Date(block.start);
-        start.setHours(0);
+        var end = moment(block.end).utc();
+        var start = moment(block.start).utc();
 
-        return Math.ceil(this._asDays((end - start) / 1000)) * this.calendar.working_day.length;
+        var days = end.diff(start, 'days');
+        var hours = end.diff(start, 'hours');
+
+        hours -= (days * 24);
+        if (hours > this.calendar.working_day.length) {
+          hours -= (24 - this.calendar.working_day.length);
+        }
+
+        return days * this.calendar.working_day.length + hours;
       },
       _tableBlockStyle: function(index, block) {
         var hue = (index / this.ganttChart.blocks.length) * 360;
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
       _tableRightPadding: function(block) {
-        var end = new Date(this.ganttChart.end);
-        end.setHours(23);
-        var start = new Date(block.end);
-        start.setHours(0);
+        var blockEnd = moment(block.end).utc();
+        var ganttChartEnd = moment(this.ganttChart.end).utc();
 
-        var l = Math.floor(this._asDays((end - start) / 1000));
-        return new Array(l * this.calendar.working_day.length);
+        var days = ganttChartEnd.diff(blockEnd, 'days');
+        var hours = ganttChartEnd.diff(blockEnd, 'hours');
+
+        hours -= (days * 24);
+        if (hours > this.calendar.working_day.length) {
+          hours -= (24 - this.calendar.working_day.length);
+        }
+
+        var l = days * this.calendar.working_day.length + hours;
+        return new Array(l);
       },
 
       _handleNew: function(e) {
