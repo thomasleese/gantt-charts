@@ -67,8 +67,8 @@ class Chart:
 
         graph_unsorted = OrderedDict(graph_unsorted)
 
-        acyclic = False
         while graph_unsorted:
+            acyclic = False
             for node, edges in list(graph_unsorted.items()):
                 for edge in edges:
                     if edge in graph_unsorted:
