@@ -22,8 +22,6 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <app-project-resource-editor id="editor" project-id="[[ projectId ]]" on-delete="reload" on-change="reload"></app-project-resource-editor>
-
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a resource to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a resource to select it.</p>
 
@@ -71,10 +69,6 @@
         this.isSelecting = false;
       },
 
-      _disableFormSubmit: function(e) {
-        e.preventDefault();
-        return false;
-      },
       _handleSelectResource: function(e) {
         if (this.isSelecting) {
           var newState = !e.model.resource.selected;
@@ -86,7 +80,7 @@
             this.fire('deselect', e.model.resource);
           }
         } else {
-          this.$.editor.show(e.model.resource);
+          this.fire('open', e.model.resource);
         }
       },
       _handleNewResource: function(e) {
@@ -135,7 +129,6 @@
           }.bind(this));
       },
       startSelecting: function() {
-        this.$.editor.hide();
         this.isSelecting = true;
       },
       stopSelecting: function() {

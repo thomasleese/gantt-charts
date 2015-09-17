@@ -44,6 +44,8 @@
   </iron-pages>
 
   <app-project-entry-editor id="entry-editor" project-id="{{ project.id }}"></app-project-entry-editor>
+  <app-project-member-editor id="member-editor" project-id="{{ project.id }}"></app-project-member-editor>
+  <app-project-resource-editor id="resource-editor" project-id="{{ project.id }}"></app-project-resource-editor>
 {% endblock %}
 
 {% block scripts %}
@@ -55,6 +57,8 @@
     var calendar = document.getElementById('calendar');
     var members = document.getElementById('members');
     var entryEditor = document.getElementById('entry-editor');
+    var memberEditor = document.getElementById('member-editor');
+    var resourceEditor = document.getElementById('resource-editor');
 
     entryEditor.calendar = calendar.calendar;
 
@@ -62,7 +66,15 @@
       entryEditor.calendar = e.detail;
     });
 
-    ganttChart.addEventListener('edit', function(e) {
+    resources.addEventListener('open', function(e) {
+      resourceEditor.show(e.detail);
+    });
+
+    members.addEventListener('open', function(e) {
+      memberEditor.show(e.detail);
+    });
+
+    ganttChart.addEventListener('open', function(e) {
       entryEditor.show(e.detail);
     });
 
@@ -72,6 +84,22 @@
 
     entryEditor.addEventListener('delete', function(e) {
       ganttChart.reload();
+    });
+
+    memberEditor.addEventListener('change', function(e) {
+      members.reload();
+    });
+
+    memberEditor.addEventListener('delete', function(e) {
+      members.reload();
+    });
+
+    resourceEditor.addEventListener('change', function(e) {
+      resources.reload();
+    });
+
+    resourceEditor.addEventListener('delete', function(e) {
+      resource.reload();
     });
 
     entryEditor.addEventListener('show', function(e) {
@@ -92,6 +120,19 @@
       entry.dependencies.forEach(function(dependency) {
         ganttChart.selectItem(dependency.child);
       });
+
+      resourceEditor.hide();
+      memberEditor.hide();
+    });
+
+    resourceEditor.addEventListener('show', function() {
+      entryEditor.hide();
+      memberEditor.hide();
+    });
+
+    memberEditor.addEventListener('show', function() {
+      entryEditor.hide();
+      resourceEditor.hide();
     });
 
     entryEditor.addEventListener('hide', function(e) {

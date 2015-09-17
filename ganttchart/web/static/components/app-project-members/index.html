@@ -49,11 +49,7 @@
       </div>
     </div>
 
-    <app-delete-modal id="deleteModal" what="member" on-delete="_handleActuallyDelete"></app-delete-modal>
-
     <app-error-modal id="errorModal"></app-error-modal>
-
-    <app-project-member-editor id="editor" project-id="[[ projectId ]]" on-delete="reload" on-change="reload"></app-project-member-editor>
 
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a member to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a member to select it.</p>
@@ -104,7 +100,7 @@
             this.fire('deselect', e.model.member);
           }
         } else {
-          this.$.editor.show(e.model.member);
+          this.fire('open', e.model.member);
         }
       },
       _handleNewMember: function(e) {
@@ -138,7 +134,6 @@
           }.bind(this));
       },
       startSelecting: function() {
-        this.$.editor.hide();
         this.isSelecting = true;
       },
       stopSelecting: function() {
