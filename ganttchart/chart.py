@@ -104,5 +104,4 @@ class Chart:
             'blocks': [b.as_json() for b in self.blocks],
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'range': (self.end - self.start).total_seconds(),
         }
