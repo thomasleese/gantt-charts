@@ -2,7 +2,7 @@ from collections import OrderedDict, namedtuple
 import datetime
 
 
-_Block = namedtuple('Block', ['task', 'start', 'end'])
+_Block = namedtuple('Block', ['task', 'start', 'end', 'length'])
 
 
 class Block(_Block):
@@ -23,6 +23,7 @@ class Chart:
 
         start_times = {}
         finish_times = {}
+        lengths = {}
 
         bday = project.calendar.business_day
         bhour = project.calendar.business_hour
@@ -50,6 +51,7 @@ class Chart:
             start_times[task] = start
 
             expected_time = task.normal_time_estimate
+            lengths[task] = expected_time
 
             days = expected_time // business_hours
             hours = (expected_time - days * business_hours)
@@ -71,7 +73,7 @@ class Chart:
         for entry in self.graph:
             task = entry[0]
             self.blocks.append(Block(task, start_times[task],
-                                     finish_times[task]))
+                                     finish_times[task], lengths[task]))
 
     def topolgical_sort(self, graph_unsorted):
         graph_sorted = []
@@ -96,16 +98,11 @@ class Chart:
 
     def as_json(self):
         if not self.blocks or self.start is None or self.end is None:
-            return {
-                'blocks': [],
-                'start': None,
-                'end': None,
-                'range': 0
-            }
-        else:
-            return {
-                'blocks': [b.as_json() for b in self.blocks],
-                'start': self.start.isoformat(),
-                'end': self.end.isoformat(),
-                'range': (self.end - self.start).total_seconds(),
-            }
+            return None
+
+        return {
+            'blocks': [b.as_json() for b in self.blocks],
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+            'range': (self.end - self.start).total_seconds(),
+        }

@@ -543,10 +543,14 @@ def api_project_gantt_chart(project_id):
 
     try:
         chart = Chart(project)
-    except RuntimeError:
+    except ValueError:
         raise errors.NotFound()
 
-    return flask.jsonify(gantt_chart=chart.as_json())
+    as_json = chart.as_json()
+    if as_json is None:
+        raise errors.NotFound()
+
+    return flask.jsonify(gantt_chart=as_json)
 
 
 @app.route('/api/projects/<int:project_id>/members', methods=['GET', 'POST'])
