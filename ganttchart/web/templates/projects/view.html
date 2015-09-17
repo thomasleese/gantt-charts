@@ -62,22 +62,6 @@
 
     ganttChart.addEventListener('edit', function(e) {
       entryEditor.show(e.detail);
-
-      resources.startSelecting();
-      members.startSelecting();
-      ganttChart.startSelecting();
-
-      e.detail.resources.forEach(function(res) {
-        resources.selectItem(res.resource);
-      });
-
-      e.detail.members.forEach(function(member) {
-        members.selectItem(member.member);
-      });
-
-      e.detail.dependencies.forEach(function(dependency) {
-        ganttChart.selectItem(dependency.child);
-      });
     });
 
     entryEditor.addEventListener('change', function(e) {
@@ -86,6 +70,26 @@
 
     entryEditor.addEventListener('delete', function(e) {
       ganttChart.reload();
+    });
+
+    entryEditor.addEventListener('show', function(e) {
+      var entry = e.detail;
+
+      resources.startSelecting();
+      members.startSelecting();
+      ganttChart.startSelecting();
+
+      entry.resources.forEach(function(res) {
+        resources.selectItem(res.resource);
+      });
+
+      entry.members.forEach(function(member) {
+        members.selectItem(member.member);
+      });
+
+      entry.dependencies.forEach(function(dependency) {
+        ganttChart.selectItem(dependency.child);
+      });
     });
 
     entryEditor.addEventListener('hide', function(e) {

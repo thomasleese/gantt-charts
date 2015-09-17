@@ -222,7 +222,7 @@
         this.$.formPessimisticUnits.value = pessimisticUnits;
 
         this.$.editor.show(entry.name);
-        this.fire('show');
+        this.fire('show', entry);
       },
       hide: function() {
         this.$.editor.hide();
