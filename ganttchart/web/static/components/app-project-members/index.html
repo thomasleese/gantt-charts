@@ -119,6 +119,7 @@
             } else if (statusCode === 400) {
               this.$.errorModal.show('No such member for that email address.');
             } else if (statusCode === 201) {
+              this.fire('open', response.member);
               this.reload();
             } else {
               this.$.errorModal.showUnknownError();

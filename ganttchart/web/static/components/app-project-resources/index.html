@@ -96,6 +96,7 @@
           .send(resource)
           .go(function(statusCode, response) {
             if (statusCode === 201) {
+              this.fire('open', response.resource);
               this.reload();
             } else {
               this.$.errorModal.showUnknownError();

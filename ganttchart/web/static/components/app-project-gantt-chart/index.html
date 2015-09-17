@@ -264,7 +264,7 @@
             if (statusCode === 201) {
               this.reload();
 
-              this.fire('edit', response.entry);
+              this.fire('open', response.entry);
             } else {
               this.$.errorModal.showUnknownError();
             }

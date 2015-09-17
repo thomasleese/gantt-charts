@@ -575,7 +575,7 @@ def api_project_members(project_id):
                 flask.g.sql_session.commit()
             except sqlalchemy.orm.exc.FlushError:
                 raise errors.AlreadyExists()
-            return '', 201
+            return flask.jsonify(member=member.as_json()), 201
         else:
             raise errors.InvalidFormData(form)
 
@@ -642,7 +642,7 @@ def api_project_resources(project_id):
                 flask.g.sql_session.commit()
             except sqlalchemy.orm.exc.FlushError:
                 raise errors.AlreadyExists()
-            return '', 201
+            return flask.jsonify(resource=resource.as_json()), 201
         else:
             raise errors.InvalidFormData(form)
 
