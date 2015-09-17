@@ -242,6 +242,8 @@
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.reload();
+
+              this.fire('edit', response.entry);
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -253,7 +255,7 @@
       _handleEdit: function(e) {
         if (!this.isSelecting) {
           var entry = e.model.block.entry;
-          this.fire('edit-entry', entry);
+          this.fire('edit', entry);
         } else {
           var newState = !e.model.block.selected;
           e.model.set('block.selected', newState);

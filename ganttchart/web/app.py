@@ -379,7 +379,7 @@ def api_project_entries(project_id):
             flask.g.sql_session.add(entry)
             flask.g.sql_session.commit()
 
-            return '', 201
+            return flask.jsonify(entry=entry.as_json()), 201
         else:
             raise errors.InvalidFormData(form)
 
