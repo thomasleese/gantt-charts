@@ -38,17 +38,28 @@ class Chart:
 
         for entry in self.graph:
             task = entry[0]
+
             if entry[1]:
-                start_times[task] = max(finish_times[t] for t in entry[1])
+                start = max(finish_times[t] for t in entry[1])
             else:
-                start_times[task] = first_start_date
+                start = first_start_date
+            if start.time() == bhour.end:
+                start += bhour
+                start -= datetime.timedelta(hours=1)
+
+            start_times[task] = start
 
             expected_time = task.normal_time_estimate
 
             days = expected_time // business_hours
             hours = (expected_time - days * business_hours)
 
-            finish_times[task] = start_times[task] + days * bday + hours * bhour
+            finish = start_times[task] + days * bday + hours * bhour
+            if finish.time() == bhour.start:
+                finish -= bhour
+                finish += datetime.timedelta(hours=1)
+
+            finish_times[task] = finish
 
         if start_times and finish_times:
             self.start = min(start_times.values())
