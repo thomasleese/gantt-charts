@@ -63,7 +63,7 @@
       properties: {
         projectId: {
           type: Number,
-          observer: '_projectIdChanged'
+          observer: 'reload'
         },
       },
 
@@ -71,9 +71,6 @@
         this.isSelecting = false;
       },
 
-      _projectIdChanged: function(newValue, oldValue) {
-        this.reload();
-      },
       _disableFormSubmit: function(e) {
         e.preventDefault();
         return false;

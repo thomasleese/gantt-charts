@@ -187,11 +187,8 @@
       properties: {
         projectId: {
           type: Number,
-          observer: '_projectIdChanged'
+          observer: 'reload',
         }
-      },
-      _projectIdChanged: function(newValue, oldValue) {
-        this.reload();
       },
       reload: function() {
         requests.get('/api/projects/' + this.projectId + '/calendar')
