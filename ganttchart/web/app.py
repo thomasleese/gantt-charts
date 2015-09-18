@@ -384,7 +384,7 @@ def api_project_entries(project_id):
             raise errors.InvalidFormData(form)
 
 
-@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>', methods=['PATCH', 'DELETE'])
+@app.route('/api/projects/<int:project_id>/entries/<int:entry_id>', methods=['GET', 'PATCH', 'DELETE'])
 def api_project_entry(project_id, entry_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
@@ -397,7 +397,9 @@ def api_project_entry(project_id, entry_id):
     if entry.project != project:
         raise errors.NotFound()
 
-    if flask.request.method == 'PATCH':
+    if flask.request.method == 'GET':
+        return flask.jsonify(entry=entry.as_json())
+    elif flask.request.method == 'PATCH':
         form = forms.ApiChangeProjectEntry.from_json(flask.request.json)
         if form.validate():
             if form.name.raw_data:

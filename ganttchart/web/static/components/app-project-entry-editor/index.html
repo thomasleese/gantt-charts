@@ -89,7 +89,29 @@
 
       <hr />
 
-      <p class="text-muted">Use the “Resources” and “Members” tabs to modify those.</p>
+      <div class="row">
+        <div class="col-sm-6">
+          <ul class="list-group">
+            <template is="dom-repeat" items="{{ entryMembers }}">
+              <li class="list-group-item">
+                <span>{{ item.member.account.display_name }}</span>
+              </li>
+            </template>
+          </ul>
+        </div>
+
+        <div class="col-sm-6">
+          <ul class="list-group">
+            <template is="dom-repeat" items="{{ entryResources }}">
+              <li class="list-group-item">
+                <span>{{ item.amount }}</span>
+                ×
+                <span>{{ item.resource.name }}</span>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
 
       <hr />
 
@@ -205,6 +227,8 @@
       },
       show: function(entry) {
         this.entryId = entry.id;
+        this.entryMembers = entry.members;
+        this.entryResources = entry.resources;
 
         if (entry.type === 'task') {
           this.$.cardFormTypeTask.checked = true;
@@ -230,12 +254,22 @@
       hide: function() {
         this.$.editor.hide();
       },
+      reload: function() {
+        requests.get('/api/projects/' + this.projectId + '/entries/' + this.entryId)
+          .go(function(statusCode, response) {
+            if (statusCode === 200) {
+              this.entryResources = response.entry.resources;
+              this.entryMembers = response.entry.members;
+            }
+          }.bind(this));
+      },
       resourceSelected: function(resource) {
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
           .send({'amount': 1})
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('change');
+              this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -246,6 +280,7 @@
           .go(function(statusCode, response) {
             if (statusCode === 204) {
               this.fire('change');
+              this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -256,6 +291,7 @@
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('change');
+              this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -266,6 +302,7 @@
           .go(function(statusCode, response) {
             if (statusCode === 204) {
               this.fire('change');
+              this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -276,6 +313,7 @@
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('change');
+              this.reload();
               callback(true);
             } else if (statusCode === 409) {
               callback(false);
@@ -290,6 +328,7 @@
           .go(function(statusCode, response) {
             if (statusCode === 204) {
               this.fire('change');
+              this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
