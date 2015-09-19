@@ -15,6 +15,7 @@ body {
     background: rgb(248, 248, 248);
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
+    padding: 2rem;
 }
 
 .star {

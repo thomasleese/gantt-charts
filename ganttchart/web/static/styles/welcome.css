@@ -2,11 +2,15 @@
     padding: 0;
 }
 
-.page section {
+.feature {
     padding: 2rem;
 }
 
-.page section:nth-of-type(even) {
+.feature.row {
+    margin: 0;
+}
+
+.feature:nth-of-type(even) {
     background: rgb(248, 248, 248);
 }
 

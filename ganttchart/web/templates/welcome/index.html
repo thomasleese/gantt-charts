@@ -7,57 +7,81 @@
 {% block body %}
   <div class="container">
     <div class="jumbotron">
-      <h1 class="display-3">Yay Gantt Charts!</h1>
+      <h1 class="display-2">Yay Gantt Charts!</h1>
 
       <hr class="m-y-md" />
 
-      <p class="lead" style="line-height: 2;">
+      <p class="lead" style="line-height: 1.8;">
         Tired of making boring old Gantt Charts for your UAV projects?<br />
         Want to feed that secret hunger for Gantt Charts?<br />
         Need to spice up your Gantt-life?
       </p>
 
-      <p class="lead">
-        <a class="btn btn-success btn-lg" href="{{ url_for('.signup') }}" role="button">Sign up now!</a>
-        <a class="btn btn-secondary btn-lg" href="#learnmore" role="button">Learn more</a>
+      <a id="learnmore"></a>
+
+      <p class="lead m-t-md">
+        <a class="btn btn-success" href="{{ url_for('.signup') }}" role="button">Sign up now!</a>
+        <a class="btn btn-secondary" href="#learnmore" role="button">Learn more</a>
       </p>
     </div>
   </div>
 
   <div class="container">
-    <div class="page" id="learnmore">
-      <section>
-        <h1>What is a Gantt Chart?</h1>
-        <p class="lead">A bar chart, basically.</p>
-        <p>Developed by Henry Gantt in the 1910s. Blah blah blah.</p>
+    <div class="page">
+      <section class="feature row">
+        <div class="col-sm-6 text-right">
+          <h1>What is a Gantt Chart?</h1>
+          <p class="lead">A bar chart, basically.</p>
+          <p>Developed by Henry Gantt in the 1910s. Blah blah blah.</p>
+        </div>
+
+        <div class="col-sm-6">
+        </div>
       </section>
 
       <div class="separator separator1"></div>
 
-      <section>
-        <h1>Bleh</h1>
-        <p>fdshjfkdshfjdslkfsd</p>
+      <section class="feature row">
+        <div class="col-sm-6">
+        </div>
+
+        <div class="col-sm-6">
+          <h1>Bleh</h1>
+          <p>fdshjfkdshfjdslkfsd</p>
+        </div>
       </section>
 
       <div class="separator separator2"></div>
 
-      <section>
-        <h1>Blah</h1>
-        <p>fdshjfkdshfjdslkfsd</p>
+      <section class="feature row">
+        <div class="col-sm-6 text-right">
+          <h1>Blah</h1>
+          <p>fdshjfkdshfjdslkfsd</p>
+        </div>
+
+        <div class="col-sm-6">
+        </div>
       </section>
 
       <div class="separator separator1"></div>
 
-      <section>
-        <h1>Bloh</h1>
-        <p>fdshjfkdshfjdslkfsd</p>
+      <section class="feature row">
+        <div class="col-sm-6">
+        </div>
+
+        <div class="col-sm-6">
+          <h1>Bloh</h1>
+          <p>fdshjfkdshfjdslkfsd</p>
+        </div>
       </section>
 
       <div class="separator separator2"></div>
 
-      <section>
-        <h1>Blih</h1>
-        <p>fdshjfkdshfjdslkfsd</p>
+      <section class="feature">
+        <p class="text-center lead">What are you waiting for?</p>
+        <p class="text-center">
+          <a class="btn btn-success btn-lg" href="{{ url_for('.signup') }}" role="button">Sign up now!</a>
+        </p>
       </section>
     </div>
   </div>
