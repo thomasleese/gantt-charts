@@ -16,6 +16,7 @@ setup(
         'Sphinx >=1.3, <2'
     ],
     install_requires=[
+        'Cerberus >=0.9, <1',
         'Flask >=0.10, <1',
         'passlib >=1.6, <2',
         'SQLAlchemy >=0.9, <1',

@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-error-modal/index.html" />
+
 <dom-module id="app-project-calendar">
 
   <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
@@ -12,6 +14,10 @@
       }
 
       .working-week .card {
+        cursor: pointer;
+      }
+
+      .holidays li {
         cursor: pointer;
       }
     </style>
@@ -91,73 +97,18 @@
 
     <app-error-modal id="errorModal"></app-error-modal>
 
-    <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              <span class="sr-only">Close</span>
-            </button>
-            <h4 class="modal-title" id="newModalLabel">New holiday</h4>
-          </div>
-
-          <div class="modal-body">
-            <p>Enter the details of the new holiday.</p>
-
-            <form id="newModalForm" class="form" on-submit="_disableFormSubmit">
-              <div class="form-group">
-                <input type="text" class="form-control" id="newModalFormName" placeholder="Name" required />
-              </div>
-
-              <div class="form-group form-inline">
-                <input type="date" class="form-control" id="newModalFormStart" placeholder="Start" required />
-                <input type="date" class="form-control" id="newModalFormEnd" placeholder="End" required />
-              </div>
-            </form>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-success" on-click="_handleActuallyNewHoliday">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              <span class="sr-only">Close</span>
-            </button>
-            <h4 class="modal-title" id="deleteModalLabel">Remove holiday?</h4>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to remove <span id="deleteModalWho"></span>?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-danger" on-click="_handleActuallyDeleteHoliday">Remove</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-block">
         <h4 class="card-title">Holidays</h4>
         <p class="card-text">Add some holidays.</p>
 
         <template is="dom-if" if="{{ hasHolidays }}">
-          <ul class="list-group">
+          <ul class="list-group holidays">
             <template is="dom-repeat" items="{{ holidays }}" as="holiday">
-              <li class="list-group-item">
+              <li class="list-group-item" on-click="_handleEditHoliday">
                 <span class="m-r">{{ holiday.name }}</span>
                 <small><span>{{ holiday.start }}</span> — <span>{{ holiday.end }}</span></small>
-                <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteHoliday"><span class="ion-trash-a"></span></button>
+                <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteHoliday"><span class="ion-trash-a m-r"></span>Delete</button>
               </li>
             </template>
           </ul>
@@ -289,53 +240,31 @@
         e.preventDefault();
         return false;
       },
-      _handleDeleteHoliday: function(e) {
-        var holiday = e.model.holiday;
 
-        this.$.deleteModalWho.textContent = holiday.name;
-        this._targetResourceForDeletion = holiday;
-        $(this.$.deleteModal).modal('show');
-      },
-      _handleActuallyDeleteHoliday: function(e) {
-        var holiday = this._targetResourceForDeletion;
-        requests.delete('/api/projects/' + this.projectId + '/calendar/holidays/' + holiday.id)
-          .go(function(statusCode, response) {
-            if (statusCode === 204) {
-              this.reload();
-            } else {
-              this.$.errorModal.showUnknownError();
-            }
-          }.bind(this));
-
-        $(this.$.deleteModal).modal('hide');
-      },
       _handleNewHoliday: function(e) {
-        this.$.newModalFormName.value = '';
-        this.$.newModalFormStart.value = '';
-        this.$.newModalFormEnd.value = '';
-
-        $(this.$.newModal).modal('show');
-      },
-      _handleActuallyNewHoliday: function(e) {
         var holiday = {
-          name: this.$.newModalFormName.value,
-          start: this.$.newModalFormStart.value,
-          end: this.$.newModalFormEnd.value,
+          name: 'Unnamed holiday',
+          start: moment().format('YYYY-MM-DD'),
+          end: moment().add(1, 'days').format('YYYY-MM-DD'),
         };
 
         requests.post('/api/projects/' + this.projectId + '/calendar/holidays')
           .send(holiday)
           .go(function(statusCode, response) {
-            if (statusCode === 400) {
-              $(this.$.newModal).modal('show');
-            } else if (statusCode === 201) {
+            if (statusCode === 201) {
+              this.fire('open-holiday', response.holiday);
               this.reload();
             } else {
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
-
-        $(this.$.newModal).modal('hide');
+      },
+      _handleEditHoliday: function(e) {
+        this.fire('open-holiday', e.model.holiday);
+      },
+      _handleDeleteHoliday: function(e) {
+        this.fire('delete-holiday', e.model.holiday);
+        e.stopPropagation();
       },
     });
   </script>

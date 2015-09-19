@@ -1,0 +1,117 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<link rel="import" href="../app-delete-modal/index.html" />
+<link rel="import" href="../app-error-modal/index.html" />
+<link rel="import" href="../app-thing-editor/index.html" />
+
+<dom-module id="app-project-calendar-holiday-editor">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-delete-modal id="deleteModal" what="holiday" on-delete="_handleActuallyDelete"></app-delete-modal>
+
+    <app-error-modal id="errorModal"></app-error-modal>
+
+    <app-thing-editor id="editor" what="Holiday">
+      <form id="newModalForm" class="form" on-submit="_preventDefault">
+        <div class="form-group">
+          <input type="text" class="form-control" id="formName" placeholder="Name" required on-change="_handleNameChange" />
+        </div>
+
+        <div class="form-group form-inline">
+          <input type="date" class="form-control" id="formStart" placeholder="Start" required on-change="_handleStartChange" />
+          <input type="date" class="form-control" id="formEnd" placeholder="End" required on-change="_handleEndChange" />
+        </div>
+      </form>
+
+      <hr />
+
+      <button class="btn btn-danger btn-sm pull-right" on-click="_handleDelete"><span class="ion-trash-a m-r"></span>Delete</button>
+      <div class="clearfix"></div>
+    </app-thing-editor>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-calendar-holiday-editor',
+      properties: {
+        projectId: Number,
+      },
+
+      show: function(holiday) {
+        this.holiday = holiday;
+        this.$.editor.show(holiday.name);
+
+        this.$.formName.value = holiday.name;
+        this.$.formStart.value = holiday.start;
+        this.$.formEnd.value = holiday.end;
+      },
+      hide: function() {
+        this.holiday = undefined;
+        this.$.editor.hide();
+      },
+      submitChange: function(key, value, callback) {
+        var data = {};
+        data[key] = value;
+
+        requests.patch('/api/projects/' + this.projectId + '/calendar/holidays/' + this.holiday.id)
+          .send(data)
+          .go(function(statusCode, response) {
+            if (statusCode === 200) {
+              if (callback !== undefined) {
+                callback();
+              }
+              this.fire('change');
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+      delete: function(holiday) {
+        this.$.deleteModal.show(holiday.name, holiday);
+      },
+
+      _preventDefault: function(e) {
+        e.preventDefault();
+        return false;
+      },
+
+      _handleNameChange: function() {
+        var newName = this.$.formName.value;
+        this.submitChange('name', newName, function() {
+          this.$.editor.title = newName;
+        }.bind(this));
+      },
+      _handleStartChange: function() {
+        this.submitChange('start', this.$.formStart.value);
+      },
+      _handleEndChange: function() {
+        this.submitChange('end', this.$.formEnd.value);
+      },
+
+      _handleDelete: function(e) {
+        this.delete(this.holiday);
+      },
+      _handleActuallyDelete: function(e) {
+        var holiday = e.detail;
+        requests.delete('/api/projects/' + this.projectId + '/calendar/holidays/' + holiday.id)
+          .go(function(statusCode, response) {
+            if (statusCode === 204) {
+              this.fire('delete', holiday);
+              this.hide();
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+    });
+  </script>
+
+</dom-module>

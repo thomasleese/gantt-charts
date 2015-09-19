@@ -12,6 +12,7 @@
   <link rel="import" href="{{ url_for('static', filename='components/app-project-calendar/index.html') }}" />
   <link rel="import" href="{{ url_for('static', filename='components/app-project-members/index.html') }}" />
   <link rel="import" href="{{ url_for('static', filename='components/app-project-entry-editor/index.html') }}" />
+  <link rel="import" href="{{ url_for('static', filename='components/app-project-calendar-holiday-editor/index.html') }}" />
 {% endblock %}
 
 {% block page %}
@@ -46,6 +47,7 @@
   <app-project-entry-editor id="entry-editor" project-id="{{ project.id }}"></app-project-entry-editor>
   <app-project-member-editor id="member-editor" project-id="{{ project.id }}"></app-project-member-editor>
   <app-project-resource-editor id="resource-editor" project-id="{{ project.id }}"></app-project-resource-editor>
+  <app-project-calendar-holiday-editor id="calendar-holiday-editor" project-id="{{ project.id }}"></app-project-calendar-holiday-editor>
 {% endblock %}
 
 {% block scripts %}
@@ -59,6 +61,16 @@
     var entryEditor = document.getElementById('entry-editor');
     var memberEditor = document.getElementById('member-editor');
     var resourceEditor = document.getElementById('resource-editor');
+    var calendarHolidayEditor = document.getElementById('calendar-holiday-editor');
+
+    var hideEditorsExcept = function(thisOne) {
+      var editors = [entryEditor, memberEditor, resourceEditor, calendarHolidayEditor];
+      editors.forEach(function(editor) {
+        if (editor !== thisOne) {
+          editor.hide();
+        }
+      });
+    };
 
     entryEditor.calendar = calendar.calendar;
 
@@ -80,6 +92,14 @@
 
     members.addEventListener('delete', function(e) {
       memberEditor.delete(e.detail);
+    });
+
+    calendar.addEventListener('open-holiday', function(e) {
+      calendarHolidayEditor.show(e.detail);
+    });
+
+    calendar.addEventListener('delete-holiday', function(e) {
+      calendarHolidayEditor.delete(e.detail);
     });
 
     ganttChart.addEventListener('open', function(e) {
@@ -110,6 +130,14 @@
       resources.reload();
     });
 
+    calendarHolidayEditor.addEventListener('change', function(e) {
+      calendar.reload();
+    });
+
+    calendarHolidayEditor.addEventListener('delete', function(e) {
+      calendar.reload();
+    });
+
     entryEditor.addEventListener('show', function(e) {
       var entry = e.detail;
 
@@ -129,18 +157,19 @@
         ganttChart.selectItem(dependency.child);
       });
 
-      resourceEditor.hide();
-      memberEditor.hide();
+      hideEditorsExcept(entryEditor);
     });
 
     resourceEditor.addEventListener('show', function() {
-      entryEditor.hide();
-      memberEditor.hide();
+      hideEditorsExcept(resourceEditor);
     });
 
     memberEditor.addEventListener('show', function() {
-      entryEditor.hide();
-      resourceEditor.hide();
+      hideEditorsExcept(memberEditor);
+    });
+
+    calendarHolidayEditor.addEventListener('show', function() {
+      hideEditorsExcept(calendarHolidayEditor);
     });
 
     entryEditor.addEventListener('hide', function(e) {

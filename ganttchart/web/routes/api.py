@@ -4,6 +4,7 @@ Routes for the API.
 
 import datetime
 
+from cerberus import Validator
 import flask
 import sqlalchemy
 
@@ -131,24 +132,66 @@ def project_calendar_holidays(project_id):
 
         flask.g.sql_session.commit()
 
-        return '', 201
+        return flask.jsonify(holiday=holiday.as_json()), 201
     else:
         raise errors.InvalidFormData(form)
 
 
-@blueprint.route('/projects/<int:project_id>/calendar/holidays/<int:holiday_id>', methods=['DELETE'])
+def coerce_date(string):
+    return datetime.datetime.strptime(string, '%Y-%m-%d')
+
+
+@blueprint.route('/projects/<int:project_id>/calendar/holidays/<int:holiday_id>', methods=['GET', 'PATCH', 'DELETE'])
 def project_calendar_holiday(project_id, holiday_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
+
+    holiday = flask.g.sql_session.query(ProjectCalendarHoliday) \
+        .filter(ProjectCalendarHoliday.id == holiday_id).one()
+    if holiday.calendar.project_id != project_id:
+        raise errors.NotFound()
+
+    if flask.request.method == 'GET':
+        return flask.jsonify(holiday=holiday.as_json())
+
     if not account_member.access_level.can_administrate:
         raise errors.MissingPermission('can_administrate')
 
-    target_holiday = flask.g.sql_session.query(ProjectCalendarHoliday) \
-        .filter(ProjectCalendarHoliday.id == holiday_id).one()
+    if flask.request.method == 'PATCH':
+        validator = Validator({
+            'name': {'type': 'string'},
+            'start': {'type': 'datetime', 'coerce': coerce_date},
+            'end': {'type': 'datetime', 'coerce': coerce_date},
+        })
 
-    flask.g.sql_session.delete(target_holiday)
-    flask.g.sql_session.commit()
-    return '', 204
+        if validator.validate(flask.request.json, update=True):
+            doc = validator.document
+
+            try:
+                holiday.name = doc['name']
+            except KeyError:
+                pass
+
+            try:
+                holiday.start = doc['start'].date()
+            except KeyError:
+                pass
+
+            try:
+                holiday.end = doc['end'].date()
+            except KeyError:
+                pass
+
+            flask.g.sql_session.commit()
+
+            return flask.jsonify(holiday=holiday.as_json())
+        else:
+            raise errors.InvalidFormData(validator)
+    elif flask.request.method == 'DELETE':
+        flask.g.sql_session.delete(holiday)
+        flask.g.sql_session.commit()
+
+        return '', 204
 
 
 @blueprint.route('/projects/<int:project_id>/entries', methods=['GET', 'POST'])

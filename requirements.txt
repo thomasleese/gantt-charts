@@ -1,6 +1,7 @@
 alabaster==0.7.6
 alembic==0.8.2
 Babel==2.0
+Cerberus==0.9.1
 docutils==0.12
 Flask==0.10.1
 gunicorn==19.3.0
