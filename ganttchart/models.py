@@ -67,6 +67,14 @@ class Account(Base):
         return self.email_addresses[0]
 
     @property
+    def initials(self):
+        names = self.display_name.split()
+        if len(names) == 1:
+            return names[0][0]
+        else:
+            return names[0][0] + names[-1][0]
+
+    @property
     def projects(self):
         for member in self.project_members:
             yield member.project
