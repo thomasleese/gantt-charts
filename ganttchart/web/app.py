@@ -234,6 +234,24 @@ def account_password():
     return flask.redirect(flask.url_for('.account'))
 
 
+@app.route('/account/<int:account_id>/avatar')
+def account_avatar(account_id):
+    account = flask.g.sql_session.query(Account).get(account_id)
+    if account is None:
+        raise errors.NotFound()
+
+    initials = account.initials
+
+    hue = account_id % 360
+
+    svg = flask.render_template('account/avatar.svg', hue=hue,
+                                initials=initials)
+
+    response = flask.make_response(svg)
+    response.headers['Content-Type'] = 'image/svg+xml'
+    return response
+
+
 @app.route('/api/account', methods=['PATCH'])
 def api_change_account():
     form = forms.ApiChangeAccount.from_json(flask.request.json)

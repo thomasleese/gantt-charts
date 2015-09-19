@@ -62,9 +62,7 @@
     <ul class="list-group list-group-flush">
       {% for email_address in g.account.email_addresses %}
         <li class="list-group-item">
-          <img class="m-r img-rounded" src="{{ email_address.gravatar(64) }}" width="32" height="32" />
-          {{ email_address.email_address }}
-          <span class="m-l"></span>
+          <span class="m-l">{{ email_address.email_address }}</span>
 
           {% if g.account.primary_email_address == email_address %}
             <span class="label label-success">Primary</span>

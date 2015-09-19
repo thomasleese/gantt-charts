@@ -62,11 +62,6 @@
         overflow: hidden;
       }
 
-      .gantt-chart tbody td img {
-        height: 1.8rem;
-        margin: 0.1rem;
-      }
-
       .gantt-chart tbody tr.active,
       .gantt-chart tbody tr.active td,
       .gantt-chart tbody tr.active th {
@@ -75,6 +70,14 @@
 
       .gantt-chart tfoot th {
         padding: 4px 10px;
+      }
+
+      .img-avatar {
+        image-rendering: crisp-edges;
+        border-radius: 0.1rem;
+
+        height: 1.6rem;
+        margin: 0.1rem;
       }
     </style>
 
@@ -106,7 +109,7 @@
 
                 <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
                   <template is="dom-repeat" items="{{ block.entry.members }}" as="member">
-                    <img src="{{ member.member.account.photo_url }}" />
+                    <img class="img-avatar" src="{{ member.member.account.photo_url }}" />
                   </template>
 
                   <span class="m-r">{{ block.entry.name }}</span>

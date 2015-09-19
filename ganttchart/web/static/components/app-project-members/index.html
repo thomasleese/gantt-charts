@@ -18,6 +18,11 @@
       li {
         cursor: pointer;
       }
+
+      .img-avatar {
+        image-rendering: crisp-edges;
+        border-radius: 0.1rem;
+      }
     </style>
 
     <div class="modal fade" id="new-modal" tabindex="-1" role="dialog" aria-labelledby="new-modal-label" aria-hidden="true">
@@ -57,7 +62,7 @@
     <ul class="list-group">
       <template is="dom-repeat" items="{{ members }}" as="member">
         <li class$="{{ _listItemClass(member.selected) }}" on-click="_handleSelect">
-          <img class="img-rounded m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
+          <img class="img-avatar m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
           <span>{{ member.account.display_name }}</span>
           <span class="label label-default m-l">{{ member.access_level.description }}</span>
           <button class="btn btn-danger btn-sm pull-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>

@@ -133,7 +133,7 @@ class Account(Base):
         return {
             'id': self.id,
             'display_name': self.display_name,
-            'photo_url': self.primary_email_address.gravatar(128),
+            'photo_url': '/account/{}/avatar'.format(self.id)
         }
 
 
@@ -178,16 +178,6 @@ class AccountEmailAddress(Base):
             mailer.send(email)
 
         self.last_verification_email_date = datetime.datetime.now()
-
-    @property
-    def as_md5_string(self):
-        h = hashlib.md5()
-        h.update(self.email_address.lower().encode('utf-8'))
-        return h.hexdigest()
-
-    def gravatar(self, size=40):
-        return 'https://www.gravatar.com/avatar/{}?s={}' \
-               .format(self.as_md5_string, size)
 
 
 @event.listens_for(AccountEmailAddress, 'after_insert')
