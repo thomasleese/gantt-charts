@@ -1,5 +1,9 @@
 {% extends "_includes/page.html" %}
 
+{% block imports %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/welcome.css') }}" />
+{% endblock %}
+
 {% block body %}
   <div class="container">
     <div class="jumbotron">
@@ -22,9 +26,39 @@
 
   <div class="container">
     <div class="page" id="learnmore">
-      <h1>What is a Gantt Chart?</h1>
-      <p class="lead">A bar chart, basically.</p>
-      <p>Developed by Henry Gantt in the 1910s. Blah blah blah.</p>
+      <section>
+        <h1>What is a Gantt Chart?</h1>
+        <p class="lead">A bar chart, basically.</p>
+        <p>Developed by Henry Gantt in the 1910s. Blah blah blah.</p>
+      </section>
+
+      <div class="separator separator1"></div>
+
+      <section>
+        <h1>Bleh</h1>
+        <p>fdshjfkdshfjdslkfsd</p>
+      </section>
+
+      <div class="separator separator2"></div>
+
+      <section>
+        <h1>Blah</h1>
+        <p>fdshjfkdshfjdslkfsd</p>
+      </section>
+
+      <div class="separator separator1"></div>
+
+      <section>
+        <h1>Bloh</h1>
+        <p>fdshjfkdshfjdslkfsd</p>
+      </section>
+
+      <div class="separator separator2"></div>
+
+      <section>
+        <h1>Blih</h1>
+        <p>fdshjfkdshfjdslkfsd</p>
+      </section>
     </div>
   </div>
 {% endblock %}
