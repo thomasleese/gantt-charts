@@ -25,6 +25,10 @@ class NotAuthenticated(Unauthorized):
     description = 'Wrong account ID or password.'
 
 
+class MissingCsrfToken(Unauthorized):
+    description = 'Missing CSRF token.'
+
+
 # 403
 class MissingPermission(Forbidden):
     description = 'Missing required permission.'

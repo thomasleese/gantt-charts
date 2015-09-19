@@ -19,6 +19,18 @@ from ganttchart.web import errors, forms
 blueprint = flask.Blueprint('api', __name__, url_prefix='/api')
 
 
+@blueprint.before_request
+def check_csrf_token(*args, **kwargs):
+    header = flask.request.headers.get('X-CSRF-Token', None)
+    cookie = flask.request.cookies.get('CSRF-Token', None)
+
+    if header is None or cookie is None:
+        raise errors.MissingCsrfToken()
+
+    if header != cookie:
+        raise errors.MissingCsrfToken()
+
+
 @blueprint.route('/account', methods=['PATCH'])
 def change_account():
     form = forms.ApiChangeAccount.from_json(flask.request.json)
