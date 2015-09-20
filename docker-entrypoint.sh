@@ -2,8 +2,8 @@
 set -e
 
 if [ "$1" = 'gunicorn' ]; then
-    chown -R ganttchart .
-    exec gosu ganttchart "$@"
+    chown -R ganttcharts .
+    exec gosu ganttcharts "$@"
 fi
 
 exec "$@"

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
 
-from ganttchart import __version__
+from ganttcharts import __version__
 
 
 setup(
-    name='ganttchart',
+    name='gantt-charts',
     version=__version__,
-    author='Tom Leese',
-    author_email='inbox@tomleese.me.uk',
+    author='Thomas Leese',
+    author_email='inbox@thomasleese.me',
     packages=find_packages(exclude=['tests*']),
     zip_safe=True,
     setup_requires=[

@@ -8,13 +8,14 @@ from cerberus import Validator
 import flask
 import sqlalchemy
 
-from ganttchart import database
-from ganttchart.chart import Chart
-from ganttchart.models import generate_key, AccessLevel, Account, AccountEmailAddress, \
-    Project, ProjectCalendarHoliday, ProjectEntry, ProjectEntryDependency, \
-    ProjectEntryMember, ProjectEntryType, ProjectEntryResource, \
-    ProjectMember, ProjectResource, ProjectStar, Session as SqlSession
-from ganttchart.web import errors, forms
+from ganttcharts import database
+from ganttcharts.chart import Chart
+from ganttcharts.models import generate_key, AccessLevel, Account, \
+    AccountEmailAddress, Project, ProjectCalendarHoliday, ProjectEntry, \
+    ProjectEntryDependency, ProjectEntryMember, ProjectEntryType, \
+    ProjectEntryResource, ProjectMember, ProjectResource, ProjectStar, \
+    Session as SqlSession
+from ganttcharts.web import errors, forms
 
 
 blueprint = flask.Blueprint('api', __name__, url_prefix='/api')

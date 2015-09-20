@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from ganttchart.web import app
+from ganttcharts.web import app
 
 
 parser = ArgumentParser(description='Web server useful for testing.')

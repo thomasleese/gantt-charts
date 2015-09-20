@@ -14,7 +14,7 @@ from ..models import generate_key, AccessLevel, Account, AccountEmailAddress, \
 from . import errors, forms, routes
 
 
-app = flask.Flask('ganttchart.web')
+app = flask.Flask('ganttcharts.web')
 app.secret_key = os.environ['GANTT_CHART_SECRET_KEY']
 
 

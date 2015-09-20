@@ -10,13 +10,13 @@ class Email(email.mime.multipart.MIMEMultipart):
 
         self.name = name
 
-        _loader = jinja2.PackageLoader('ganttchart', 'emails/templates')
+        _loader = jinja2.PackageLoader('ganttcharts', 'emails/templates')
         self.env = jinja2.Environment(loader=_loader)
         self.context = context
 
         self['Date'] = email.utils.formatdate()
         self['Subject'] = self.subject
-        self['From'] = email.utils.formataddr(('Gantt Chart', 'customers@ganttchart.xyz'))
+        self['From'] = email.utils.formataddr(('Gantt Charts', 'customers@ganttcharts.xyz'))
 
         self._attach_template('body.txt', 'plain')
         self._attach_template('body.html', 'html')
