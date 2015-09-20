@@ -1,0 +1,204 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html" />
+
+<link rel="import" href="../app-project-gantt-chart/index.html" />
+<link rel="import" href="../app-project-resources/index.html" />
+<link rel="import" href="../app-project-calendar/index.html" />
+<link rel="import" href="../app-project-members/index.html" />
+<link rel="import" href="../app-project-entry-editor/index.html" />
+<link rel="import" href="../app-project-calendar-holiday-editor/index.html" />
+
+<dom-module id="app-project">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link type="css" rel="import" href="../../bower_components/ionicons/css/ionicons.css" />
+
+  <template>
+    <ul id="navigation" class="nav nav-pills pull-right">
+      <li class="nav-item">
+        <a href="#" class$="{{ _navLinkClass(currentPage, 0) }}" on-click="showGanttChart">Gantt Chart</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class$="{{ _navLinkClass(currentPage, 1) }}" on-click="showResources">Resources</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class$="{{ _navLinkClass(currentPage, 2) }}" on-click="showCalendar">Calendar</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class$="{{ _navLinkClass(currentPage, 3) }}" on-click="showMembers">Members</a>
+      </li>
+    </ul>
+
+    <h1>{{ project.name }}</h1>
+    <p class="lead">{{ project.description }}</p>
+
+    <iron-pages id="pages" selected="{{ currentPage }}">
+      <app-project-gantt-chart id="ganttChart" project-id="{{ projectId }}" on-open="_entryEditorShow" on-delete="_entryEditorDelete"  on-select="_entryEditorSelectDependency" on-deselect="_entryEditorDeselectDependency"></app-project-gantt-chart>
+      <app-project-resources id="resources" project-id="{{ projectId }}" on-open="_resourceEditorShow" on-delete="_resourceEditorDelete" on-select="_entryEditorSelectResource" on-deselect="_entryEditorDeselectResource"></app-project-resources>
+      <app-project-calendar id="calendar" project-id="{{ projectId }}" on-load="_setEntryEditorCalendar" on-open-holiday="_calendarHolidayEditorShow" on-delete-holiday="_calendarHolidayEditorDelete"></app-project-calendar>
+      <app-project-members id="members" project-id="{{ projectId }}" on-open="_memberEditorShow" on-delete="_memberEditorDelete" on-select="_entryEditorSelectMember" on-deselect="_entryEditorDeselectMember"></app-project-members>
+    </iron-pages>
+
+    <app-project-entry-editor id="entryEditor" project-id="{{ projectId }}" on-show="_initEntryEditor" on-hide="_deinitEntryEditor" on-change="reloadGanttChart" on-delete="reloadGanttChart"></app-project-entry-editor>
+    <app-project-member-editor id="memberEditor" project-id="{{ projectId }}" on-show="_initMemberEditor" on-change="reloadMembers" on-delete="reloadMembers"></app-project-member-editor>
+    <app-project-resource-editor id="resourceEditor" project-id="{{ projectId }}" on-show="_initResourceEditor" on-change="reloadResources" on-delete="reloadResources"></app-project-resource-editor>
+    <app-project-calendar-holiday-editor id="calendarHolidayEditor" project-id="{{ projectId }}" on-show="_initCalendarHolidayEditor" on-change="reloadCalendar" on-delete="reloadCalendar"></app-project-calendar-holiday-editor>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project',
+      properties: {
+        projectId: {
+          type: Number,
+          observer: 'reload',
+        },
+        currentPage: {
+          type: Number,
+          value: 0,
+        },
+      },
+
+      reload: function() {
+        requests.get('/api/projects/' + this.projectId)
+          .go(function(statusCode, response) {
+            this.project = response.project;
+            window.title = this.project.name;
+          }.bind(this));
+      },
+
+      showGanttChart: function(e) {
+        this.currentPage = 0;
+        e.preventDefault();
+      },
+      reloadGanttChart: function() {
+        this.$.ganttChart.reload();
+      },
+      showResources: function(e) {
+        this.currentPage = 1;
+        e.preventDefault();
+      },
+      reloadResources: function() {
+        this.$.resources.reload();
+      },
+      showCalendar: function(e) {
+        this.currentPage = 2;
+        e.preventDefault();
+      },
+      reloadCalendar: function() {
+        this.$.calendar.reload();
+      },
+      showMembers: function(e) {
+        this.currentPage = 3;
+        e.preventDefault();
+      },
+      reloadMembers: function() {
+        this.$.members.reload();
+      },
+      hideEditorsExcept: function(thisOne) {
+        var editors = [this.$.entryEditor, this.$.memberEditor,
+                       this.$.resourceEditor, this.$.calendarHolidayEditor];
+        editors.forEach(function(editor) {
+          if (editor !== thisOne) {
+            editor.hide();
+          }
+        });
+      },
+
+      _setEntryEditorCalendar: function(e) {
+        this.$.entryEditor.calendar = e.detail;
+      },
+      _initResourceEditor: function(e) {
+        this.hideEditorsExcept(this.$.resourceEditor);
+      },
+      _resourceEditorShow: function(e) {
+        this.$.resourceEditor.show(e.detail);
+      },
+      _resourceEditorDelete: function(e) {
+        this.$.resourceEditor.delete(e.detail);
+      },
+      _initMemberEditor: function(e) {
+        this.hideEditorsExcept(this.$.memberEditor);
+      },
+      _memberEditorShow: function(e) {
+        this.$.memberEditor.show(e.detail);
+      },
+      _memberEditorDelete: function(e) {
+        this.$.memberEditor.delete(e.detail);
+      },
+      _initCalendarHolidayEditor: function(e) {
+        this.hideEditorsExcept(this.$.calendarHolidayEditor);
+      },
+      _calendarHolidayEditorShow: function(e) {
+        this.$.calendarHolidayEditor.show(e.detail);
+      },
+      _calendarHolidayEditorDelete: function(e) {
+        this.$.calendarHolidayEditor.delete(e.detail);
+      },
+      _initEntryEditor: function(e) {
+        var entry = e.detail;
+
+        this.$.resources.startSelecting();
+        this.$.members.startSelecting();
+        this.$.ganttChart.startSelecting();
+
+        entry.resources.forEach(function(res) {
+          this.$.resources.selectItem(res.resource);
+        }.bind(this));
+
+        entry.members.forEach(function(member) {
+          this.$.members.selectItem(member.member);
+        }.bind(this));
+
+        entry.dependencies.forEach(function(dependency) {
+          this.$.ganttChart.selectItem(dependency.child);
+        }.bind(this));
+
+        this.hideEditorsExcept(this.$.entryEditor);
+      },
+      _deinitEntryEditor: function(e) {
+        this.$.resources.stopSelecting();
+        this.$.members.stopSelecting();
+        this.$.ganttChart.stopSelecting();
+      },
+      _entryEditorShow: function(e) {
+        this.$.entryEditor.show(e.detail);
+      },
+      _entryEditorDelete: function(e) {
+        this.$.entryEditor.delete(e.detail);
+      },
+      _entryEditorSelectResource: function(e) {
+        this.$.entryEditor.resourceSelected(e.detail);
+      },
+      _entryEditorDeselectResource: function(e) {
+        this.$.entryEditor.resourceDeselected(e.detail);
+      },
+      _entryEditorSelectMember: function(e) {
+        this.$.entryEditor.memberSelected(e.detail);
+      },
+      _entryEditorDeselectMember: function(e) {
+        this.$.entryEditor.memberDeselected(e.detail);
+      },
+      _entryEditorSelectDependency: function(e) {
+        this.$.entryEditor.dependencySelected(e.detail.entry, function(worked) {
+          if (!worked) {
+            this.$.ganttChart.unselectItem(e.detail.entry);
+          }
+        });
+      },
+      _entryEditorDeselectDependency: function(e) {
+        this.$.entryEditor.dependencyDeselected(e.detail.entry);
+      },
+
+      _navLinkClass: function(currentSelection, mySelection) {
+        if (currentSelection === mySelection) {
+          return 'nav-link active';
+        } else {
+          return 'nav-link';
+        }
+      },
+    });
+  </script>
+
+</dom-module>
