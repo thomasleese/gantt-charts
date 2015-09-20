@@ -12,7 +12,7 @@
     <meta name="theme-color" content="rgb(255, 228, 124)" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <title>{% block title %}Ganttable{% endblock %}</title>
+    <title>{% block title %}Gantt Charts{% endblock %}</title>
 
     <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.css') }}" rel="stylesheet" />
     <link href="{{ url_for('static', filename='bower_components/ionicons/css/ionicons.css') }}" rel="stylesheet" />
@@ -33,7 +33,7 @@
 
   <body>
     <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-      <a class="navbar-brand" href="{{ url_for('.home') }}">Ganttable &nbsp;<span class="ion-ios-home"></span></a>
+      <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Charts &nbsp;<span class="ion-ios-home"></span></a>
 
       {% if g.account %}
         <ul class="nav navbar-nav">
