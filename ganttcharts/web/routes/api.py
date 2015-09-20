@@ -72,7 +72,7 @@ def get_project_member_or_403(project):
     return member
 
 
-@blueprint.route('/projects/<int:project_id>')
+@blueprint.route('/projects/<int:project_id>', methods=['GET', 'PATCH'])
 def project(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
@@ -80,7 +80,35 @@ def project(project_id):
     if not account_member.access_level.can_view:
         raise errors.MissingPermission('can_view')
 
-    return flask.jsonify(project=project.as_json())
+    if flask.request.method == 'PATCH':
+        if not account_member.access_level.can_administrate:
+            raise errors.MissingPermission('can_administrate')
+
+        validator = Validator({
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+        })
+
+        if validator.validate(flask.request.json, update=True):
+            doc = validator.document
+
+            try:
+                project.name = doc['name']
+            except KeyError:
+                pass
+
+            try:
+                project.description = doc['description']
+            except KeyError:
+                pass
+
+            flask.g.sql_session.commit()
+
+            return flask.jsonify(project=project.as_json())
+        else:
+            raise errors.InvalidFormData(validator)
+    elif flask.request.method == 'GET':
+        return flask.jsonify(project=project.as_json())
 
 
 @blueprint.route('/projects/<int:project_id>/calendar', methods=['GET', 'PATCH'])

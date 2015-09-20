@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<link rel="import" href="../app-thing-editor/index.html" />
+
+<dom-module id="app-project-editor">
+
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-error-modal id="errorModal"></app-error-modal>
+
+    <app-thing-editor id="editor" what="Project">
+      <form id="form" class="form" on-submit="_preventDefault">
+        <div class="form-group">
+          <input type="text" class="form-control" id="formName" placeholder="Name" required on-change="_handleNameChange" />
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="formDescription" placeholder="Description" required on-change="_handleDescriptionChange" />
+        </div>
+      </form>
+    </app-thing-editor>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-project-editor',
+      properties: {
+        projectId: Number,
+      },
+
+      show: function(project) {
+        this.project = project;
+        this.$.editor.show(project.name);
+
+        this.$.formName.value = project.name;
+        this.$.formDescription.value = project.description;
+      },
+      hide: function() {
+        this.project = undefined;
+        this.$.editor.hide();
+      },
+      submitChange: function(key, value, callback) {
+        var data = {};
+        data[key] = value;
+
+        requests.patch('/api/projects/' + this.project.id)
+          .send(data)
+          .go(function(statusCode, response) {
+            if (statusCode === 200) {
+              if (callback !== undefined) {
+                callback();
+              }
+              this.fire('change', response.project);
+            } else {
+              this.$.errorModal.showUnknownError();
+            }
+          }.bind(this));
+      },
+
+      _preventDefault: function(e) {
+        e.preventDefault();
+        return false;
+      },
+
+      _handleNameChange: function() {
+        var newName = this.$.formName.value;
+        this.submitChange('name', newName, function() {
+          this.$.editor.title = newName;
+        }.bind(this));
+      },
+      _handleDescriptionChange: function() {
+        this.submitChange('description', this.$.formDescription.value);
+      },
+    });
+  </script>
+
+</dom-module>

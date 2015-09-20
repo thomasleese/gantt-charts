@@ -6,6 +6,7 @@
 <link rel="import" href="../app-project-resources/index.html" />
 <link rel="import" href="../app-project-calendar/index.html" />
 <link rel="import" href="../app-project-members/index.html" />
+<link rel="import" href="../app-project-editor/index.html" />
 <link rel="import" href="../app-project-entry-editor/index.html" />
 <link rel="import" href="../app-project-calendar-holiday-editor/index.html" />
 
@@ -24,6 +25,10 @@
         max-width: none;
         min-width: 100vw;
         padding: 0 1.5rem;
+      }
+
+      .text-muted a {
+        color: rgb(100, 100, 100);
       }
 
       #navigation {
@@ -55,7 +60,7 @@
 
     <div class="container">
       <div class="page">
-        <h1>{{ project.name }}</h1>
+        <h1><span>{{ project.name }}</span> <small class="text-muted"><small><small><small> — <a href="#" on-click="_projectEditorShow">Edit</a></small></small></small></small></h1>
         <p class="lead">{{ project.description }}</p>
 
         <iron-pages id="pages" selected="{{ currentPage }}">
@@ -65,6 +70,7 @@
           <app-project-members id="members" project-id="{{ projectId }}" on-open="_memberEditorShow" on-delete="_memberEditorDelete" on-select="_entryEditorSelectMember" on-deselect="_entryEditorDeselectMember"></app-project-members>
         </iron-pages>
 
+        <app-project-editor id="projectEditor" project-id="{{ projectId }}" on-show="_initProjectEditor" on-change="reload" on-delete="reload"></app-project-editor>
         <app-project-entry-editor id="entryEditor" project-id="{{ projectId }}" on-show="_initEntryEditor" on-hide="_deinitEntryEditor" on-change="reloadGanttChart" on-delete="reloadGanttChart"></app-project-entry-editor>
         <app-project-member-editor id="memberEditor" project-id="{{ projectId }}" on-show="_initMemberEditor" on-change="reloadMembers" on-delete="reloadMembers"></app-project-member-editor>
         <app-project-resource-editor id="resourceEditor" project-id="{{ projectId }}" on-show="_initResourceEditor" on-change="reloadResources" on-delete="reloadResources"></app-project-resource-editor>
@@ -91,7 +97,7 @@
         requests.get('/api/projects/' + this.projectId)
           .go(function(statusCode, response) {
             this.project = response.project;
-            window.title = this.project.name;
+            document.title = this.project.name;
           }.bind(this));
       },
 
@@ -124,8 +130,9 @@
         this.$.members.reload();
       },
       hideEditorsExcept: function(thisOne) {
-        var editors = [this.$.entryEditor, this.$.memberEditor,
-                       this.$.resourceEditor, this.$.calendarHolidayEditor];
+        var editors = [this.$.projectEditor, this.$.entryEditor,
+                       this.$.memberEditor, this.$.resourceEditor,
+                       this.$.calendarHolidayEditor];
         editors.forEach(function(editor) {
           if (editor !== thisOne) {
             editor.hide();
@@ -135,6 +142,13 @@
 
       _setEntryEditorCalendar: function(e) {
         this.$.entryEditor.calendar = e.detail;
+      },
+      _initProjectEditor: function(e) {
+        this.hideEditorsExcept(this.$.projectEditor);
+      },
+      _projectEditorShow: function(e) {
+        this.$.projectEditor.show(this.project);
+        e.preventDefault();
       },
       _initResourceEditor: function(e) {
         this.hideEditorsExcept(this.$.resourceEditor);
