@@ -86,7 +86,6 @@ def upgrade():
         sa.Column('description', sa.String, nullable=False),
         sa.Column('type', sa.String, nullable=False),
         sa.Column('creation_date', sa.DateTime, nullable=False),
-        sa.Column('optimistic_time_estimate', sa.Integer, nullable=False),
         sa.Column('normal_time_estimate', sa.Integer, nullable=False),
         sa.Column('pessimistic_time_estimate', sa.Integer, nullable=False),
     )

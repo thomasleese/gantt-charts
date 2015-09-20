@@ -24,6 +24,9 @@ def upgrade():
         sa.Column('display_name', sa.String, nullable=False),
         sa.Column('password_hashed', sa.String, nullable=False),
         sa.Column('creation_date', sa.DateTime, nullable=False),
+        sa.Column('reset_password_key', sa.String),
+        sa.Column('reset_password_key_expiration_date', sa.DateTime),
+        sa.Column('last_reset_password_email_date', sa.DateTime),
     )
 
     op.create_table('account_email_address',
@@ -34,7 +37,8 @@ def upgrade():
                   nullable=False),
         sa.Column('primary', sa.Boolean, nullable=False),
         sa.Column('verified', sa.Boolean, nullable=False),
-        sa.Column('verify_key', sa.String, nullable=False)
+        sa.Column('verify_key', sa.String, nullable=False),
+        sa.Column('last_verification_email_date', sa.DateTime),
     )
 
 
