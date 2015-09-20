@@ -15,6 +15,29 @@
   <link type="css" rel="import" href="../../bower_components/ionicons/css/ionicons.css" />
 
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .container {
+        max-width: none;
+        min-width: 100vw;
+        padding: 0 1.5rem;
+      }
+
+      #navigation {
+        position: fixed;
+        right: 0.8rem;
+        top: 4.2rem;
+        background: white;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 1rem rgb(180, 180, 180);
+        z-index: 1000;
+      }
+    </style>
+
     <ul id="navigation" class="nav nav-pills pull-right">
       <li class="nav-item">
         <a href="#" class$="{{ _navLinkClass(currentPage, 0) }}" on-click="showGanttChart">Gantt Chart</a>
@@ -30,20 +53,24 @@
       </li>
     </ul>
 
-    <h1>{{ project.name }}</h1>
-    <p class="lead">{{ project.description }}</p>
+    <div class="container">
+      <div class="page">
+        <h1>{{ project.name }}</h1>
+        <p class="lead">{{ project.description }}</p>
 
-    <iron-pages id="pages" selected="{{ currentPage }}">
-      <app-project-gantt-chart id="ganttChart" project-id="{{ projectId }}" on-open="_entryEditorShow" on-delete="_entryEditorDelete"  on-select="_entryEditorSelectDependency" on-deselect="_entryEditorDeselectDependency"></app-project-gantt-chart>
-      <app-project-resources id="resources" project-id="{{ projectId }}" on-open="_resourceEditorShow" on-delete="_resourceEditorDelete" on-select="_entryEditorSelectResource" on-deselect="_entryEditorDeselectResource"></app-project-resources>
-      <app-project-calendar id="calendar" project-id="{{ projectId }}" on-load="_setEntryEditorCalendar" on-open-holiday="_calendarHolidayEditorShow" on-delete-holiday="_calendarHolidayEditorDelete"></app-project-calendar>
-      <app-project-members id="members" project-id="{{ projectId }}" on-open="_memberEditorShow" on-delete="_memberEditorDelete" on-select="_entryEditorSelectMember" on-deselect="_entryEditorDeselectMember"></app-project-members>
-    </iron-pages>
+        <iron-pages id="pages" selected="{{ currentPage }}">
+          <app-project-gantt-chart id="ganttChart" project-id="{{ projectId }}" on-open="_entryEditorShow" on-delete="_entryEditorDelete"  on-select="_entryEditorSelectDependency" on-deselect="_entryEditorDeselectDependency"></app-project-gantt-chart>
+          <app-project-resources id="resources" project-id="{{ projectId }}" on-open="_resourceEditorShow" on-delete="_resourceEditorDelete" on-select="_entryEditorSelectResource" on-deselect="_entryEditorDeselectResource"></app-project-resources>
+          <app-project-calendar id="calendar" project-id="{{ projectId }}" on-load="_setEntryEditorCalendar" on-open-holiday="_calendarHolidayEditorShow" on-delete-holiday="_calendarHolidayEditorDelete"></app-project-calendar>
+          <app-project-members id="members" project-id="{{ projectId }}" on-open="_memberEditorShow" on-delete="_memberEditorDelete" on-select="_entryEditorSelectMember" on-deselect="_entryEditorDeselectMember"></app-project-members>
+        </iron-pages>
 
-    <app-project-entry-editor id="entryEditor" project-id="{{ projectId }}" on-show="_initEntryEditor" on-hide="_deinitEntryEditor" on-change="reloadGanttChart" on-delete="reloadGanttChart"></app-project-entry-editor>
-    <app-project-member-editor id="memberEditor" project-id="{{ projectId }}" on-show="_initMemberEditor" on-change="reloadMembers" on-delete="reloadMembers"></app-project-member-editor>
-    <app-project-resource-editor id="resourceEditor" project-id="{{ projectId }}" on-show="_initResourceEditor" on-change="reloadResources" on-delete="reloadResources"></app-project-resource-editor>
-    <app-project-calendar-holiday-editor id="calendarHolidayEditor" project-id="{{ projectId }}" on-show="_initCalendarHolidayEditor" on-change="reloadCalendar" on-delete="reloadCalendar"></app-project-calendar-holiday-editor>
+        <app-project-entry-editor id="entryEditor" project-id="{{ projectId }}" on-show="_initEntryEditor" on-hide="_deinitEntryEditor" on-change="reloadGanttChart" on-delete="reloadGanttChart"></app-project-entry-editor>
+        <app-project-member-editor id="memberEditor" project-id="{{ projectId }}" on-show="_initMemberEditor" on-change="reloadMembers" on-delete="reloadMembers"></app-project-member-editor>
+        <app-project-resource-editor id="resourceEditor" project-id="{{ projectId }}" on-show="_initResourceEditor" on-change="reloadResources" on-delete="reloadResources"></app-project-resource-editor>
+        <app-project-calendar-holiday-editor id="calendarHolidayEditor" project-id="{{ projectId }}" on-show="_initCalendarHolidayEditor" on-change="reloadCalendar" on-delete="reloadCalendar"></app-project-calendar-holiday-editor>
+      </div>
+    </div>
   </template>
 
   <script>

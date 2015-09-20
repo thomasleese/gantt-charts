@@ -6,8 +6,14 @@
 
 {% block imports %}
   <link rel="import" href="{{ url_for('static', filename='components/app-project/index.html') }}" />
+
+  <style>
+    body {
+      float: left;
+    }
+  </style>
 {% endblock %}
 
-{% block page %}
+{% block body %}
   <app-project project-id="{{ project.id }}"></app-project>
 {% endblock %}

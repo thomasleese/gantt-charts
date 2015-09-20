@@ -17,6 +17,7 @@
 
       .gantt-chart {
         border-collapse: collapse;
+        margin-right: 3rem;
       }
 
       .gantt-chart th.rotate {
@@ -31,7 +32,7 @@
 
       .gantt-chart th.rotate > div > span {
         border-bottom: 1px solid rgb(200, 200, 200);
-        padding: 2px 100px 2px 1.8rem;
+        padding: 2px 1rem 2px 1.8rem;
       }
 
       .gantt-chart tbody tr {
@@ -86,47 +87,45 @@
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a row to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a row to select it.</p>
 
-    <template is="dom-if" if="{{hasGanttChart}}">
-      <div style="overflow-y: scroll;">
-        <table class="gantt-chart">
-          <thead>
-            <tr>
-              <th></th>
-              <template is="dom-repeat" items="{{ _tableHeadings }}">
-                <th class="rotate" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
+    <template is="dom-if" if="{{ hasGanttChart }}">
+      <table class="gantt-chart">
+        <thead>
+          <tr>
+            <th></th>
+            <template is="dom-repeat" items="{{ _tableHeadings }}">
+              <th class="rotate" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
+            </template>
+          </tr>
+        </thead>
+
+        <tbody>
+          <template is="dom-repeat" items="{{ blocks }}" as="block">
+            <tr class$="{{ _listItemClass(block.selected) }}" on-click="_handleEdit">
+              <th>{{ block.entry.name }}</th>
+
+              <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
+                <td></td>
+              </template>
+
+              <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
+                <template is="dom-repeat" items="{{ block.entry.members }}" as="member">
+                  <img class="img-avatar" src="{{ member.member.account.photo_url }}" />
+                </template>
+
+                <span class="m-r">{{ block.entry.name }}</span>
+
+                <template is="dom-repeat" items="{{ block.entry.resources }}" as="resource">
+                  <span class$="[[ _iconClass(resource.resource.icon) ]]"></span>
+                </template>
+              </td>
+
+              <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
+                <td></td>
               </template>
             </tr>
-          </thead>
-
-          <tbody>
-            <template is="dom-repeat" items="{{ blocks }}" as="block">
-              <tr class$="{{ _listItemClass(block.selected) }}" on-click="_handleEdit">
-                <th>{{ block.entry.name }}</th>
-
-                <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
-                  <td></td>
-                </template>
-
-                <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
-                  <template is="dom-repeat" items="{{ block.entry.members }}" as="member">
-                    <img class="img-avatar" src="{{ member.member.account.photo_url }}" />
-                  </template>
-
-                  <span class="m-r">{{ block.entry.name }}</span>
-
-                  <template is="dom-repeat" items="{{ block.entry.resources }}" as="resource">
-                    <span class$="[[ _iconClass(resource.resource.icon) ]]"></span>
-                  </template>
-                </td>
-
-                <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
-                  <td></td>
-                </template>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </div>
+          </template>
+        </tbody>
+      </table>
 
       <br />
       <button type="button" class="btn btn-success pull-right" on-click="_handleNew">
