@@ -15,7 +15,7 @@ _sql_engine = None
 _sql_connection = None
 
 def get_sql_database_uri():
-    key = 'GANTT_CHART_SQL_URI'
+    key = 'GANTT_CHARTS_SQL_URI'
     try:
         return os.environ[key]
     except KeyError:
