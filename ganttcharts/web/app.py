@@ -3,7 +3,9 @@ import logging
 import os
 
 import flask
+from raven.contrib.flask import Sentry
 import sqlalchemy
+from werkzeug.contrib.fixers import ProxyFix
 
 from .. import database
 from ..chart import Chart
@@ -16,14 +18,16 @@ from . import errors, forms, routes
 
 app = flask.Flask('ganttcharts.web')
 app.secret_key = os.environ['GANTT_CHART_SECRET_KEY']
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
-@app.before_first_request
-def configure_logging():
-    if not app.debug:
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.INFO)
-        app.logger.addHandler(stream_handler)
+try:
+    sentry_dsn = os.environ['SENTRY_DSN']
+except KeyError:
+    pass
+else:
+    app.sentry = Sentry(app, dsn=sentry_dsn, logging=True,
+                        level=logging.WARNING)
 
 
 @app.before_first_request
