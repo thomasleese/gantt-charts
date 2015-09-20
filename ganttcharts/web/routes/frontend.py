@@ -3,6 +3,7 @@ Routes for the front-end.
 """
 
 import datetime
+import functools
 
 import flask
 import sqlalchemy
@@ -42,6 +43,15 @@ def get_project_member_or_403(project):
     return member
 
 
+def login_required(func):
+    @functools.wraps(func)
+    def decorated_function(*args, **kwargs):
+        if 'account' not in flask.g:
+            return flask.redirect(flask.url_for('.login', next=flask.request.url))
+        return func(*args, **kwargs)
+    return decorated_function
+
+
 @blueprint.route('/')
 def home():
     if 'account' in flask.g:
@@ -56,7 +66,10 @@ def login():
     if flask.request.method == 'POST' and form.validate():
         account = form.password.record.account
         flask.session['account_id'] = account.id
-        return flask.redirect(flask.url_for('.home'))
+        if 'next' in flask.request.args:
+            return flask.redirect(flask.request.args['next'])
+        else:
+            return flask.redirect(flask.url_for('.home'))
 
     return flask.render_template('account/login.html', form=form)
 
@@ -75,12 +88,14 @@ def signup():
 
 
 @blueprint.route('/logout', methods=['GET', 'POST'])
+@login_required
 def logout():
     del flask.session['account_id']
     return flask.redirect(flask.url_for('.home'))
 
 
 @blueprint.route('/projects/new', methods=['GET', 'POST'])
+@login_required
 def new_project():
     form = forms.CreateProject(flask.request.form)
     if flask.request.method == 'POST' and form.validate():
@@ -93,6 +108,7 @@ def new_project():
 
 
 @blueprint.route('/projects/<int:project_id>')
+@login_required
 def view_project(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
@@ -104,6 +120,7 @@ def view_project(project_id):
 
 
 @blueprint.route('/projects/<int:project_id>/star')
+@login_required
 def star_project(project_id):
     # TODO check if they are a member
     star = ProjectStar(account=flask.g.account, project_id=project_id)
@@ -113,6 +130,7 @@ def star_project(project_id):
 
 
 @blueprint.route('/projects/<int:project_id>/unstar')
+@login_required
 def unstar_project(project_id):
     star = flask.g.sql_session.query(ProjectStar) \
         .filter(ProjectStar.account == flask.g.account) \
@@ -124,11 +142,13 @@ def unstar_project(project_id):
 
 
 @blueprint.route('/account')
+@login_required
 def account():
     return flask.render_template('account/index.html')
 
 
 @blueprint.route('/account/email-addresses', methods=['POST'])
+@login_required
 def account_email_addresses():
     form = forms.EmailAddress(flask.request.form)
     if form.validate():
@@ -173,6 +193,7 @@ def account_reset(account_id=None, reset_password_key=None):
 
 
 @blueprint.route('/account/email-addresses/<int:id>/send-verify-email')
+@login_required
 def account_send_verify_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
     if email_address.account == flask.g.account:
@@ -183,6 +204,7 @@ def account_send_verify_email(id):
 
 
 @blueprint.route('/account/email-addresses/<int:id>/primary')
+@login_required
 def account_primary_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
     if email_address.account == flask.g.account:
@@ -193,6 +215,7 @@ def account_primary_email(id):
 
 
 @blueprint.route('/account/email-addresses/<int:id>/delete')
+@login_required
 def account_delete_email(id):
     email_address = flask.g.sql_session.query(AccountEmailAddress).get(id)
     if email_address.account == flask.g.account:
@@ -205,6 +228,7 @@ def account_delete_email(id):
 
 
 @blueprint.route('/account/email-addresses/<int:id>/verify/<key>')
+@login_required
 def account_verify_email(id, key):
     email_address = flask.g.sql_session.query(AccountEmailAddress) \
         .filter(AccountEmailAddress.id == id) \
@@ -217,6 +241,7 @@ def account_verify_email(id, key):
 
 
 @blueprint.route('/account/password', methods=['POST'])
+@login_required
 def account_password():
     form = forms.ChangePassword(flask.request.form)
     if form.validate():
@@ -229,6 +254,7 @@ def account_password():
 
 
 @blueprint.route('/account/<int:account_id>/avatar')
+@login_required
 def account_avatar(account_id):
     account = flask.g.sql_session.query(Account).get(account_id)
     if account is None:

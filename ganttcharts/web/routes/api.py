@@ -33,6 +33,12 @@ def check_csrf_token(*args, **kwargs):
         raise errors.MissingCsrfToken()
 
 
+@blueprint.before_request
+def check_logged_in(*args, **kwargs):
+    if 'account' not in flask.g:
+        raise errors.NotAuthenticated()
+
+
 @blueprint.route('/account', methods=['PATCH'])
 def change_account():
     form = forms.ApiChangeAccount.from_json(flask.request.json)
