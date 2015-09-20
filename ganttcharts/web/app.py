@@ -56,4 +56,9 @@ def remove_session(*args, **kwargs):
     SqlSession.remove()
 
 
+@app.errorhandler(500)
+def server_error(e):
+    return flask.render_template('errors/500.html')
+
+
 routes.register(app)

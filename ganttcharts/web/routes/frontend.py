@@ -22,8 +22,11 @@ blueprint = flask.Blueprint('frontend', __name__)
 
 
 def get_project_or_404(project_id):
-    return flask.g.sql_session.query(Project) \
-        .filter(Project.id == project_id).one()
+    try:
+        return flask.g.sql_session.query(Project) \
+            .filter(Project.id == project_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise errors.NotFound()
 
 
 def get_project_member_or_404(member_id):
@@ -270,3 +273,8 @@ def account_avatar(account_id):
     response = flask.make_response(svg)
     response.headers['Content-Type'] = 'image/svg+xml'
     return response
+
+
+@blueprint.errorhandler(404)
+def page_not_found(e):
+    return flask.render_template('errors/404.html')
