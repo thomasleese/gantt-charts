@@ -57,7 +57,7 @@
           </li>
         </ul>
       {% else %}
-        <form class="form-inline navbar-form pull-right" action="{{ url_for('.login') }}" method="POST">
+        <form class="form-inline navbar-form pull-right hidden-sm-down" action="{{ url_for('.login') }}" method="POST">
           <div class="form-group">
             <input type="email" name="email_address" placeholder="Email address" class="form-control">
           </div>
@@ -66,6 +66,12 @@
           </div>
           <button type="submit" class="btn btn-success">Log in</button>
         </form>
+
+        <ul class="nav navbar-nav pull-right hidden-md-up">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('.login') }}">Log in</a>
+          </li>
+        </ul>
       {% endif %}
     </nav>
 
