@@ -211,8 +211,8 @@
         return seconds / (60 * 60 * 24);
       },
       _tableLeftPadding: function(block) {
-        var blockStart = moment(block.start).utc();
-        var ganttChartStart = moment(this.ganttChart.start).utc();
+        var blockStart = moment.utc(block.start).utc();
+        var ganttChartStart = moment.utc(this.ganttChart.start).utc();
 
         var days = blockStart.diff(ganttChartStart, 'days');
         var hours = blockStart.diff(ganttChartStart, 'hours');
@@ -223,8 +223,8 @@
         return new Array(l);
       },
       _tableBlockColspan: function(block) {
-        var end = moment(block.end).utc();
-        var start = moment(block.start).utc();
+        var end = moment.utc(block.end).utc();
+        var start = moment.utc(block.start).utc();
 
         var days = end.diff(start, 'days');
         var hours = end.diff(start, 'hours');
@@ -241,8 +241,8 @@
         return 'background: hsl(' + hue + ', 50%, 50%)';
       },
       _tableRightPadding: function(block) {
-        var blockEnd = moment(block.end).utc();
-        var ganttChartEnd = moment(this.ganttChart.end).utc();
+        var blockEnd = moment.utc(block.end).utc();
+        var ganttChartEnd = moment.utc(this.ganttChart.end).utc();
 
         var days = ganttChartEnd.diff(blockEnd, 'days');
         var hours = ganttChartEnd.diff(blockEnd, 'hours');
