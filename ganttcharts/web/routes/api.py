@@ -23,6 +23,9 @@ blueprint = flask.Blueprint('api', __name__, url_prefix='/api')
 
 @blueprint.before_request
 def check_csrf_token(*args, **kwargs):
+    if flask.current_app.debug:
+        return
+
     header = flask.request.headers.get('X-CSRF-Token', None)
     cookie = flask.request.cookies.get('CSRF-Token', None)
 
