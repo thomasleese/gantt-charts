@@ -219,25 +219,25 @@
 
         var day = date.day();
 
-        if (day === 0 && !calendar.working_week.monday) {
+        if (day === 0 && !calendar.working_week.sunday) {
           isHoliday = true;
         }
-        if (day === 1 && !calendar.working_week.tuesday) {
+        if (day === 1 && !calendar.working_week.monday) {
           isHoliday = true;
         }
-        if (day === 2 && !calendar.working_week.wednesday) {
+        if (day === 2 && !calendar.working_week.tuesday) {
           isHoliday = true;
         }
-        if (day === 3 && !calendar.working_week.thursday) {
+        if (day === 3 && !calendar.working_week.wednesday) {
           isHoliday = true;
         }
-        if (day === 4 && !calendar.working_week.friday) {
+        if (day === 4 && !calendar.working_week.thursday) {
           isHoliday = true;
         }
-        if (day === 5 && !calendar.working_week.saturday) {
+        if (day === 5 && !calendar.working_week.friday) {
           isHoliday = true;
         }
-        if (day === 6 && !calendar.working_week.sunday) {
+        if (day === 6 && !calendar.working_week.saturday) {
           isHoliday = true;
         }
 
