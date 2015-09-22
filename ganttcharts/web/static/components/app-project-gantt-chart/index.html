@@ -134,7 +134,7 @@
       <div class="clearfix"></div>
     </template>
 
-    <template is="dom-if" if="{{!hasGanttChart}}">
+    <template is="dom-if" if="{{ !hasGanttChart }}">
       <p class="lead text-center">This project hasn't got any tasks.</p>
       <p class="text-center">Click the button below to create one.</p>
       <p class="text-center">
@@ -165,40 +165,44 @@
 
             requests.get('/api/projects/' + this.projectId + '/gantt-chart')
               .go(function(statusCode, response) {
-                var ganttChart = response.gantt_chart;
-
-                var tableHeadings = [];
-                var start = new Date(ganttChart.start);
-                var end = new Date(ganttChart.end);
-
-                var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                for (var i = 0; i < days + 1; i++) {
-                  var d = new Date(start);
-                  d.setDate(start.getDate() + i);
-
-                  tableHeadings.push(moment(d).format('D MMM YYYY'));
-                }
-                this._tableHeadings = tableHeadings;
-
-                if (this.hasGanttChart) {
-                  var oldBlocks = this.blocks;
-                  var newBlocks = ganttChart.blocks;
-
-                  newBlocks.forEach(function(a) {
-                    oldBlocks.forEach(function(b) {
-                      if (a.entry.id === b.entry.id) {
-                        a.selected = b.selected;
-                      }
-                    });
-                  });
-
-                  this.blocks = newBlocks;
+                if (statusCode === 404) {
+                  this.hasGanttChart = false;
                 } else {
-                  this.blocks = ganttChart.blocks;
-                }
+                  var ganttChart = response.gantt_chart;
 
-                this.ganttChart = ganttChart;
-                this.hasGanttChart = !!this.blocks.length;
+                  var tableHeadings = [];
+                  var start = new Date(ganttChart.start);
+                  var end = new Date(ganttChart.end);
+
+                  var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                  for (var i = 0; i < days + 1; i++) {
+                    var d = new Date(start);
+                    d.setDate(start.getDate() + i);
+
+                    tableHeadings.push(moment(d).format('D MMM YYYY'));
+                  }
+                  this._tableHeadings = tableHeadings;
+
+                  if (this.hasGanttChart) {
+                    var oldBlocks = this.blocks;
+                    var newBlocks = ganttChart.blocks;
+
+                    newBlocks.forEach(function(a) {
+                      oldBlocks.forEach(function(b) {
+                        if (a.entry.id === b.entry.id) {
+                          a.selected = b.selected;
+                        }
+                      });
+                    });
+
+                    this.blocks = newBlocks;
+                  } else {
+                    this.blocks = ganttChart.blocks;
+                  }
+
+                  this.ganttChart = ganttChart;
+                  this.hasGanttChart = !!this.blocks.length;
+                }
               }.bind(this));
           }.bind(this));
       },
