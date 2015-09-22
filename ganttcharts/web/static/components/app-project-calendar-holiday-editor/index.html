@@ -69,6 +69,8 @@
                 callback();
               }
               this.fire('change');
+            } else if (statusCode === 400) {
+              // ignore for now, user probably realises something is wrong
             } else {
               this.$.errorModal.showUnknownError();
             }
