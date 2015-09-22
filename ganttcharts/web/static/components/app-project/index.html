@@ -142,6 +142,7 @@
 
       _calendarLoaded: function(e) {
         this.$.entryEditor.calendar = e.detail;
+        this.$.ganttChart.calendar = e.detail;
         this.$.ganttChart.reload();
       },
       _initProjectEditor: function(e) {

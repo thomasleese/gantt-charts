@@ -97,7 +97,7 @@
           <tr>
             <th></th>
             <template is="dom-repeat" items="{{ _tableHeadings }}">
-              <th class$="{{ _tableHeadingClass(item) }}" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
+              <th class$="{{ _tableHeadingClass(item, calendar) }}" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
             </template>
           </tr>
         </thead>
@@ -153,9 +153,12 @@
       properties: {
         projectId: {
           type: Number,
-          observer: 'reload'
+          observer: 'reload',
         },
-        calendar: Object,
+        calendar: {
+          type: Object,
+          reflectToAttribute: true,
+        }
       },
 
       ready: function() {
@@ -163,90 +166,85 @@
       },
 
       reload: function() {
-        requests.get('/api/projects/' + this.projectId + '/calendar')
+        requests.get('/api/projects/' + this.projectId + '/gantt-chart')
           .go(function(statusCode, response) {
-            this.calendar = response.calendar;
+            if (!this.calendar || statusCode === 404) {
+              this.hasGanttChart = false;
+            } else {
+              var ganttChart = response.gantt_chart;
 
-            requests.get('/api/projects/' + this.projectId + '/gantt-chart')
-              .go(function(statusCode, response) {
-                if (statusCode === 404) {
-                  this.hasGanttChart = false;
-                } else {
-                  var ganttChart = response.gantt_chart;
+              var tableHeadings = [];
+              var start = new Date(ganttChart.start);
+              var end = new Date(ganttChart.end);
 
-                  var tableHeadings = [];
-                  var start = new Date(ganttChart.start);
-                  var end = new Date(ganttChart.end);
+              var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+              for (var i = 0; i < days; i++) {
+                var d = new Date(start);
+                d.setDate(start.getDate() + i);
 
-                  var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                  for (var i = 0; i < days; i++) {
-                    var d = new Date(start);
-                    d.setDate(start.getDate() + i);
+                tableHeadings.push(moment(d).format('D MMM YYYY'));
+              }
+              tableHeadings.push('');
+              this._tableHeadings = tableHeadings;
 
-                    tableHeadings.push(moment(d).format('D MMM YYYY'));
-                  }
-                  tableHeadings.push('');
-                  this._tableHeadings = tableHeadings;
+              if (this.hasGanttChart) {
+                var oldBlocks = this.blocks;
+                var newBlocks = ganttChart.blocks;
 
-                  if (this.hasGanttChart) {
-                    var oldBlocks = this.blocks;
-                    var newBlocks = ganttChart.blocks;
+                newBlocks.forEach(function(a) {
+                  oldBlocks.forEach(function(b) {
+                    if (a.entry.id === b.entry.id) {
+                      a.selected = b.selected;
+                    }
+                  });
+                });
 
-                    newBlocks.forEach(function(a) {
-                      oldBlocks.forEach(function(b) {
-                        if (a.entry.id === b.entry.id) {
-                          a.selected = b.selected;
-                        }
-                      });
-                    });
+                this.blocks = newBlocks;
+              } else {
+                this.blocks = ganttChart.blocks;
+              }
 
-                    this.blocks = newBlocks;
-                  } else {
-                    this.blocks = ganttChart.blocks;
-                  }
-
-                  this.ganttChart = ganttChart;
-                  this.hasGanttChart = !!this.blocks.length;
-                }
-              }.bind(this));
+              this.ganttChart = ganttChart;
+              this.hasGanttChart = !!this.blocks.length;
+            }
           }.bind(this));
       },
 
       _asDays: function(seconds) {
         return seconds / (60 * 60 * 24);
       },
-      _tableHeadingClass: function(date) {
+      _tableHeadingClass: function(date, calendar) {
         date = moment.utc(date, 'D MMM YYYY');
         var isHoliday = false;
 
         var day = date.day();
 
-        if (day === 0 && !this.calendar.working_week.monday) {
+        if (day === 0 && !calendar.working_week.monday) {
           isHoliday = true;
         }
-        if (day === 1 && !this.calendar.working_week.tuesday) {
+        if (day === 1 && !calendar.working_week.tuesday) {
           isHoliday = true;
         }
-        if (day === 2 && !this.calendar.working_week.wednesday) {
+        if (day === 2 && !calendar.working_week.wednesday) {
           isHoliday = true;
         }
-        if (day === 3 && !this.calendar.working_week.thursday) {
+        if (day === 3 && !calendar.working_week.thursday) {
           isHoliday = true;
         }
-        if (day === 4 && !this.calendar.working_week.friday) {
+        if (day === 4 && !calendar.working_week.friday) {
           isHoliday = true;
         }
-        if (day === 5 && !this.calendar.working_week.saturday) {
+        if (day === 5 && !calendar.working_week.saturday) {
           isHoliday = true;
         }
-        if (day === 6 && !this.calendar.working_week.sunday) {
+        if (day === 6 && !calendar.working_week.sunday) {
           isHoliday = true;
         }
 
         if (!isHoliday) {
-          for (var i = 0; i < this.calendar.holidays.length; i++) {
-            var start = moment.utc(this.calendar.holidays[i].start);
-            var end = moment.utc(this.calendar.holidays[i].end);
+          for (var i = 0; i < calendar.holidays.length; i++) {
+            var start = moment.utc(calendar.holidays[i].start);
+            var end = moment.utc(calendar.holidays[i].end);
             if (date.isBetween(start, end) || date.isSame(start) || date.isSame(end)) {
               isHoliday = true;
               break;

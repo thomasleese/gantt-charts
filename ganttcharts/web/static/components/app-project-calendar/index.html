@@ -183,8 +183,10 @@
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'working_week': data})
           .go(function(statusCode, response) {
-            if (statusCode !== 204) {
+            if (statusCode === 204) {
               this.fire('load', this.calendar);
+            } else {
+              // reset to the old state
               this._setWorkingDay(element, oldState);
             }
           }.bind(this));
