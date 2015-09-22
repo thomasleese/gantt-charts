@@ -20,6 +20,10 @@
         margin-right: 3rem;
       }
 
+      th.holiday {
+        background: rgb(240, 240, 240);
+      }
+
       .gantt-chart th.rotate {
         height: 85px;
         white-space: nowrap;
@@ -93,7 +97,7 @@
           <tr>
             <th></th>
             <template is="dom-repeat" items="{{ _tableHeadings }}">
-              <th class="rotate" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
+              <th class$="{{ _tableHeadingClass(item) }}" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
             </template>
           </tr>
         </thead>
@@ -210,6 +214,51 @@
 
       _asDays: function(seconds) {
         return seconds / (60 * 60 * 24);
+      },
+      _tableHeadingClass: function(date) {
+        date = moment.utc(date, 'D MMM YYYY');
+        var isHoliday = false;
+
+        var day = date.day();
+
+        if (day === 0 && !this.calendar.working_week.monday) {
+          isHoliday = true;
+        }
+        if (day === 1 && !this.calendar.working_week.tuesday) {
+          isHoliday = true;
+        }
+        if (day === 2 && !this.calendar.working_week.wednesday) {
+          isHoliday = true;
+        }
+        if (day === 3 && !this.calendar.working_week.thursday) {
+          isHoliday = true;
+        }
+        if (day === 4 && !this.calendar.working_week.friday) {
+          isHoliday = true;
+        }
+        if (day === 5 && !this.calendar.working_week.saturday) {
+          isHoliday = true;
+        }
+        if (day === 6 && !this.calendar.working_week.sunday) {
+          isHoliday = true;
+        }
+
+        if (!isHoliday) {
+          for (var i = 0; i < this.calendar.holidays.length; i++) {
+            var start = moment.utc(this.calendar.holidays[i].start);
+            var end = moment.utc(this.calendar.holidays[i].end);
+            if (date.isBetween(start, end) || date.isSame(start) || date.isSame(end)) {
+              isHoliday = true;
+              break;
+            }
+          }
+        }
+
+        if (isHoliday) {
+          return 'rotate holiday';
+        } else {
+          return 'rotate';
+        }
       },
       _tableLeftPadding: function(block) {
         var blockStart = moment.utc(block.start).utc();
