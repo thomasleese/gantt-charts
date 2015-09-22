@@ -66,7 +66,7 @@
         <iron-pages id="pages" selected="{{ currentPage }}">
           <app-project-gantt-chart id="ganttChart" project-id="{{ projectId }}" on-open="_entryEditorShow" on-delete="_entryEditorDelete"  on-select="_entryEditorSelectDependency" on-deselect="_entryEditorDeselectDependency"></app-project-gantt-chart>
           <app-project-resources id="resources" project-id="{{ projectId }}" on-open="_resourceEditorShow" on-delete="_resourceEditorDelete" on-select="_entryEditorSelectResource" on-deselect="_entryEditorDeselectResource"></app-project-resources>
-          <app-project-calendar id="calendar" project-id="{{ projectId }}" on-load="_setEntryEditorCalendar" on-open-holiday="_calendarHolidayEditorShow" on-delete-holiday="_calendarHolidayEditorDelete"></app-project-calendar>
+          <app-project-calendar id="calendar" project-id="{{ projectId }}" on-load="_calendarLoaded" on-open-holiday="_calendarHolidayEditorShow" on-delete-holiday="_calendarHolidayEditorDelete"></app-project-calendar>
           <app-project-members id="members" project-id="{{ projectId }}" on-open="_memberEditorShow" on-delete="_memberEditorDelete" on-select="_entryEditorSelectMember" on-deselect="_entryEditorDeselectMember"></app-project-members>
         </iron-pages>
 
@@ -140,8 +140,9 @@
         });
       },
 
-      _setEntryEditorCalendar: function(e) {
+      _calendarLoaded: function(e) {
         this.$.entryEditor.calendar = e.detail;
+        this.$.ganttChart.reload();
       },
       _initProjectEditor: function(e) {
         this.hideEditorsExcept(this.$.projectEditor);

@@ -184,6 +184,7 @@
           .send({'working_week': data})
           .go(function(statusCode, response) {
             if (statusCode !== 204) {
+              this.fire('load', this.calendar);
               this._setWorkingDay(element, oldState);
             }
           }.bind(this));
@@ -213,7 +214,9 @@
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'working_day': {'start': this.$.workingDayStart.value}})
           .go(function(statusCode, response) {
-            if (statusCode !== 204) {
+            if (statusCode === 204) {
+              this.fire('load', this.calendar);
+            } else {
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
@@ -222,7 +225,9 @@
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'working_day': {'end': this.$.workingDayEnd.value}})
           .go(function(statusCode, response) {
-            if (statusCode !== 204) {
+            if (statusCode === 204) {
+              this.fire('load', this.calendar);
+            } else {
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
@@ -231,7 +236,9 @@
         requests.patch('/api/projects/' + this.projectId + '/calendar')
           .send({'start_date': this.$.startDate.value})
           .go(function(statusCode, response) {
-            if (statusCode !== 204) {
+            if (statusCode === 204) {
+              this.fire('load', this.calendar);
+            } else {
               this.$.errorModal.showUnknownError();
             }
           }.bind(this));
