@@ -52,12 +52,12 @@
 
       .gantt-chart tbody td {
         border: 1px solid rgb(200, 200, 200);
-        padding: 0.2rem 0.4rem;
+        padding: 0.2rem 0.3rem;
         position: relative;
         z-index: 10;
         background: white;
 
-        max-width: 0.8rem;  /* sum of paddings above */
+        max-width: 0.6rem;  /* sum of paddings above */
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -175,12 +175,13 @@
                   var end = new Date(ganttChart.end);
 
                   var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                  for (var i = 0; i < days + 1; i++) {
+                  for (var i = 0; i < days; i++) {
                     var d = new Date(start);
                     d.setDate(start.getDate() + i);
 
                     tableHeadings.push(moment(d).format('D MMM YYYY'));
                   }
+                  tableHeadings.push('');
                   this._tableHeadings = tableHeadings;
 
                   if (this.hasGanttChart) {
