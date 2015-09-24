@@ -15,68 +15,6 @@
         display: block;
       }
 
-      .gantt-chart {
-        border-collapse: collapse;
-        margin-right: 3rem;
-      }
-
-      th.holiday {
-        background: rgb(240, 240, 240);
-      }
-
-      .gantt-chart th.rotate {
-        height: 85px;
-        white-space: nowrap;
-      }
-
-      .gantt-chart th.rotate > div {
-        transform: translate(-28px, 40px) rotate(315deg);
-        width: 2rem;
-      }
-
-      .gantt-chart th.rotate > div > span {
-        border-bottom: 1px solid rgb(200, 200, 200);
-        padding: 2px 1rem 2px 1.8rem;
-      }
-
-      .gantt-chart tbody tr {
-        cursor: pointer;
-      }
-
-      .gantt-chart tbody th {
-        white-space: nowrap;
-        text-align: right;
-        padding: 4px 10px;
-        border-bottom: 1px solid rgb(200, 200, 200);
-        padding-right: 1rem;
-        background: white;
-        z-index: 10;
-        position: relative;
-      }
-
-      .gantt-chart tbody td {
-        border: 1px solid rgb(200, 200, 200);
-        padding: 0.2rem 0.3rem;
-        position: relative;
-        z-index: 10;
-        background: white;
-
-        max-width: 0.6rem;  /* sum of paddings above */
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
-      .gantt-chart tbody tr.active,
-      .gantt-chart tbody tr.active td,
-      .gantt-chart tbody tr.active th {
-        background: rgb(255, 228, 124);
-      }
-
-      .gantt-chart tfoot th {
-        padding: 4px 10px;
-      }
-
       .img-avatar {
         image-rendering: crisp-edges;
         border-radius: 0.1rem;
@@ -130,7 +68,7 @@
       },
 
       reload: function() {
-        this.ganttChartSrc = '/api/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
+        this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
 
         requests.get('/api/projects/' + this.projectId + '/gantt-chart')
           .go(function(statusCode, response) {

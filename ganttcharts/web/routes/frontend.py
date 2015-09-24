@@ -122,6 +122,24 @@ def view_project(project_id):
     return flask.render_template('projects/view.html', project=project)
 
 
+@blueprint.route('/projects/<int:project_id>/gantt-chart/svg')
+def project_gantt_chart_svg(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    try:
+        chart = Chart(project)
+    except ValueError:
+        raise errors.NotFound()
+
+    svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
+                                project=project, timedelta=datetime.timedelta)
+
+    response = flask.make_response(svg)
+    response.headers['Content-Type'] = 'image/svg+xml'
+    return response
+
+
 @blueprint.route('/projects/<int:project_id>/star')
 @login_required
 def star_project(project_id):
