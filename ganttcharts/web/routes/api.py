@@ -301,7 +301,17 @@ def project_entry(project_id, entry_id):
         else:
             raise errors.InvalidFormData(form)
     elif flask.request.method == 'DELETE':
+        for d in entry.dependencies:
+            flask.g.sql_session.delete(d)
+        for r in entry.resources:
+            flask.g.sql_session.delete(r)
+        for m in entry.members:
+            flask.g.sql_session.delete(m)
+
+        flask.g.sql_session.commit()
+
         flask.g.sql_session.delete(entry)
+
         flask.g.sql_session.commit()
 
         return '', 204
