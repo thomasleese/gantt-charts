@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+{% set entryNameColumnWidth = 100 %}
+{% set entryNameColumnHeight = 24 %}
+{% set hourlyColumnWidth = 10 %}
+{% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}
+
+{% set fullHeight = dailyColumnSize + (entryNameColumnHeight * (chart.blocks | length)) %}
+{% set fullWidth = entryNameColumnWidth + (dailyColumnSize * ((chart.end - chart.start).days + 2)) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 {{ fullWidth }} {{ fullHeight }}"
+     height="{{ fullHeight }}" width="{{ fullWidth }}">
+
+     <style>
+     /* <![CDATA[ */
+         text {
+             font-family: sans-serif;
+         }
+     /* ]]> */
+     </style>
+
+    <g id="holidays" transform="translate({{ entryNameColumnWidth }} 0)">
+        {% for i in range((chart.end - chart.start).days + 1) %}
+            {% if not chart.project.calendar.is_working_date(chart.start + timedelta(days=i)) %}
+                <rect x="{{ dailyColumnSize * i }}" y="0"
+                      width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+                      fill="rgb(230, 230, 230)" />
+            {% endif %}
+        {% endfor %}
+    </g>
+
+    <g id="thead" transform="translate({{ entryNameColumnWidth }} 0)">
+        {% for i in range((chart.end - chart.start).days + 1) %}
+            <line x1="{{ dailyColumnSize * i + 100 * 1.732 }}" y1="{{ dailyColumnSize - 100 }}" x2="{{ dailyColumnSize * i }}" y2="{{ dailyColumnSize }}"
+                  stroke="grey" stroke-width="1" />
+            <text x="-1" y="-5" transform="rotate(-30 {{ i * dailyColumnSize }} {{ dailyColumnSize }}) translate({{ i * dailyColumnSize }} {{ dailyColumnSize }})">
+                {{ (chart.start + timedelta(days=i)).strftime('%a %-d %b %Y') }}
+            </text>
+        {% endfor %}
+    </g>
+
+    <g id="entry-names" transform="translate(0 {{ dailyColumnSize }})">
+        {% for block in chart.blocks %}
+            <rect x="0" y="{{ (loop.index - 1) * entryNameColumnHeight }}"
+                  width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight }}"
+                  stroke="grey" stroke-width="1" fill="white" />
+            <text x="0" y="{{ (loop.index) * entryNameColumnHeight }}" dy="-6" dx="5"
+                  width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight }}">
+                <tspan>{{ block.entry.name }}</tspan>
+            </text>
+        {% endfor %}
+    </g>
+
+    <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
+        {% for block in chart.blocks %}
+            {% set y = loop.index - 1 %}
+
+            {% for i in range(block.left_cells) %}
+                <rect x="{{ i * hourlyColumnWidth }}" y="{{ y * entryNameColumnHeight }}"
+                      width="{{ hourlyColumnWidth }}" height="{{ entryNameColumnHeight }}"
+                      stroke="grey" stroke-width="1" fill="none" />
+            {% endfor %}
+
+            <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y * entryNameColumnHeight }}"
+                  width="{{ block.cells * hourlyColumnWidth }}" height="{{ entryNameColumnHeight }}"
+                  stroke="grey" stroke-width="1" fill="{{ block.colour }}" />
+
+            {% for i in range(block.right_cells) %}
+                <rect x="{{ (block.left_cells + block.cells + i) * hourlyColumnWidth }}" y="{{ y * entryNameColumnHeight }}"
+                      width="{{ hourlyColumnWidth }}" height="{{ entryNameColumnHeight }}"
+                      stroke="grey" stroke-width="1" fill="none" />
+            {% endfor %}
+        {% endfor %}
+    </g>
+
+</svg>

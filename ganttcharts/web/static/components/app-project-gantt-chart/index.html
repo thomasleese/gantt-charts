@@ -92,46 +92,10 @@
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a row to select it.</p>
 
     <template is="dom-if" if="{{ hasGanttChart }}">
-      <table class="gantt-chart">
-        <thead>
-          <tr>
-            <th></th>
-            <template is="dom-repeat" items="{{ _tableHeadings }}">
-              <th class$="{{ _tableHeadingClass(item, calendar) }}" colspan$="{{ calendar.working_day.length }}"><div><span>{{ item }}</span></div></th>
-            </template>
-          </tr>
-        </thead>
+      <object data="{{ ganttChartSrc }}" type="image/svg+xml"></object>
 
-        <tbody>
-          <template is="dom-repeat" items="{{ blocks }}" as="block">
-            <tr class$="{{ _listItemClass(block.selected) }}" on-click="_handleEdit">
-              <th>{{ block.entry.name }}</th>
+      <br /><br />
 
-              <template is="dom-repeat" items="{{ _tableLeftPadding(block) }}">
-                <td></td>
-              </template>
-
-              <td colspan$="{{ _tableBlockColspan(block) }}" class="bg-inverse" title="{{ block.entry.description }}" style$="{{ _tableBlockStyle(index, block) }}">
-                <template is="dom-repeat" items="{{ block.entry.members }}" as="member">
-                  <img class="img-avatar" src="{{ member.member.account.photo_url }}" />
-                </template>
-
-                <span class="m-r">{{ block.entry.name }}</span>
-
-                <template is="dom-repeat" items="{{ block.entry.resources }}" as="resource">
-                  <span class$="[[ _iconClass(resource.resource.icon) ]]"></span>
-                </template>
-              </td>
-
-              <template is="dom-repeat" items="{{ _tableRightPadding(block) }}">
-                <td></td>
-              </template>
-            </tr>
-          </template>
-        </tbody>
-      </table>
-
-      <br />
       <button type="button" class="btn btn-success pull-right" on-click="_handleNew">
         <span class="ion-plus-round m-r"></span>New entry
       </button>
@@ -166,142 +130,16 @@
       },
 
       reload: function() {
+        this.ganttChartSrc = '/api/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
+
         requests.get('/api/projects/' + this.projectId + '/gantt-chart')
           .go(function(statusCode, response) {
-            if (!this.calendar || statusCode === 404) {
+            if (statusCode === 404) {
               this.hasGanttChart = false;
             } else {
-              var ganttChart = response.gantt_chart;
-
-              var tableHeadings = [];
-              var start = new Date(ganttChart.start);
-              var end = new Date(ganttChart.end);
-
-              var days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-              for (var i = 0; i < days; i++) {
-                var d = new Date(start);
-                d.setDate(start.getDate() + i);
-
-                tableHeadings.push(moment(d).format('D MMM YYYY'));
-              }
-              tableHeadings.push('');
-              this._tableHeadings = tableHeadings;
-
-              if (this.hasGanttChart) {
-                var oldBlocks = this.blocks;
-                var newBlocks = ganttChart.blocks;
-
-                newBlocks.forEach(function(a) {
-                  oldBlocks.forEach(function(b) {
-                    if (a.entry.id === b.entry.id) {
-                      a.selected = b.selected;
-                    }
-                  });
-                });
-
-                this.blocks = newBlocks;
-              } else {
-                this.blocks = ganttChart.blocks;
-              }
-
-              this.ganttChart = ganttChart;
-              this.hasGanttChart = !!this.blocks.length;
+              this.hasGanttChart = true;
             }
           }.bind(this));
-      },
-
-      _asDays: function(seconds) {
-        return seconds / (60 * 60 * 24);
-      },
-      _tableHeadingClass: function(date, calendar) {
-        date = moment.utc(date, 'D MMM YYYY');
-        var isHoliday = false;
-
-        var day = date.day();
-
-        if (day === 0 && !calendar.working_week.sunday) {
-          isHoliday = true;
-        }
-        if (day === 1 && !calendar.working_week.monday) {
-          isHoliday = true;
-        }
-        if (day === 2 && !calendar.working_week.tuesday) {
-          isHoliday = true;
-        }
-        if (day === 3 && !calendar.working_week.wednesday) {
-          isHoliday = true;
-        }
-        if (day === 4 && !calendar.working_week.thursday) {
-          isHoliday = true;
-        }
-        if (day === 5 && !calendar.working_week.friday) {
-          isHoliday = true;
-        }
-        if (day === 6 && !calendar.working_week.saturday) {
-          isHoliday = true;
-        }
-
-        if (!isHoliday) {
-          for (var i = 0; i < calendar.holidays.length; i++) {
-            var start = moment.utc(calendar.holidays[i].start);
-            var end = moment.utc(calendar.holidays[i].end);
-            if (date.isBetween(start, end) || date.isSame(start) || date.isSame(end)) {
-              isHoliday = true;
-              break;
-            }
-          }
-        }
-
-        if (isHoliday) {
-          return 'rotate holiday';
-        } else {
-          return 'rotate';
-        }
-      },
-      _tableLeftPadding: function(block) {
-        var blockStart = moment.utc(block.start).utc();
-        var ganttChartStart = moment.utc(this.ganttChart.start).utc();
-
-        var days = blockStart.diff(ganttChartStart, 'days');
-        var hours = blockStart.diff(ganttChartStart, 'hours');
-
-        hours -= (days * 24);
-
-        var l = days * this.calendar.working_day.length + hours;
-        return new Array(l);
-      },
-      _tableBlockColspan: function(block) {
-        var end = moment.utc(block.end).utc();
-        var start = moment.utc(block.start).utc();
-
-        var days = end.diff(start, 'days');
-        var hours = end.diff(start, 'hours');
-
-        hours -= (days * 24);
-        if (hours > this.calendar.working_day.length) {
-          hours -= (24 - this.calendar.working_day.length);
-        }
-
-        return days * this.calendar.working_day.length + hours;
-      },
-      _tableBlockStyle: function(index, block) {
-        var hue = (index / this.ganttChart.blocks.length) * 360;
-        return 'background: hsl(' + hue + ', 50%, 50%)';
-      },
-      _tableRightPadding: function(block) {
-        var blockEnd = moment.utc(block.end).utc();
-        var ganttChartEnd = moment.utc(this.ganttChart.end).utc();
-
-        var days = ganttChartEnd.diff(blockEnd, 'days');
-        var hours = ganttChartEnd.diff(blockEnd, 'hours');
-
-        hours -= (days * 24);
-        if (hours > this.calendar.working_day.length) {
-          hours -= (24 - this.calendar.working_day.length);
-        }
-
-        var l = days * this.calendar.working_day.length + hours;
-        return new Array(l);
       },
 
       _handleNew: function(e) {

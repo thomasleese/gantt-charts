@@ -2,7 +2,7 @@ from collections import OrderedDict, namedtuple
 import datetime
 
 
-_Block = namedtuple('Block', ['task', 'start', 'end', 'length'])
+_Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
 
 
 class Block(_Block):
@@ -10,12 +10,48 @@ class Block(_Block):
         return {
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'entry': self.task.as_json(),
+            'entry': self.entry.as_json(),
         }
+
+    @property
+    def left_cells(self):
+        diff = self.start - self.chart.start
+
+        days = diff.days
+        hours = diff.seconds // 60 // 60
+
+        return days * self.chart.project.calendar.business_day_length + hours
+
+    @property
+    def cells(self):
+        diff = self.end - self.start
+
+        days = diff.days
+        hours = diff.seconds // 60 // 60
+
+        if hours > self.chart.project.calendar.business_day_length:
+            hours -= (24 - self.chart.project.calendar.business_day_length)
+
+        return days * self.chart.project.calendar.business_day_length + hours
+
+    @property
+    def right_cells(self):
+        diff = self.chart.end - self.end
+
+        days = diff.days
+        hours = diff.seconds // 60 // 60
+
+        return days * self.chart.project.calendar.business_day_length + hours
+
+    @property
+    def colour(self):
+        return 'hsl({}, 50%, 50%)'.format((self.index / len(self.chart.blocks)) * 360)
 
 
 class Chart:
     def __init__(self, project):
+        self.project = project
+
         graph = [(task, [dep.child for dep in task.dependencies]) for task in project.entries]
 
         self.graph = self.topolgical_sort(graph)
@@ -74,9 +110,9 @@ class Chart:
             self.start = None
             self.end = None
 
-        for entry in self.graph:
+        for i, entry in enumerate(self.graph):
             task = entry[0]
-            self.blocks.append(Block(task, start_times[task],
+            self.blocks.append(Block(i, self, task, start_times[task],
                                      finish_times[task], lengths[task]))
 
     def topolgical_sort(self, graph_unsorted):
