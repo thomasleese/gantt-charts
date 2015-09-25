@@ -92,7 +92,7 @@
       },
 
       _setUpGanttChart: function(ganttChart) {
-        this.$.ganttChart.contentDocument.restoreState(this._savedState);
+        ganttChart.restoreState(this._savedState);
 
         ganttChart.addEventListener('open-entry', function(e) {
           this.fire('open', this.entries[e.detail]);
@@ -105,6 +105,10 @@
         ganttChart.addEventListener('deselect-entry', function(e) {
           this.fire('deselect', this.entries[e.detail]);
         }.bind(this));
+
+        var svg = ganttChart.querySelector('svg');
+        this.$.ganttChart.width = svg.getAttribute('width');
+        this.$.ganttChart.height = svg.getAttribute('height');
       },
 
       _handleNew: function(e) {
