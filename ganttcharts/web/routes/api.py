@@ -303,6 +303,8 @@ def project_entry(project_id, entry_id):
     elif flask.request.method == 'DELETE':
         for d in entry.dependencies:
             flask.g.sql_session.delete(d)
+        for d in entry.dependees:
+            flask.g.sql_session.delete(d)
         for r in entry.resources:
             flask.g.sql_session.delete(r)
         for m in entry.members:

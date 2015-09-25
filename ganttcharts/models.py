@@ -489,7 +489,7 @@ class ProjectEntryDependency(Base):
 
     parent = relationship('ProjectEntry', backref='dependencies',
                           foreign_keys='ProjectEntryDependency.parent_id')
-    child = relationship('ProjectEntry',
+    child = relationship('ProjectEntry', backref='dependees',
                          foreign_keys='ProjectEntryDependency.child_id')
 
     def as_json(self):
