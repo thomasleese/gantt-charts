@@ -145,14 +145,19 @@
         (function() {
             'use strict';
 
+            var TAG = 'Gantt Chart';
+
             var rows = document.querySelectorAll('.row');
             var isSelecting = false;
 
             document.openEntry = function(entryId) {
+                console.log(TAG, 'Opening', entryId);
                 document.dispatchEvent(new CustomEvent('open-entry', {detail: entryId}));
             };
 
             document.selectEntry = function(entryId, fireEvent) {
+                console.log(TAG, 'Selecting', entryId);
+
                 for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
                     var rowEntryId = row.getAttributeNS('http://example.org/gantt-charts', 'entry-id');
@@ -167,6 +172,8 @@
             };
 
             document.deselectEntry = function(entryId, fireEvent) {
+                console.log(TAG, 'Deselecting', entryId);
+
                 for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
                     var rowEntryId = row.getAttributeNS('http://example.org/gantt-charts', 'entry-id');
@@ -181,6 +188,8 @@
             };
 
             document.clearSelection = function() {
+                console.log(TAG, 'Clearing selection.');
+
                 for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
                     row.setAttribute('class', 'row');
@@ -205,15 +214,20 @@
             };
 
             document.startSelecting = function() {
+                console.log(TAG, 'Starting selection.');
                 isSelecting = true;
             };
 
             document.stopSelecting = function() {
+                console.log(TAG, 'Stopping selection.');
+
                 isSelecting = false;
                 document.clearSelection();
             };
 
             document.saveState = function() {
+                console.log(TAG, 'Saving state.');
+
                 return {
                     isSelecting: isSelecting,
                     selectedEntries: document.getSelectedEntryIds(),
@@ -221,6 +235,7 @@
             };
 
             document.restoreState = function(state) {
+                console.log(TAG, 'Restoring state to:', state);
                 if (state) {
                     document.clearSelection();
                     isSelecting = state.isSelecting;

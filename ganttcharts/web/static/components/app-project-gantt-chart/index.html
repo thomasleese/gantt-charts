@@ -72,11 +72,7 @@
       },
 
       reload: function() {
-        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.saveState) {
-          this._savedState = this.$.ganttChart.contentDocument.saveState();
-        } else {
-          this._savedState = null;
-        }
+        this._saveGanttChartState();
 
         this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
 
@@ -91,19 +87,34 @@
           }.bind(this));
       },
 
+      _saveGanttChartState: function() {
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.saveState) {
+          this._savedState = this.$.ganttChart.contentDocument.saveState();
+        } else {
+          this._savedState = null;
+        }
+      },
+      _restoreGanttChartState: function() {
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.restoreState) {
+          this.$.ganttChart.contentDocument.restoreState(this._savedState);
+        }
+      },
       _setUpGanttChart: function(ganttChart) {
-        ganttChart.restoreState(this._savedState);
+        this._restoreGanttChartState();
 
         ganttChart.addEventListener('open-entry', function(e) {
           this.fire('open', this.entries[e.detail]);
+          this._saveGanttChartState();
         }.bind(this));
 
         ganttChart.addEventListener('select-entry', function(e) {
           this.fire('select', this.entries[e.detail]);
+          this._saveGanttChartState();
         }.bind(this));
 
         ganttChart.addEventListener('deselect-entry', function(e) {
           this.fire('deselect', this.entries[e.detail]);
+          this._saveGanttChartState();
         }.bind(this));
 
         var svg = ganttChart.querySelector('svg');
@@ -136,12 +147,15 @@
       },
       startSelecting: function() {
         this.$.ganttChart.contentDocument.startSelecting();
+        this._saveGanttChartState();
       },
       stopSelecting: function() {
         this.$.ganttChart.contentDocument.stopSelecting();
+        this._saveGanttChartState();
       },
       clearSelection: function() {
         this.$.ganttChart.contentDocument.clearSelection();
+        this._saveGanttChartState();
       },
       selectItem: function(entry) {
         this.$.ganttChart.contentDocument.selectEntry(entry.id);
