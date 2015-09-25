@@ -3,7 +3,7 @@
 {% set blockHeight = 24 %}
 {% set milestoneSize = 16.3 %}
 
-{% set entryNameColumnWidth = 100 %}
+{% set entryNameColumnWidth = (chart.calculate_max_entry_name() + 3) * 7.5 %}
 {% set entryNameColumnHeight = blockHeight %}
 {% set hourlyColumnWidth = 10 %}
 {% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}

@@ -122,6 +122,9 @@ class Chart:
         for i in range(no_days):
             yield self.start + datetime.timedelta(days=i)
 
+    def calculate_max_entry_name(self):
+        return max(len(entry.name) for entry in self.project.entries)
+
     def topolgical_sort(self, graph_unsorted):
         graph_sorted = []
 
