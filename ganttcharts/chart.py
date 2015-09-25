@@ -118,7 +118,7 @@ class Chart:
 
     @property
     def days(self):
-        no_days = math.ceil((self.end - self.start).days)
+        no_days = math.ceil((self.end - self.start).days) + 1
         for i in range(no_days):
             yield self.start + datetime.timedelta(days=i)
 

@@ -29,9 +29,9 @@
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a row to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a row to select it.</p>
 
-    <template is="dom-if" if="{{ hasGanttChart }}">
-      <object data="{{ ganttChartSrc }}" type="image/svg+xml"></object>
+    <object id="ganttChart" data="{{ ganttChartSrc }}" type="image/svg+xml"></object>
 
+    <template is="dom-if" if="{{ hasGanttChart }}">
       <br /><br />
 
       <button type="button" class="btn btn-success pull-right" on-click="_handleNew">
@@ -41,7 +41,7 @@
     </template>
 
     <template is="dom-if" if="{{ !hasGanttChart }}">
-      <p class="lead text-center">This project hasn't got any tasks.</p>
+      <p class="lead text-center">This project hasn't got any entries.</p>
       <p class="text-center">Click the button below to create one.</p>
       <p class="text-center">
         <button class="btn btn-success" on-click="_handleNew"><span class="ion-plus-round m-r"></span>New entry</button>
@@ -65,19 +65,46 @@
 
       ready: function() {
         this.isSelecting = false;
+
+        this.$.ganttChart.onload = function() {
+          this._setUpGanttChart(this.$.ganttChart.contentDocument);
+        }.bind(this);
       },
 
       reload: function() {
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.saveState) {
+          this._savedState = this.$.ganttChart.contentDocument.saveState();
+        } else {
+          this._savedState = null;
+        }
+
         this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
 
-        requests.get('/api/projects/' + this.projectId + '/gantt-chart')
+        requests.get('/api/projects/' + this.projectId + '/entries')
           .go(function(statusCode, response) {
-            if (statusCode === 404) {
-              this.hasGanttChart = false;
-            } else {
-              this.hasGanttChart = true;
+            this.hasGanttChart = !!response.entries.length;
+
+            this.entries = {};
+            for (var i = 0; i < response.entries.length; i++) {
+              this.entries[response.entries[i].id] = response.entries[i];
             }
           }.bind(this));
+      },
+
+      _setUpGanttChart: function(ganttChart) {
+        this.$.ganttChart.contentDocument.restoreState(this._savedState);
+
+        ganttChart.addEventListener('open-entry', function(e) {
+          this.fire('open', this.entries[e.detail]);
+        }.bind(this));
+
+        ganttChart.addEventListener('select-entry', function(e) {
+          this.fire('select', this.entries[e.detail]);
+        }.bind(this));
+
+        ganttChart.addEventListener('deselect-entry', function(e) {
+          this.fire('deselect', this.entries[e.detail]);
+        }.bind(this));
       },
 
       _handleNew: function(e) {
@@ -103,52 +130,20 @@
         e.preventDefault();
         return false;
       },
-      _handleEdit: function(e) {
-        if (!this.isSelecting) {
-          var entry = e.model.block.entry;
-          this.fire('open', entry);
-        } else {
-          var newState = !e.model.block.selected;
-          e.model.set('block.selected', newState);
-
-          if (newState) {
-            this.fire('select', e.model.block);
-          } else {
-            this.fire('deselect', e.model.block);
-          }
-        }
-      },
       startSelecting: function() {
-        this.isSelecting = true;
+        this.$.ganttChart.contentDocument.startSelecting();
       },
       stopSelecting: function() {
-        this.clearSelection();
-        this.isSelecting = false;
+        this.$.ganttChart.contentDocument.stopSelecting();
       },
       clearSelection: function() {
-        for (var i = 0; i < this.blocks.length; i++) {
-          this.set('blocks.' + i + '.selected', false);
-        }
+        this.$.ganttChart.contentDocument.clearSelection();
       },
       selectItem: function(entry) {
-        for (var i = 0; i < this.blocks.length; i++) {
-          if (this.blocks[i].entry.id === entry.id) {
-            this.set('blocks.' + i + '.selected', true);
-          }
-        }
+        this.$.ganttChart.contentDocument.selectEntry(entry.id);
       },
       unselectItem: function(entry) {
-        for (var i = 0; i < this.blocks.length; i++) {
-          if (this.blocks[i].entry.id === entry.id) {
-            this.set('blocks.' + i + '.selected', false);
-          }
-        }
-      },
-      _listItemClass: function(isSelected) {
-        return isSelected ? 'active' : '';
-      },
-      _iconClass: function(icon) {
-        return 'ion-' + icon;
+        this.$.ganttChart.contentDocument.deselectEntry(entry.id);
       },
     });
   </script>

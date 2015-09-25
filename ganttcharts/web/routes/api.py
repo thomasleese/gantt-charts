@@ -242,7 +242,7 @@ def project_entries(project_id):
             raise errors.MissingPermission('can_view')
 
         entries = [entry.as_json() for entry in project.entries]
-        return flask.jsonify(entries=entires)
+        return flask.jsonify(entries=entries)
     elif flask.request.method == 'POST':
         if not account_member.access_level.can_edit:
             raise errors.MissingPermission('can_edit')

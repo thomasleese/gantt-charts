@@ -224,14 +224,14 @@
         this.$.entryEditor.memberDeselected(e.detail);
       },
       _entryEditorSelectDependency: function(e) {
-        this.$.entryEditor.dependencySelected(e.detail.entry, function(worked) {
+        this.$.entryEditor.dependencySelected(e.detail, function(worked) {
           if (!worked) {
-            this.$.ganttChart.unselectItem(e.detail.entry);
+            this.$.ganttChart.unselectItem(e.detail);
           }
-        });
+        }.bind(this));
       },
       _entryEditorDeselectDependency: function(e) {
-        this.$.entryEditor.dependencyDeselected(e.detail.entry);
+        this.$.entryEditor.dependencyDeselected(e.detail);
       },
 
       _navLinkClass: function(currentSelection, mySelection) {
