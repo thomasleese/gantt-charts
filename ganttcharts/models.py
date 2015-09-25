@@ -324,7 +324,7 @@ class ProjectCalendar(Base):
             return True
 
         for holiday in self.holidays:
-            if holiday.start <= date <= holiday.end:
+            if holiday.start <= date.date() <= holiday.end:
                 return True
 
         return False
