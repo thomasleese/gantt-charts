@@ -122,6 +122,14 @@
                   stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                   ganttcharts:entry-id="{{ block.entry.id }}" />
         {% endfor %}
+
+        {% for block in chart.blocks %}
+            {% if block.entry.type.name == 'milestone' %}
+                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
+                      x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y2="{{ gridHeight }}"
+                      stroke="{{ block.colour }}" stroke-width="2" />
+            {% endif %}
+        {% endfor %}
     </g>
 
     <script>
