@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 {% set blockHeight = 24 %}
+{% set milestoneSize = 16.3 %}
 
 {% set entryNameColumnWidth = 100 %}
 {% set entryNameColumnHeight = blockHeight %}
@@ -103,10 +104,18 @@
                   stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                   ganttcharts:entry-id="{{ block.entry.id }}" />
 
-            <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
-                  width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                  stroke="grey" stroke-width="1" fill="{{ block.colour }}" class="row"
-                  ganttcharts:entry-id="{{ block.entry.id }}" />
+            {% if block.entry.type.name == 'task' %}
+                <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
+                      width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                      stroke="grey" stroke-width="1" fill="{{ block.colour }}" class="row"
+                      ganttcharts:entry-id="{{ block.entry.id }}" />
+            {% else %}
+                <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
+                      width="{{ milestoneSize }}" height="{{ milestoneSize }}"
+                      stroke="grey" stroke-width="1" fill="{{ block.colour }}" class="row"
+                      transform="rotate(45 {{ (block.left_cells + block.cells) * hourlyColumnWidth }} {{ y }})"
+                      ganttcharts:entry-id="{{ block.entry.id }}" />
+            {% endif %}
 
             <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
                   width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
