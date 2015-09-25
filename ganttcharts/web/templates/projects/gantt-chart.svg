@@ -10,7 +10,7 @@
 
 {% set gridHeight = entryNameColumnHeight * (chart.blocks | length) %}
 {% set fullHeight = dailyColumnSize + gridHeight %}
-{% set gridWidth = dailyColumnSize * (chart.days | list | length + 1) %}
+{% set gridWidth = dailyColumnSize * (chart.days | list | length + 6) %}
 {% set fullWidth = entryNameColumnWidth + gridWidth %}
 
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +83,7 @@
         {% endfor %}
 
         <!-- vertical -->
-        {% for i in range((chart.days | list | length) + 2) %}
+        {% for i in range((chart.days | list | length) + 6) %}
             <line x1="{{ i * dailyColumnSize }}" x2="{{ i * dailyColumnSize }}"
                   y1="0" y2="{{ gridHeight }}"
                   stroke="black" stroke-width="1" />
