@@ -1,5 +1,6 @@
 from collections import OrderedDict, namedtuple
 import datetime
+import math
 
 
 _Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
@@ -114,6 +115,12 @@ class Chart:
             task = entry[0]
             self.blocks.append(Block(i, self, task, start_times[task],
                                      finish_times[task], lengths[task]))
+
+    @property
+    def days(self):
+        no_days = math.ceil((self.end - self.start).days)
+        for i in range(no_days):
+            yield self.start + datetime.timedelta(days=i)
 
     def topolgical_sort(self, graph_unsorted):
         graph_sorted = []
