@@ -85,6 +85,16 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group">
+          <label class="c-input c-checkbox">
+            <input type="checkbox" id="formEnableMinStartDate" on-change="_handleMinStartDateChange" />
+            <span class="c-indicator"></span>
+            Must start after
+          </label>
+
+          <input type="datetime-local" id="formMinStartDate" class="form-control" placeholder="Must start after" on-change="_handleMinStartDateChange" required />
+        </div>
       </form>
 
       <hr />
@@ -141,11 +151,11 @@
         requests.patch('/api/projects/' + this.projectId + '/entries/' + this.entryId)
           .send(data)
           .go(function(statusCode, response) {
-            if (statusCode === 204) {
+            if (statusCode === 200) {
               if (callback !== undefined) {
                 callback();
               }
-              this.fire('change');
+              this.fire('change', response.entry);
             } else {
               this.$.errorModal.showUnknownError();
             }
@@ -176,6 +186,13 @@
       _handlePessimisticChange: function() {
         var value = this._applyUnits(this.$.cardFormPessimistic.value, this.$.formPessimisticUnits.value);
         this._submitEntryChange('pessimistic_time_estimate', value);
+      },
+      _handleMinStartDateChange: function(e) {
+        if (this.$.formEnableMinStartDate.checked && this.$.formMinStartDate.value) {
+          this._submitEntryChange('min_start_date', this.$.formMinStartDate.value);
+        } else {
+          this._submitEntryChange('min_start_date', null);
+        }
       },
       _handleDelete: function(e) {
         this.$.deleteModal.show(this.$.cardFormName.value, this.entryId);
@@ -247,6 +264,11 @@
         var pessimisticUnits = this._guessUnits(entry.time_estimates.pessimistic);
         this.$.cardFormPessimistic.value = this._unapplyUnits(entry.time_estimates.pessimistic, pessimisticUnits);
         this.$.formPessimisticUnits.value = pessimisticUnits;
+
+        this.$.formMinStartDate.value = entry.min_start_date;
+        if (entry.min_start_date) {
+          this.$.formEnableMinStartDate.checked = true;
+        }
 
         this.$.editor.show(entry.name);
         this.fire('show', entry);

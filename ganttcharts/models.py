@@ -478,6 +478,7 @@ class ProjectEntry(Base):
                 'normal': self.normal_time_estimate,
                 'pessimistic': self.pessimistic_time_estimate
             },
+            'min_start_date': self.min_start_date.isoformat() if self.min_start_date else None,
             'dependencies': [dep.as_json() for dep in self.dependencies],
             'resources': [res.as_json() for res in self.resources],
             'members': [member.as_json() for member in self.members],

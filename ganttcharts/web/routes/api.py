@@ -3,6 +3,7 @@ Routes for the API.
 """
 
 import datetime
+import dateutil.parser
 
 from cerberus import Validator
 import flask
@@ -278,28 +279,53 @@ def project_entry(project_id, entry_id):
     if flask.request.method == 'GET':
         return flask.jsonify(entry=entry.as_json())
     elif flask.request.method == 'PATCH':
-        form = forms.ApiChangeProjectEntry.from_json(flask.request.json)
-        if form.validate():
-            if form.name.raw_data:
-                entry.name = form.name.data
+        validator = Validator({
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'type': {'type': 'string'},
+            'normal_time_estimate': {'type': 'integer', 'coerce': int},
+            'pessimistic_time_estimate': {'type': 'integer', 'coerce': int},
+            'min_start_date': {'type': 'datetime', 'coerce': dateutil.parser.parse, 'nullable': True},
+        })
 
-            if form.description.raw_data:
-                entry.description = form.description.data
+        if validator.validate(flask.request.json, update=True):
+            doc = validator.document
 
-            if form.type.raw_data:
-                entry.type = ProjectEntryType[form.type.data]
+            try:
+                entry.name = doc['name']
+            except KeyError:
+                pass
 
-            if form.normal_time_estimate.raw_data:
-                entry.normal_time_estimate = form.normal_time_estimate.data
+            try:
+                entry.description = doc['description']
+            except KeyError:
+                pass
 
-            if form.pessimistic_time_estimate.raw_data:
-                entry.pessimistic_time_estimate = form.pessimistic_time_estimate.data
+            try:
+                entry.type = ProjectEntryType[doc['type']]
+            except KeyError:
+                pass
+
+            try:
+                entry.normal_time_estimate = doc['normal_time_estimate']
+            except KeyError:
+                pass
+
+            try:
+                entry.pessimistic_time_estimate = doc['pessimistic_time_estimate']
+            except KeyError:
+                pass
+
+            try:
+                entry.min_start_date = doc['min_start_date']
+            except KeyError:
+                pass
 
             flask.g.sql_session.commit()
 
-            return '', 204
+            return flask.jsonify(entry=entry.as_json())
         else:
-            raise errors.InvalidFormData(form)
+            raise errors.InvalidFormData(validator)
     elif flask.request.method == 'DELETE':
         for d in entry.dependencies:
             flask.g.sql_session.delete(d)

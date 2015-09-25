@@ -81,6 +81,15 @@ class Chart:
                 start = max(finish_times[t] for t in entry[1])
             else:
                 start = first_start_date
+
+            if task.min_start_date:
+                min_start_date = task.min_start_date
+                min_start_date2 = bday.rollforward(min_start_date)
+                if min_start_date2 != min_start_date:
+                    min_start_date = min_start_date2.replace(hour=0,minute=0)
+                min_start_date = bhour.rollforward(min_start_date)
+                start = max(min_start_date, start)
+
             if start.time() == bhour.end:
                 start += bhour
                 start -= datetime.timedelta(hours=1)
