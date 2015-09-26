@@ -8,6 +8,10 @@ import numpy as np
 _Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
 
 
+class CyclicGraphError(ValueError):
+    pass
+
+
 class Block(_Block):
     def as_json(self):
         return {
@@ -257,7 +261,7 @@ class Chart:
                     graph_sorted.append((node, edges))
 
             if not acyclic:
-                raise ValueError("A cyclic dependency occurred")
+                raise CyclicGraphError('A cyclic dependency occurred.')
 
         return graph_sorted
 
