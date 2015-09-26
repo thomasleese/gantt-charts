@@ -137,7 +137,7 @@ class Chart:
                 start = 0
                 for dependency in entry.dependencies:
                     row = self.entries.index(dependency.child)
-                    start = matrix[row,:].nonzero()[0][-1] + 1
+                    start = max(start, matrix[row,:].nonzero()[0][-1] + 1)
             else:
                 start = 0
 
