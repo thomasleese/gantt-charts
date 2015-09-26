@@ -289,10 +289,6 @@ class ProjectCalendar(Base):
                          start_date=datetime.datetime.now())
 
     @property
-    def business_hour(self):
-        return BusinessHour(start=self.work_starts_at, end=self.work_ends_at)
-
-    @property
     def _weekmask(self):
         return [self.works_on_monday, self.works_on_tuesday,
                 self.works_on_wednesday, self.works_on_thursday,
@@ -314,10 +310,7 @@ class ProjectCalendar(Base):
 
     @property
     def business_day_length(self):
-        today = datetime.date.today()
-        start = datetime.datetime.combine(today, self.work_starts_at)
-        end = datetime.datetime.combine(today, self.work_ends_at)
-        return int((end - start).total_seconds() / (60 * 60))
+        return self.work_ends_at.hour - self.work_starts_at.hour
 
     @property
     def number_working_days(self):

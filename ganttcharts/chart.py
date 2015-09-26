@@ -80,42 +80,50 @@ class Chart:
 
     @property
     def start(self):
+        try:
+            return self._start
+        except AttributeError:
+            pass
+
+        start_date = datetime.datetime.combine(self.project.calendar.start_date, self.project.calendar.work_starts_at)
+        start_date = start_date.replace(minute=0, second=0)
+
         bday = self.project.calendar.business_day
-        bhour = self.project.calendar.business_hour
+        start_date = bday.rollforward(start_date)
 
-        first_start_date = self.project.calendar.start_date
-        first_start_date = bday.rollforward(first_start_date)
-        first_start_date = bhour.rollforward(first_start_date)
+        self._start = start_date
 
-        return first_start_date
+        return start_date
 
     def add_hours_to_date(self, date, duration):
+        print('Adding', duration, 'hours to', date)
+
         bday = self.project.calendar.business_day
-        bhour = self.project.calendar.business_hour
         business_hours = self.project.calendar.business_day_length
 
         days = duration // business_hours
+        new_date = date + days * bday
+
         hours = (duration - days * business_hours)
 
-        return date + days * bday + hours * bhour
+        hours_left = self.project.calendar.work_ends_at.hour - new_date.hour
+        if hours >= hours_left:
+            new_date = new_date.replace(hour=self.project.calendar.work_starts_at.hour)
+            hours -= hours_left
+            new_date += bday
+
+        new_date += datetime.timedelta(hours=int(hours))
+
+        return new_date
 
     def block_for_row(self, i, entry, row):
-        bhour = self.project.calendar.business_hour
-
         first_zero = row.nonzero()[0][0]
         last_zero = row.nonzero()[0][-1]
 
         length = last_zero - first_zero + 1
 
         start = self.add_hours_to_date(self.start, first_zero)
-        if start.time() == bhour.end:
-            start += bhour
-            start -= datetime.timedelta(hours=1)
-
         end = self.add_hours_to_date(start, length)
-        if end.time() == bhour.start:
-            end -= bhour
-            end += datetime.timedelta(hours=1)
 
         return Block(i, self, entry, start, end, length)
 
