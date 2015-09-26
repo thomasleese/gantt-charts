@@ -41,6 +41,13 @@
     /* ]]> */
     </style>
 
+    <defs>
+        <marker id="markerArrow" markerWidth="4" markerHeight="4" refX="0" refY="2"
+           orient="auto">
+           <path d="M0,0 L0,4 L4,2 L0,0" />
+        </marker>
+    </defs>
+
     <g id="non-working-days" transform="translate({{ entryNameColumnWidth }} 0)">
         {% for day in chart.days %}
             {% if not chart.project.calendar.is_working_date(day) %}
@@ -74,7 +81,7 @@
     </g>
 
     <g id="entry-names" transform="translate(0 {{ dailyColumnSize }})">
-        {% for block in chart.blocks %}
+        {% for block in chart.blocks.values() %}
             <rect x="0" y="{{ loop.index0 * entryNameColumnHeight + 1 }}"
                   width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight - 2 }}"
                   fill="white" class="row"
@@ -112,7 +119,7 @@
     </g>
 
     <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
-        {% for block in chart.blocks %}
+        {% for block in chart.blocks.values() %}
             {% if block.entry.type.name == 'milestone' %}
                 <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
                       x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y2="{{ gridHeight }}"
@@ -120,7 +127,7 @@
             {% endif %}
         {% endfor %}
 
-        {% for block in chart.blocks %}
+        {% for block in chart.blocks.values() %}
             {% set y = loop.index0 * blockHeight %}
 
             <rect x="{{ 0 }}" y="{{ y }}"
@@ -145,6 +152,23 @@
                   width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
                   stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                   ganttcharts:entry-id="{{ block.entry.id }}" />
+        {% endfor %}
+
+        {% for block in chart.blocks.values() %}
+            {% set y = loop.index0 * blockHeight %}
+
+            {% for dependee in block.entry.dependees %}
+                {% set dependeeBlock = chart.blocks[dependee.parent] %}
+                {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
+
+                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
+                      x2="{{ x2 }}" y2="{{ y + blockHeight / 2 }}"
+                      stroke="{{ block.colour }}" stroke-width="2" />
+                <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
+                      x2="{{ x2 }}" y2="{{ dependeeBlock.index * blockHeight - 8 }}"
+                      stroke="{{ block.colour }}" stroke-width="2"
+                      style="marker-end: url(#markerArrow);" />
+            {% endfor %}
         {% endfor %}
     </g>
 

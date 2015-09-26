@@ -68,13 +68,13 @@ class Chart:
         print('-- EXISTENCE MATRIX 2 --')
         print(existence_matrix)
 
-        self.blocks = []
+        self.blocks = OrderedDict()
         for i, entry in enumerate(self.entries):
             row = existence_matrix[i,:]
-            self.blocks.append(self.block_for_row(i, entry, row))
+            self.blocks[entry] = self.block_for_row(i, entry, row)
 
         if self.blocks:
-            self.end = max(block.end for block in self.blocks)
+            self.end = max(block.end for block in self.blocks.values())
         else:
             self.end = None
 
