@@ -133,7 +133,8 @@ def project_gantt_chart_svg(project_id):
         raise errors.NotFound()
 
     svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
-                                project=project)
+                                project=project,
+                                today=datetime.datetime.utcnow())
 
     response = flask.make_response(svg)
     response.headers['Content-Type'] = 'image/svg+xml'

@@ -14,6 +14,7 @@
 {% set fullWidth = entryNameColumnWidth + gridWidth %}
 
 {% set veryLightGrey = 'rgb(235, 235, 235)' %}
+{% set slightlyLightGrey = 'rgb(210, 210, 210)' %}
 {% set lightGrey = 'rgb(190, 190, 190)' %}
 {% set darkGrey = 'rgb(50, 50, 50)' %}
 
@@ -48,6 +49,13 @@
                       fill="{{ veryLightGrey }}" />
             {% endif %}
         {% endfor %}
+    </g>
+
+    <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
+        {% set index = (today - chart.start).days %}
+        <rect x="{{ dailyColumnSize * index }}" y="0"
+              width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+              fill="{{ slightlyLightGrey }}" />
     </g>
 
     <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
