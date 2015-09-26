@@ -22,6 +22,14 @@
         height: 1.6rem;
         margin: 0.1rem;
       }
+
+      .fixed-bottom-right {
+        position: fixed;
+        top: 8.8rem;
+        right: 0.8rem;
+        box-shadow: 0 0 1rem rgb(180, 180, 180);
+        z-index: 1000;
+      }
     </style>
 
     <app-error-modal id="errorModal"></app-error-modal>
@@ -34,7 +42,7 @@
     <template is="dom-if" if="{{ hasGanttChart }}">
       <br /><br />
 
-      <button type="button" class="btn btn-success pull-right" on-click="_handleNew">
+      <button type="button" class="btn btn-success fixed-bottom-right" on-click="_handleNew">
         <span class="ion-plus-round m-r"></span>New entry
       </button>
       <div class="clearfix"></div>
