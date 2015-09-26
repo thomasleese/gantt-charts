@@ -74,7 +74,7 @@ def upgrade():
         sa.Column('name', sa.String, nullable=False),
         sa.Column('description', sa.String, nullable=False),
         sa.Column('icon', sa.String, nullable=False),
-        sa.Column('amount', sa.String, nullable=False),
+        sa.Column('amount', sa.Integer, nullable=False),
         sa.Column('reusable', sa.Boolean, nullable=False),
     )
 
