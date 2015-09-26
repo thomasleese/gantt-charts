@@ -257,6 +257,11 @@ class Project(Base):
                 return member
         return None
 
+    @property
+    def graph(self):
+        return [(entry, [dep.child for dep in entry.dependencies])
+                for entry in self.entries]
+
     def as_json(self):
         return {
             'id': self.id,

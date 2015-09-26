@@ -2,6 +2,8 @@ from collections import OrderedDict, namedtuple
 import datetime
 import math
 
+import numpy as np
+
 
 _Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
 
@@ -53,77 +55,148 @@ class Chart:
     def __init__(self, project):
         self.project = project
 
-        graph = [(task, [dep.child for dep in task.dependencies]) for task in project.entries]
+        self.graph = self.topolgical_sort(project.graph)
+        self.entries = [x[0] for x in self.graph]
 
-        self.graph = self.topolgical_sort(graph)
+        existence_matrix = self.produce_existence_matrix()
+
+        print('-- EXISTENCE MATRIX 1 --')
+        print(existence_matrix)
+
+        existence_matrix = self.assign_resources(existence_matrix)
+
+        print('-- EXISTENCE MATRIX 2 --')
+        print(existence_matrix)
+
         self.blocks = []
+        for i, entry in enumerate(self.entries):
+            row = existence_matrix[i,:]
+            self.blocks.append(self.block_for_row(i, entry, row))
 
-        start_times = {}
-        finish_times = {}
-        lengths = {}
+        if self.blocks:
+            self.end = max(block.end for block in self.blocks)
+        else:
+            self.end = None
 
-        bday = project.calendar.business_day
-        bhour = project.calendar.business_hour
+    @property
+    def start(self):
+        bday = self.project.calendar.business_day
+        bhour = self.project.calendar.business_hour
 
-        today = datetime.date.today()
-        bhour_start = datetime.datetime.combine(today, bhour.start)
-        bhour_end = datetime.datetime.combine(today, bhour.end)
-        business_hours = int((bhour_end - bhour_start).total_seconds() / (60 * 60))
-
-        first_start_date = project.calendar.start_date
+        first_start_date = self.project.calendar.start_date
         first_start_date = bday.rollforward(first_start_date)
         first_start_date = bhour.rollforward(first_start_date)
 
-        for entry in self.graph:
-            task = entry[0]
+        return first_start_date
 
-            if entry[1]:
-                start = max(finish_times[t] for t in entry[1])
+    def add_hours_to_date(self, date, duration):
+        bday = self.project.calendar.business_day
+        bhour = self.project.calendar.business_hour
+        business_hours = self.project.calendar.business_day_length
+
+        days = duration // business_hours
+        hours = (duration - days * business_hours)
+
+        return date + days * bday + hours * bhour
+
+    def block_for_row(self, i, entry, row):
+        bhour = self.project.calendar.business_hour
+
+        first_zero = row.nonzero()[0][0]
+        last_zero = row.nonzero()[0][-1]
+
+        length = last_zero - first_zero + 1
+
+        start = self.add_hours_to_date(self.start, first_zero)
+        if start.time() == bhour.end:
+            start += bhour
+            start -= datetime.timedelta(hours=1)
+
+        end = self.add_hours_to_date(start, length)
+        if end.time() == bhour.start:
+            end -= bhour
+            end += datetime.timedelta(hours=1)
+
+        return Block(i, self, entry, start, end, length)
+
+    def produce_existence_matrix(self):
+        matrix = np.zeros((len(self.entries), 0))
+
+        for i, entry in enumerate(self.entries):
+            duration = entry.normal_time_estimate
+
+            if entry.dependencies:
+                start = 0
+                for dependency in entry.dependencies:
+                    row = self.entries.index(dependency.child)
+                    for value in np.nditer(matrix[row,:]):
+                        if value == 0:
+                            break
+                        start += 1
             else:
-                start = first_start_date
+                start = 0
 
-            if task.min_start_date:
-                min_start_date = task.min_start_date
-                min_start_date2 = bday.rollforward(min_start_date)
-                if min_start_date2 != min_start_date:
-                    min_start_date = min_start_date2.replace(hour=0,minute=0)
-                min_start_date = bhour.rollforward(min_start_date)
-                start = max(min_start_date, start)
+            matrix = Chart.upsize(matrix, cols=max(start + duration, matrix.shape[1]))
 
-            if start.time() == bhour.end:
-                start += bhour
-                start -= datetime.timedelta(hours=1)
+            for j in range(duration):
+                matrix[i, start + j] = 1
 
-            start_times[task] = start
+        return matrix
 
-            expected_time = task.normal_time_estimate
-            lengths[task] = expected_time
+    def assign_resources(self, existence_matrix):
+        had_a_problem = True
+        while had_a_problem:
+            had_a_problem = False
 
-            days = expected_time // business_hours
-            hours = (expected_time - days * business_hours)
+            for resource in self.project.resources:
+                matrix = np.zeros(existence_matrix.shape)
+                for i, entry in enumerate(self.entries):
+                    for entry_resource in entry.resources:
+                        if entry_resource.resource == resource:
+                            for j, value in enumerate(np.nditer(existence_matrix[i,:])):
+                                if value != 0:
+                                    matrix[i,j] = entry_resource.amount
 
-            finish = start_times[task] + days * bday + hours * bhour
-            if finish.time() == bhour.start:
-                finish -= bhour
-                finish += datetime.timedelta(hours=1)
+                print('-- STAGE #2 SUMS - {} --'.format(resource.name))
+                print(matrix.sum(axis=0))
 
-            finish_times[task] = finish
+                for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
+                    if value > resource.amount:
+                        print('WE HAVE A PROBLEM AT', i)
+                        entry_index = matrix[:, i].nonzero()[0][0]
+                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, self.entries[entry_index])
+                        had_a_problem = True
+                        break
 
-        if start_times and finish_times:
-            self.start = min(start_times.values())
-            self.end = max(finish_times.values())
+        return existence_matrix
 
-            self.end = self.end.replace(hour=bhour.end.hour,
-                                        minute=bhour.end.minute,
-                                        second=bhour.end.second)
+    @staticmethod
+    def upsize(matrix, rows=None, cols=None):
+        old_shape = matrix.shape
+        new_shape = (rows or old_shape[0], cols or old_shape[1])
+        if old_shape == new_shape:
+            return matrix
         else:
-            self.start = None
-            self.end = None
+            new_matrix = np.zeros(new_shape)
+            new_matrix[:old_shape[0], :old_shape[1]] = matrix
+            return new_matrix
 
-        for i, entry in enumerate(self.graph):
-            task = entry[0]
-            self.blocks.append(Block(i, self, task, start_times[task],
-                                     finish_times[task], lengths[task]))
+    def move_entry_in_existence_matrix(self, matrix, entry, amount=1):
+        row = self.entries.index(entry)
+        first_zero = matrix[row,:].nonzero()[0][0]
+        last_zero = matrix[row,:].nonzero()[0][-1]
+
+        print('Moving', entry.name, 'by', amount)
+
+        matrix = self.upsize(matrix, cols=max(last_zero + 2, matrix.shape[1]))
+
+        matrix[row,first_zero] = 0
+        matrix[row,last_zero + 1] = 1
+
+        for dependency in entry.dependees:
+            matrix = self.move_entry_in_existence_matrix(matrix, dependency.parent, amount)
+
+        return matrix
 
     @property
     def days(self):

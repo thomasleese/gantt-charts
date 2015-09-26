@@ -459,10 +459,10 @@ def project_gantt_chart(project_id):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
 
-    try:
-        chart = Chart(project)
-    except ValueError:
-        raise errors.NotFound()
+    #try:
+    chart = Chart(project)
+    #except ValueError:
+    #    raise errors.NotFound()
 
     as_json = chart.as_json()
     if as_json is None:
