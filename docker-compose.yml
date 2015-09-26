@@ -9,3 +9,10 @@ web:
     - '80:8000'
   links:
     - postgres
+
+send-summary-emails:
+  build: .
+  env_file: secrets.env
+  links:
+    - postgres
+  command: ganttchartsctl send-summary-emails --forever

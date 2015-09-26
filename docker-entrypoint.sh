@@ -6,4 +6,9 @@ if [ "$1" = 'gunicorn' ]; then
     exec gosu ganttcharts "$@"
 fi
 
+if [ "$1" = 'ganttchartsctl' ]; then
+    chown -R ganttcharts .
+    exec gosu ganttcharts "$@"
+fi
+
 exec "$@"
