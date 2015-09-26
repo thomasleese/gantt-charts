@@ -150,12 +150,11 @@ class Chart:
 
     def assign_resources(self, existence_matrix):
         def pick_entry_to_move(column):
+            def index_key(index):
+                return (self.entries[index].normal_time_estimate, index)
+
             indexes = column.nonzero()[0]
-            print('out of', indexes)
-
-            index = max(indexes, key=lambda index: self.entries[index].normal_time_estimate)
-
-            print('chose', index)
+            index = max(indexes, key=index_key)
 
             return self.entries[index]
 
