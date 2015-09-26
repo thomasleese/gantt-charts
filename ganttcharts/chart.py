@@ -142,15 +142,22 @@ class Chart:
             if entry.dependencies:
                 start = 0
                 for dependency in entry.dependencies:
-                    row = self.entries.index(dependency.child)
-                    start = max(start, matrix[row,:].nonzero()[0][-1] + 1)
+                    row_index = self.entries.index(dependency.child)
+                    nonzero = matrix[row_index, :].nonzero()
+                    last_nonzero = nonzero[0][-1]
+                    if matrix[row_index, last_nonzero] == 1:
+                        last_nonzero += 1
+                    start = max(start, last_nonzero)
             else:
                 start = 0
 
             matrix = Chart.upsize(matrix, cols=max(start + duration, matrix.shape[1]))
 
-            for j in range(duration):
-                matrix[i, start + j] = 1
+            if duration == 0:
+                matrix[i, start] = 0.5
+            else:
+                for j in range(duration):
+                    matrix[i, start + j] = 1
 
         return matrix
 
