@@ -2,3 +2,5 @@
 {% endblock %}
 
 -- Gantt Chart
+
+Log in to your account to change your email settings. -- https://www.ganttcharts.xyz
