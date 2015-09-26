@@ -47,6 +47,7 @@ class Account(Base):
                                                         primary=True))
         self.password = password
         self.creation_date = datetime.datetime.now()
+        self.receive_summary_email = True
 
     @property
     def password(self):
@@ -451,6 +452,12 @@ class ProjectEntry(Base):
         self.pessimistic_time_estimate = pessimistic_time_estimate
         self.project = project
         self.creation_date = datetime.datetime.now()
+
+    def has_member(self, account):
+        for member in self.members:
+            if member.account == account:
+                return True
+        return False
 
     _type = Column('type', String)
 

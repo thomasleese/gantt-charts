@@ -45,13 +45,29 @@ def check_logged_in(*args, **kwargs):
 
 @blueprint.route('/account', methods=['PATCH'])
 def change_account():
-    form = forms.ApiChangeAccount.from_json(flask.request.json)
-    if form.validate():
-        flask.g.account.display_name = form.display_name.data
+    validator = Validator({
+        'display_name': {'type': 'string'},
+        'receive_summary_email': {'type': 'boolean'},
+    })
+
+    if validator.validate(flask.request.json, update=True):
+        doc = validator.document
+
+        try:
+            flask.g.account.display_name = doc['display_name']
+        except KeyError:
+            pass
+
+        try:
+            flask.g.account.receive_summary_email = doc['receive_summary_email']
+        except KeyError:
+            pass
+
         flask.g.sql_session.commit()
-        return flask.jsonify()
+
+        return flask.jsonify(account=flask.g.account.as_json())
     else:
-        return flask.jsonify(errors=form.errors), 400
+        raise errors.InvalidFormData(validator)
 
 
 def get_project_or_404(project_id):

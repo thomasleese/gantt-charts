@@ -35,5 +35,22 @@
       updateDisplayName();
       return false;
     });
+
+    $('#summary-email').change(function(e) {
+      var $check = $(this);
+
+      $.ajax({
+        url: '/api/account',
+        method: 'PATCH',
+        data: JSON.stringify({'receive_summary_email': $check.prop('checked')}),
+        contentType: 'application/json',
+        success: function(response, textStatus, xhr) {
+
+        },
+        error: function(xhr, textStatus, errorThrown) {
+          $check.prop('checked', !$check.prop('checked'));
+        },
+      });
+    });
   });
 }());
