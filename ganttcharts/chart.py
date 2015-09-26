@@ -100,7 +100,7 @@ class Chart:
         return start_date
 
     def add_hours_to_date(self, date, duration):
-        print('Adding', duration, 'hours to', date)
+        #print('Adding', duration, 'hours to', date)
 
         bday = self.project.calendar.business_day
         business_hours = self.project.calendar.business_day_length
@@ -151,6 +151,30 @@ class Chart:
             else:
                 start = 0
 
+            if entry.min_start_date:
+                bday = self.project.calendar.business_day
+
+                min_start_date = entry.min_start_date
+                if min_start_date.hour >= self.project.calendar.work_ends_at.hour:
+                    min_start_date += bday
+                    min_start_date = min_start_date.replace(hour=self.project.calendar.work_starts_at.hour)
+                if min_start_date.hour < self.project.calendar.work_starts_at.hour:
+                    min_start_date = min_start_date.replace(hour=self.project.calendar.work_starts_at.hour)
+
+                days = -1
+                while True:
+                    if min_start_date >= self.start:
+                        days += 1
+                        min_start_date -= bday
+                    else:
+                        break
+
+                hours = min_start_date.hour - self.project.calendar.work_starts_at.hour
+
+                min_start = self.project.calendar.business_day_length * days + hours
+
+                start = max(min_start, start)
+
             matrix = Chart.upsize(matrix, cols=max(start + duration, matrix.shape[1]))
 
             if duration == 0:
@@ -184,14 +208,10 @@ class Chart:
                                 if value != 0:
                                     matrix[i,j] = entry_resource.amount
 
-                print('-- STAGE #2 SUMS - {} --'.format(resource.name))
-                print(matrix.sum(axis=0))
-
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
                     if value > resource.amount:
                         existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, pick_entry_to_move(matrix[:, i]))
                         had_a_problem = True
-                        print('We had a problem at:', i)
                         break
 
             for member in self.project.members:
@@ -202,9 +222,6 @@ class Chart:
                             for j, value in enumerate(np.nditer(existence_matrix[i,:])):
                                 if value != 0:
                                     matrix[i, j] = 1
-
-                print('-- STAGE #2 SUMS - {} --'.format(member.account.display_name))
-                print(matrix.sum(axis=0))
 
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
                     if value > 1:
@@ -230,7 +247,7 @@ class Chart:
         first_zero = matrix[row,:].nonzero()[0][0]
         last_zero = matrix[row,:].nonzero()[0][-1]
 
-        print('Moving', entry.name, 'by', amount)
+        #print('Moving', entry.name, 'by', amount)
 
         matrix = self.upsize(matrix, cols=max(last_zero + 2, matrix.shape[1]))
 
