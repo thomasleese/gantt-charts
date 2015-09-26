@@ -137,10 +137,7 @@ class Chart:
                 start = 0
                 for dependency in entry.dependencies:
                     row = self.entries.index(dependency.child)
-                    for value in np.nditer(matrix[row,:]):
-                        if value == 0:
-                            break
-                        start += 1
+                    start = matrix[row,:].nonzero()[0][-1] + 1
             else:
                 start = 0
 
