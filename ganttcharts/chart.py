@@ -8,7 +8,11 @@ import numpy as np
 _Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
 
 
-class CyclicGraphError(ValueError):
+class InvalidGanttChart(ValueError):
+    pass
+
+
+class CyclicGraphError(InvalidGanttChart):
     pass
 
 
@@ -62,6 +66,9 @@ class Chart:
         self.graph = self.topolgical_sort(project.graph)
         self.entries = [x[0] for x in self.graph]
 
+        if not self.entries:
+            raise InvalidGanttChart('No blocks.')
+
         existence_matrix = self.produce_existence_matrix()
 
         print('-- EXISTENCE MATRIX 1 --')
@@ -77,10 +84,7 @@ class Chart:
             row = existence_matrix[i,:]
             self.blocks[entry] = self.block_for_row(i, entry, row)
 
-        if self.blocks:
-            self.end = max(block.end for block in self.blocks.values())
-        else:
-            self.end = None
+        self.end = max(block.end for block in self.blocks.values())
 
     @property
     def start(self):
@@ -290,9 +294,6 @@ class Chart:
         return graph_sorted
 
     def as_json(self):
-        if not self.blocks or self.start is None or self.end is None:
-            return None
-
         return {
             'blocks': [b.as_json() for b in self.blocks],
             'start': self.start.isoformat(),

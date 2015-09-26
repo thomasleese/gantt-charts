@@ -9,7 +9,7 @@ import flask
 import sqlalchemy
 
 from ganttcharts import database
-from ganttcharts.chart import Chart
+from ganttcharts.chart import Chart, InvalidGanttChart
 from ganttcharts.models import generate_key, AccessLevel, Account, \
     AccountEmailAddress, Project, ProjectCalendarHoliday, ProjectEntry, \
     ProjectEntryDependency, ProjectEntryMember, ProjectEntryType, \
@@ -129,8 +129,8 @@ def project_gantt_chart_svg(project_id):
 
     try:
         chart = Chart(project)
-    except ValueError:
-        raise errors.NotFound()
+    except InvalidGanttChart:
+        chart=None
 
     svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
                                 project=project,

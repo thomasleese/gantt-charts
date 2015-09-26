@@ -126,8 +126,10 @@
         }.bind(this));
 
         var svg = ganttChart.querySelector('svg');
-        this.$.ganttChart.width = svg.getAttribute('width');
-        this.$.ganttChart.height = svg.getAttribute('height');
+        if (svg) {
+          this.$.ganttChart.width = svg.getAttribute('width');
+          this.$.ganttChart.height = svg.getAttribute('height');
+        }
       },
 
       _handleNew: function(e) {

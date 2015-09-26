@@ -5,7 +5,7 @@
 
 {% set charWidth = 8.5 %}
 
-{% set entryNameColumnWidth = (chart.calculate_max_entry_name() + 1) * charWidth + 12 %}
+{% set entryNameColumnWidth = (chart.calculate_max_entry_name() if chart else 0 + 1) * charWidth + 12 %}
 {% set entryNameColumnHeight = blockHeight %}
 {% set hourlyColumnWidth = 10 %}
 {% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}
@@ -50,149 +50,151 @@
         </marker>
     </defs>
 
-    <g id="non-working-days" transform="translate({{ entryNameColumnWidth }} 0)">
-        {% for day in chart.days %}
-            {% if not chart.project.calendar.is_working_date(day) %}
-                <rect x="{{ dailyColumnSize * loop.index0 }}" y="0"
-                      width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
-                      fill="{{ veryLightGrey }}" />
-            {% endif %}
-        {% endfor %}
-    </g>
+    {% if chart %}
+        <g id="non-working-days" transform="translate({{ entryNameColumnWidth }} 0)">
+            {% for day in chart.days %}
+                {% if not chart.project.calendar.is_working_date(day) %}
+                    <rect x="{{ dailyColumnSize * loop.index0 }}" y="0"
+                          width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+                          fill="{{ veryLightGrey }}" />
+                {% endif %}
+            {% endfor %}
+        </g>
 
-    <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
-        {% set index = (today - chart.start).days %}
-        <rect x="{{ dailyColumnSize * index }}" y="0"
-              width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
-              fill="{{ slightlyLightGrey }}" />
-    </g>
+        <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
+            {% set index = (today - chart.start).days %}
+            <rect x="{{ dailyColumnSize * index }}" y="0"
+                  width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+                  fill="{{ slightlyLightGrey }}" />
+        </g>
 
-    <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
-        {% for day in chart.days %}
-            <line x1="{{ dailyColumnSize * loop.index0 + 100 * 1.732 }}"
-                  y1="{{ dailyColumnSize - 100 }}"
-                  x2="{{ dailyColumnSize * loop.index0 }}"
-                  y2="{{ dailyColumnSize }}"
-                  stroke="{{ lightGrey }}" stroke-width="1" />
+        <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
+            {% for day in chart.days %}
+                <line x1="{{ dailyColumnSize * loop.index0 + 100 * 1.732 }}"
+                      y1="{{ dailyColumnSize - 100 }}"
+                      x2="{{ dailyColumnSize * loop.index0 }}"
+                      y2="{{ dailyColumnSize }}"
+                      stroke="{{ lightGrey }}" stroke-width="1" />
 
-            <text x="-1" y="-5"
-                  transform="rotate(-30 {{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }}) translate({{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }})">
-                {{ day.strftime('%a %-d %b %Y') }}
-            </text>
-        {% endfor %}
-    </g>
+                <text x="-1" y="-5"
+                      transform="rotate(-30 {{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }}) translate({{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }})">
+                    {{ day.strftime('%a %-d %b %Y') }}
+                </text>
+            {% endfor %}
+        </g>
 
-    <g id="entry-names" transform="translate(0 {{ dailyColumnSize }})">
-        {% for block in chart.blocks.values() %}
-            <rect x="0" y="{{ loop.index0 * entryNameColumnHeight + 1 }}"
-                  width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight - 2 }}"
-                  fill="white" class="row"
-                  ganttcharts:entry-id="{{ block.entry.id }}" />
-            <text x="{{ entryNameColumnWidth }}" y="{{ loop.index * entryNameColumnHeight }}"
-                  dy="-6" dx="-6" class="row" text-anchor="end"
-                  ganttcharts:entry-id="{{ block.entry.id }}">
-                {{ block.entry.name }}
-            </text>
-            <line x1="0" y1="{{ loop.index * entryNameColumnHeight }}"
-                  x2="{{ entryNameColumnWidth }}" y2="{{ loop.index * entryNameColumnHeight }}"
-                  stroke="{{ lightGrey }}" stroke-width="1" />
-        {% endfor %}
-    </g>
-
-    <g id="grid" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
-        <!-- horizontal -->
-        {% for i in range((chart.blocks | length) + 1) %}
-            <line x1="0" x2="{{ gridWidth }}"
-                  y1="{{ i * blockHeight }}" y2="{{ i * blockHeight }}"
-                  stroke="{{ lightGrey }}" stroke-width="1" />
-        {% endfor %}
-
-        <!-- vertical -->
-        {% for i in range((chart.days | list | length) + 6) %}
-            <line x1="{{ i * dailyColumnSize }}" x2="{{ i * dailyColumnSize }}"
-                  y1="0" y2="{{ gridHeight }}"
-                  stroke="{{ darkGrey }}" stroke-width="1" />
-            {% for j in range(1, project.calendar.business_day_length) %}
-                <line x1="{{ i * dailyColumnSize + j * hourlyColumnWidth }}" x2="{{ i * dailyColumnSize + j * hourlyColumnWidth }}"
-                      y1="0" y2="{{ gridHeight }}"
+        <g id="entry-names" transform="translate(0 {{ dailyColumnSize }})">
+            {% for block in chart.blocks.values() %}
+                <rect x="0" y="{{ loop.index0 * entryNameColumnHeight + 1 }}"
+                      width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight - 2 }}"
+                      fill="white" class="row"
+                      ganttcharts:entry-id="{{ block.entry.id }}" />
+                <text x="{{ entryNameColumnWidth }}" y="{{ loop.index * entryNameColumnHeight }}"
+                      dy="-6" dx="-6" class="row" text-anchor="end"
+                      ganttcharts:entry-id="{{ block.entry.id }}">
+                    {{ block.entry.name }}
+                </text>
+                <line x1="0" y1="{{ loop.index * entryNameColumnHeight }}"
+                      x2="{{ entryNameColumnWidth }}" y2="{{ loop.index * entryNameColumnHeight }}"
                       stroke="{{ lightGrey }}" stroke-width="1" />
             {% endfor %}
-        {% endfor %}
-    </g>
+        </g>
 
-    <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
-        {% for block in chart.blocks.values() %}
-            {% if block.entry.type.name == 'milestone' %}
-                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
-                      x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y2="{{ gridHeight }}"
-                      stroke="{{ block.colour }}" stroke-width="2" />
-            {% endif %}
-        {% endfor %}
-
-        {% for block in chart.blocks.values() %}
-            {% set y = loop.index0 * blockHeight %}
-
-            {% for dependee in block.entry.dependees %}
-                {% set dependeeBlock = chart.blocks[dependee.parent] %}
-                {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
-
-                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
-                      x2="{{ x2 + 1 }}" y2="{{ y + blockHeight / 2 }}"
-                      stroke="{{ block.colour }}" stroke-width="2" />
-                <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
-                      x2="{{ x2 }}" y2="{{ dependeeBlock.index * blockHeight - 8 }}"
-                      stroke="{{ block.colour }}" stroke-width="2"
-                      style="marker-end: url(#markerArrow);" />
+        <g id="grid" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
+            <!-- horizontal -->
+            {% for i in range((chart.blocks | length) + 1) %}
+                <line x1="0" x2="{{ gridWidth }}"
+                      y1="{{ i * blockHeight }}" y2="{{ i * blockHeight }}"
+                      stroke="{{ lightGrey }}" stroke-width="1" />
             {% endfor %}
-        {% endfor %}
 
-        {% for block in chart.blocks.values() %}
-            {% set y = loop.index0 * blockHeight %}
+            <!-- vertical -->
+            {% for i in range((chart.days | list | length) + 6) %}
+                <line x1="{{ i * dailyColumnSize }}" x2="{{ i * dailyColumnSize }}"
+                      y1="0" y2="{{ gridHeight }}"
+                      stroke="{{ darkGrey }}" stroke-width="1" />
+                {% for j in range(1, project.calendar.business_day_length) %}
+                    <line x1="{{ i * dailyColumnSize + j * hourlyColumnWidth }}" x2="{{ i * dailyColumnSize + j * hourlyColumnWidth }}"
+                          y1="0" y2="{{ gridHeight }}"
+                          stroke="{{ lightGrey }}" stroke-width="1" />
+                {% endfor %}
+            {% endfor %}
+        </g>
 
-            <rect x="{{ 0 }}" y="{{ y }}"
-                  width="{{ block.left_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                  stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
-                  ganttcharts:entry-id="{{ block.entry.id }}" />
+        <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
+            {% for block in chart.blocks.values() %}
+                {% if block.entry.type.name == 'milestone' %}
+                    <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
+                          x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y2="{{ gridHeight }}"
+                          stroke="{{ block.colour }}" stroke-width="2" />
+                {% endif %}
+            {% endfor %}
 
-            {% if block.entry.type.name == 'task' %}
-                <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
-                      width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                      stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
+            {% for block in chart.blocks.values() %}
+                {% set y = loop.index0 * blockHeight %}
+
+                {% for dependee in block.entry.dependees %}
+                    {% set dependeeBlock = chart.blocks[dependee.parent] %}
+                    {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
+
+                    <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
+                          x2="{{ x2 + 1 }}" y2="{{ y + blockHeight / 2 }}"
+                          stroke="{{ block.colour }}" stroke-width="2" />
+                    <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
+                          x2="{{ x2 }}" y2="{{ dependeeBlock.index * blockHeight - 8 }}"
+                          stroke="{{ block.colour }}" stroke-width="2"
+                          style="marker-end: url(#markerArrow);" />
+                {% endfor %}
+            {% endfor %}
+
+            {% for block in chart.blocks.values() %}
+                {% set y = loop.index0 * blockHeight %}
+
+                <rect x="{{ 0 }}" y="{{ y }}"
+                      width="{{ block.left_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                      stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                       ganttcharts:entry-id="{{ block.entry.id }}" />
-            {% elif block.entry.type.name == 'milestone' %}
-                {% if block.length >= 1 %}
-                    <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
-                          x2="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
-                          y1="{{ y + blockHeight * 0.1 }}" y2="{{ y + blockHeight * 0.9 }}"
-                          stroke="{{ block.colour }}" stroke-width="2" />
 
-                    <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
-                          x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}"
-                          y1="{{ y + blockHeight / 2 }}" y2="{{ y + blockHeight / 2 }}"
-                          stroke="{{ block.colour }}" stroke-width="2" />
+                {% if block.entry.type.name == 'task' %}
+                    <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
+                          width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
+                          ganttcharts:entry-id="{{ block.entry.id }}" />
+                {% elif block.entry.type.name == 'milestone' %}
+                    {% if block.length >= 1 %}
+                        <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
+                              x2="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
+                              y1="{{ y + blockHeight * 0.1 }}" y2="{{ y + blockHeight * 0.9 }}"
+                              stroke="{{ block.colour }}" stroke-width="2" />
+
+                        <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
+                              x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}"
+                              y1="{{ y + blockHeight / 2 }}" y2="{{ y + blockHeight / 2 }}"
+                              stroke="{{ block.colour }}" stroke-width="2" />
+                    {% endif %}
+
+                    <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
+                          width="{{ milestoneSize }}" height="{{ milestoneSize }}"
+                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
+                          transform="rotate(45 {{ (block.left_cells + block.cells) * hourlyColumnWidth }} {{ y }})"
+                          ganttcharts:entry-id="{{ block.entry.id }}" />
                 {% endif %}
 
                 <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
-                      width="{{ milestoneSize }}" height="{{ milestoneSize }}"
-                      stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
-                      transform="rotate(45 {{ (block.left_cells + block.cells) * hourlyColumnWidth }} {{ y }})"
+                      width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                      stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                       ganttcharts:entry-id="{{ block.entry.id }}" />
-            {% endif %}
 
-            <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
-                  width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                  stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
-                  ganttcharts:entry-id="{{ block.entry.id }}" />
-
-            {% if block.entry.type.name == 'task' and (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
-                <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
-                      dy="-6" dx="5" class="row"
-                      ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
-                    {{ block.entry.name }}
-                </text>
-            {% endif %}
-        {% endfor %}
-    </g>
+                {% if block.entry.type.name == 'task' and (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
+                    <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
+                          dy="-6" dx="5" class="row"
+                          ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
+                        {{ block.entry.name }}
+                    </text>
+                {% endif %}
+            {% endfor %}
+        </g>
+    {% endif %}
 
     <script>
         <![CDATA[
