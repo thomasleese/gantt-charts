@@ -28,4 +28,9 @@ setup(
         'WTForms-JSON >=0.2, <1',
     ],
     test_suite='nose.collector',
+    entry_points={
+        'console_scripts': [
+            'ganttchartsctl = ganttcharts.cli.__main__:main'
+        ]
+    }
 )

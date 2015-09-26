@@ -1,0 +1,15 @@
+{% extends "_includes/base.html" %}
+
+{% block content %}
+  <h1>Hello {{ account.display_name }}, your tasks for today are:</h1>
+
+  {% for project, blocks in blocks_today.items() %}
+    <h2>{{ project.name }}</h2>
+
+    <ul>
+      {% for block in blocks %}
+        <li><strong>{{ block.entry.name }}</strong> (<small>{{ block.start.strftime('%a %-d %b %H:%M') }}</small> - <small>{{ block.end.strftime('%a %-d %b %H:%M') }}</small>)</li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+{% endblock %}

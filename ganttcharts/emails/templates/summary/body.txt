@@ -1,0 +1,13 @@
+{% extends "_includes/base.txt" %}
+
+{% block content %}
+Hello {{ account.display_name }}, your tasks for today are:
+
+{% for project, blocks in blocks_today.items() %}
+- {{ project.name }}
+{% for block in blocks %}
+ -- {{ block.entry.name }} ({{ block.start.strftime('%a %-d %b %H:%M') }} - {{ block.end.strftime('%a %-d %b %H:%M') }})</li>
+{% endfor %}
+{% endfor %}
+
+{% endblock %}
