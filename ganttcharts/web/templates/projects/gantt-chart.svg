@@ -3,7 +3,9 @@
 {% set blockHeight = 24 %}
 {% set milestoneSize = 16.3 %}
 
-{% set entryNameColumnWidth = (chart.calculate_max_entry_name() + 1) * 8.5 + 12 %}
+{% set charWidth = 8.5 %}
+
+{% set entryNameColumnWidth = (chart.calculate_max_entry_name() + 1) * charWidth + 12 %}
 {% set entryNameColumnHeight = blockHeight %}
 {% set hourlyColumnWidth = 10 %}
 {% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}
@@ -89,7 +91,7 @@
             <text x="{{ entryNameColumnWidth }}" y="{{ loop.index * entryNameColumnHeight }}"
                   dy="-6" dx="-6" class="row" text-anchor="end"
                   ganttcharts:entry-id="{{ block.entry.id }}">
-                <tspan>{{ block.entry.name }}</tspan>
+                {{ block.entry.name }}
             </text>
             <line x1="0" y1="{{ loop.index * entryNameColumnHeight }}"
                   x2="{{ entryNameColumnWidth }}" y2="{{ loop.index * entryNameColumnHeight }}"
@@ -130,6 +132,23 @@
         {% for block in chart.blocks.values() %}
             {% set y = loop.index0 * blockHeight %}
 
+            {% for dependee in block.entry.dependees %}
+                {% set dependeeBlock = chart.blocks[dependee.parent] %}
+                {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
+
+                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
+                      x2="{{ x2 + 1 }}" y2="{{ y + blockHeight / 2 }}"
+                      stroke="{{ block.colour }}" stroke-width="2" />
+                <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
+                      x2="{{ x2 }}" y2="{{ dependeeBlock.index * blockHeight - 8 }}"
+                      stroke="{{ block.colour }}" stroke-width="2"
+                      style="marker-end: url(#markerArrow);" />
+            {% endfor %}
+        {% endfor %}
+
+        {% for block in chart.blocks.values() %}
+            {% set y = loop.index0 * blockHeight %}
+
             <rect x="{{ 0 }}" y="{{ y }}"
                   width="{{ block.left_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
                   stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
@@ -152,23 +171,20 @@
                   width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
                   stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                   ganttcharts:entry-id="{{ block.entry.id }}" />
-        {% endfor %}
 
-        {% for block in chart.blocks.values() %}
-            {% set y = loop.index0 * blockHeight %}
-
-            {% for dependee in block.entry.dependees %}
-                {% set dependeeBlock = chart.blocks[dependee.parent] %}
-                {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
-
-                <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
-                      x2="{{ x2 + 1 }}" y2="{{ y + blockHeight / 2 }}"
-                      stroke="{{ block.colour }}" stroke-width="2" />
-                <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
-                      x2="{{ x2 }}" y2="{{ dependeeBlock.index * blockHeight - 8 }}"
-                      stroke="{{ block.colour }}" stroke-width="2"
-                      style="marker-end: url(#markerArrow);" />
-            {% endfor %}
+            {% if (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
+                <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
+                      dy="-6" dx="5" class="row"
+                      ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
+                    {{ block.entry.name }}
+                </text>
+            {% else %}
+                <text x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
+                      dy="-6" dx="11" class="row"
+                      ganttcharts:entry-id="{{ block.entry.id }}" fill="{{ darkGrey }}">
+                    {{ block.entry.name }}
+                </text>
+            {% endif %}
         {% endfor %}
     </g>
 
