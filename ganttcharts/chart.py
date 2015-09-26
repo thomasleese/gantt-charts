@@ -117,10 +117,12 @@ class Chart:
         return new_date
 
     def block_for_row(self, i, entry, row):
-        first_zero = row.nonzero()[0][0]
-        last_zero = row.nonzero()[0][-1]
+        try:
+            first_zero = row.nonzero()[0][0]
+        except IndexError:
+            first_zero = 0
 
-        length = last_zero - first_zero + 1
+        length = entry.normal_time_estimate
 
         start = self.add_hours_to_date(self.start, first_zero)
         end = self.add_hours_to_date(start, length)
@@ -190,7 +192,7 @@ class Chart:
                                 if value != 0:
                                     matrix[i, j] = 1
 
-                print('-- STAGE #2 SUMS - {} --'.format(resource.name))
+                print('-- STAGE #2 SUMS - {} --'.format(member.account.display_name))
                 print(matrix.sum(axis=0))
 
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
