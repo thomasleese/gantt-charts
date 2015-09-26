@@ -149,6 +149,16 @@ class Chart:
         return matrix
 
     def assign_resources(self, existence_matrix):
+        def pick_entry_to_move(column):
+            indexes = column.nonzero()[0]
+            print('out of', indexes)
+
+            index = max(indexes, key=lambda index: self.entries[index].normal_time_estimate)
+
+            print('chose', index)
+
+            return self.entries[index]
+
         had_a_problem = True
         while had_a_problem:
             had_a_problem = False
@@ -167,9 +177,26 @@ class Chart:
 
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
                     if value > resource.amount:
-                        print('WE HAVE A PROBLEM AT', i)
-                        entry_index = matrix[:, i].nonzero()[0][0]
-                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, self.entries[entry_index])
+                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, pick_entry_to_move(matrix[:, i]))
+                        had_a_problem = True
+                        print('We had a problem at:', i)
+                        break
+
+            for member in self.project.members:
+                matrix = np.zeros(existence_matrix.shape)
+                for i, entry in enumerate(self.entries):
+                    for entry_member in entry.members:
+                        if entry_member.member == member:
+                            for j, value in enumerate(np.nditer(existence_matrix[i,:])):
+                                if value != 0:
+                                    matrix[i, j] = 1
+
+                print('-- STAGE #2 SUMS - {} --'.format(resource.name))
+                print(matrix.sum(axis=0))
+
+                for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
+                    if value > 1:
+                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, pick_entry_to_move(matrix[:, i]))
                         had_a_problem = True
                         break
 
