@@ -71,13 +71,13 @@ class Chart:
 
         existence_matrix = self.produce_existence_matrix()
 
-        print('-- EXISTENCE MATRIX 1 --')
-        print(existence_matrix)
+        #print('-- EXISTENCE MATRIX 1 --')
+        #print(existence_matrix)
 
         existence_matrix = self.assign_resources(existence_matrix)
 
-        print('-- EXISTENCE MATRIX 2 --')
-        print(existence_matrix)
+        #print('-- EXISTENCE MATRIX 2 --')
+        #print(existence_matrix)
 
         self.blocks = OrderedDict()
         for i, entry in enumerate(self.entries):
