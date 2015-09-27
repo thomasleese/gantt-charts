@@ -90,7 +90,7 @@
           <label class="c-input c-checkbox">
             <input type="checkbox" id="formEnableMinStartDate" on-change="_handleMinStartDateChange" />
             <span class="c-indicator"></span>
-            Must start after
+            Must start on or after
           </label>
 
           <input type="datetime-local" id="formMinStartDate" class="form-control" placeholder="Must start after" on-change="_handleMinStartDateChange" required />
@@ -188,6 +188,11 @@
         this._submitEntryChange('pessimistic_time_estimate', value);
       },
       _handleMinStartDateChange: function(e) {
+        var dom = Polymer.dom(e);
+        if (dom.rootTarget === this.$.formMinStartDate) {
+          this.$.formEnableMinStartDate.checked = true;
+        }
+
         if (this.$.formEnableMinStartDate.checked && this.$.formMinStartDate.value) {
           this._submitEntryChange('min_start_date', this.$.formMinStartDate.value);
         } else {
