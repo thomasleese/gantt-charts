@@ -291,8 +291,13 @@
           }.bind(this));
       },
       resourceSelected: function(resource) {
+        var amount = parseInt(prompt('How much of "' + resource.name + '" will this task use?'));
+        if (isNaN(amount)) {
+          amount = 1;
+        }
+
         requests.put('/api/projects/' + this.projectId + '/entries/' + this.entryId + '/resources/' + resource.id)
-          .send({'amount': 1})
+          .send({'amount': amount})
           .go(function(statusCode, response) {
             if (statusCode === 201) {
               this.fire('change');
