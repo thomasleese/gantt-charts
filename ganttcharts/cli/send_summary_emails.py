@@ -17,7 +17,11 @@ def send_out_emails():
     accounts = session.query(Account) \
         .filter(Account.receive_summary_email == True)
     for account in accounts:
-        email = emails.Summary(account, today)
+        try:
+            email = emails.Summary(account, today)
+        except RuntimeError:  # no tasks
+            continue
+
         with emails.Mailer() as mailer:
             mailer.send(email)
 
