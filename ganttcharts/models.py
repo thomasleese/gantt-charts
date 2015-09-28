@@ -318,15 +318,12 @@ class ProjectCalendar(Base):
         return sum([1 if x is True else 0 for x in self._weekmask])
 
     def is_working_date(self, date):
-        weekday = date.weekday()
-        if self._weekmask[weekday]:
-            return True
-
         for holiday in self.holidays:
             if holiday.start <= date.date() <= holiday.end:
-                return True
+                return False
 
-        return False
+        weekday = date.weekday()
+        return self._weekmask[weekday]
 
     def as_json(self):
         return {
