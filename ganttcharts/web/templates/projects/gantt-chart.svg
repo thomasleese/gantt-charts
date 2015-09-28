@@ -7,7 +7,7 @@
 
 {% set entryNameColumnWidth = (chart.calculate_max_entry_name() if chart else 0 + 1) * charWidth + 12 %}
 {% set entryNameColumnHeight = blockHeight %}
-{% set hourlyColumnWidth = 10 %}
+{% set hourlyColumnWidth = 9 %}
 {% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}
 
 {% set gridHeight = entryNameColumnHeight * (chart.blocks | length) %}
