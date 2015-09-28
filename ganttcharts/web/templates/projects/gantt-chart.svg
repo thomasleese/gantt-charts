@@ -8,11 +8,12 @@
 {% set entryNameColumnWidth = (chart.calculate_max_entry_name() if chart else 0 + 1) * charWidth + 12 %}
 {% set entryNameColumnHeight = blockHeight %}
 {% set hourlyColumnWidth = 9 %}
-{% set dailyColumnSize = hourlyColumnWidth * project.calendar.business_day_length %}
+{% set dailyColumnWidth = hourlyColumnWidth * project.calendar.business_day_length %}
+{% set dailyColumnHeight = 80 %}
 
 {% set gridHeight = entryNameColumnHeight * (chart.blocks | length) %}
-{% set fullHeight = dailyColumnSize + gridHeight %}
-{% set gridWidth = dailyColumnSize * (chart.days | list | length + 6) %}
+{% set fullHeight = dailyColumnHeight + gridHeight %}
+{% set gridWidth = dailyColumnWidth * (chart.days | list | length + 6) %}
 {% set fullWidth = entryNameColumnWidth + gridWidth %}
 
 {% set veryLightGrey = 'rgb(235, 235, 235)' %}
@@ -58,8 +59,8 @@
         <g id="non-working-days" transform="translate({{ entryNameColumnWidth }} 0)">
             {% for day in chart.days %}
                 {% if not chart.project.calendar.is_working_date(day) %}
-                    <rect x="{{ dailyColumnSize * loop.index0 }}" y="0"
-                          width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+                    <rect x="{{ dailyColumnWidth * loop.index0 }}" y="0"
+                          width="{{ dailyColumnWidth }}" height="{{ fullHeight }}"
                           fill="{{ veryLightGrey }}" />
                 {% endif %}
             {% endfor %}
@@ -67,27 +68,27 @@
 
         <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
             {% set index = (today - chart.start).days %}
-            <rect x="{{ dailyColumnSize * index }}" y="0"
-                  width="{{ dailyColumnSize }}" height="{{ fullHeight }}"
+            <rect x="{{ dailyColumnWidth * index }}" y="0"
+                  width="{{ dailyColumnWidth }}" height="{{ fullHeight }}"
                   fill="{{ slightlyLightGrey }}" />
         </g>
 
         <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
             {% for day in chart.days %}
-                <line x1="{{ dailyColumnSize * loop.index0 + 100 * 1.732 }}"
-                      y1="{{ dailyColumnSize - 100 }}"
-                      x2="{{ dailyColumnSize * loop.index0 }}"
-                      y2="{{ dailyColumnSize }}"
+                <line x1="{{ dailyColumnWidth * loop.index0 + dailyColumnHeight * 1.732 }}"
+                      y1="0"
+                      x2="{{ dailyColumnWidth * loop.index0 }}"
+                      y2="{{ dailyColumnHeight }}"
                       stroke="{{ lightGrey }}" stroke-width="1" />
 
                 <text x="-1" y="-5"
-                      transform="rotate(-30 {{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }}) translate({{ loop.index0 * dailyColumnSize }} {{ dailyColumnSize }})">
+                      transform="rotate(-30 {{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }}) translate({{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }})">
                     {{ day.strftime('%a %-d %b %Y') }}
                 </text>
             {% endfor %}
         </g>
 
-        <g id="entry-names" transform="translate(0 {{ dailyColumnSize }})">
+        <g id="entry-names" transform="translate(0 {{ dailyColumnHeight }})">
             {% for block in chart.blocks.values() %}
                 <rect x="0" y="{{ loop.index0 * entryNameColumnHeight + 1 }}"
                       width="{{ entryNameColumnWidth }}" height="{{ entryNameColumnHeight - 2 }}"
@@ -104,7 +105,7 @@
             {% endfor %}
         </g>
 
-        <g id="grid" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
+        <g id="grid" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnHeight }})">
             <!-- horizontal -->
             {% for i in range((chart.blocks | length) + 1) %}
                 <line x1="0" x2="{{ gridWidth }}"
@@ -114,18 +115,18 @@
 
             <!-- vertical -->
             {% for i in range((chart.days | list | length) + 6) %}
-                <line x1="{{ i * dailyColumnSize }}" x2="{{ i * dailyColumnSize }}"
+                <line x1="{{ i * dailyColumnWidth }}" x2="{{ i * dailyColumnWidth }}"
                       y1="0" y2="{{ gridHeight }}"
                       stroke="{{ darkGrey }}" stroke-width="1" />
                 {% for j in range(1, project.calendar.business_day_length) %}
-                    <line x1="{{ i * dailyColumnSize + j * hourlyColumnWidth }}" x2="{{ i * dailyColumnSize + j * hourlyColumnWidth }}"
+                    <line x1="{{ i * dailyColumnWidth + j * hourlyColumnWidth }}" x2="{{ i * dailyColumnWidth + j * hourlyColumnWidth }}"
                           y1="0" y2="{{ gridHeight }}"
                           stroke="{{ lightGrey }}" stroke-width="1" />
                 {% endfor %}
             {% endfor %}
         </g>
 
-        <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnSize }})">
+        <g id="blocks" transform="translate({{ entryNameColumnWidth }} {{ dailyColumnHeight }})">
             {% for block in chart.blocks.values() %}
                 {% if block.entry.type.name == 'milestone' %}
                     <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
