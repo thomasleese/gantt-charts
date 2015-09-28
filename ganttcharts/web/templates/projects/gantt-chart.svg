@@ -40,6 +40,10 @@
         rect.selected {
             fill: rgb(255, 228, 124);
         }
+
+        line.selected {
+            stroke: rgb(255, 228, 124);
+        }
     /* ]]> */
     </style>
 
@@ -150,27 +154,44 @@
             {% for block in chart.blocks.values() %}
                 {% set y = loop.index0 * blockHeight %}
 
+                <!-- background clicking target -->
                 <rect x="{{ 0 }}" y="{{ y }}"
-                      width="{{ block.left_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                      width="{{ (block.left_cells + block.cells + block.right_cells) * hourlyColumnWidth }}" height="{{ blockHeight }}"
                       stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
                       ganttcharts:entry-id="{{ block.entry.id }}" />
 
+                <!-- actual block -->
                 {% if block.entry.type.name == 'task' %}
                     <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
                           width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
                           stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
                           ganttcharts:entry-id="{{ block.entry.id }}" />
+
+                    {% if (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
+                        <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
+                              dy="-6" dx="5" class="row"
+                              ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
+                            {{ block.entry.name }}
+                        </text>
+                    {% endif %}
                 {% elif block.entry.type.name == 'milestone' %}
+                    <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
+                          width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
+                          stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
+                          ganttcharts:entry-id="{{ block.entry.id }}" />
+
                     {% if block.length >= 1 %}
                         <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               x2="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               y1="{{ y + blockHeight * 0.1 }}" y2="{{ y + blockHeight * 0.9 }}"
-                              stroke="{{ block.colour }}" stroke-width="2" />
+                              stroke="{{ block.colour }}" stroke-width="2" class="row"
+                              ganttcharts:entry-id="{{ block.entry.id }}" />
 
                         <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}"
                               y1="{{ y + blockHeight / 2 }}" y2="{{ y + blockHeight / 2 }}"
-                              stroke="{{ block.colour }}" stroke-width="2" />
+                              stroke="{{ block.colour }}" stroke-width="2" class="row"
+                              ganttcharts:entry-id="{{ block.entry.id }}" />
                     {% endif %}
 
                     <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
@@ -178,19 +199,6 @@
                           stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
                           transform="rotate(45 {{ (block.left_cells + block.cells) * hourlyColumnWidth }} {{ y }})"
                           ganttcharts:entry-id="{{ block.entry.id }}" />
-                {% endif %}
-
-                <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
-                      width="{{ block.right_cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                      stroke="none" fill="rgba(255, 255, 255, 0)" class="row"
-                      ganttcharts:entry-id="{{ block.entry.id }}" />
-
-                {% if block.entry.type.name == 'task' and (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
-                    <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
-                          dy="-6" dx="5" class="row"
-                          ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
-                        {{ block.entry.name }}
-                    </text>
                 {% endif %}
             {% endfor %}
         </g>
