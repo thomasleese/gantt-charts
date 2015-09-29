@@ -179,7 +179,10 @@ class Chart:
 
                 start = max(min_start, start)
 
-            matrix = Chart.upsize(matrix, cols=max(start + duration, matrix.shape[1]))
+            cols = max(start + duration, matrix.shape[1])
+            if duration == 0:
+                cols += 1
+            matrix = Chart.upsize(matrix, cols=cols)
 
             if duration == 0:
                 matrix[i, start] = 0.5
