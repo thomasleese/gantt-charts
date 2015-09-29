@@ -5,8 +5,19 @@ postgres:
 web:
   build: .
   env_file: secrets/gantt-charts.env
+  links:
+    - postgres
+
+nginx:
+  build: tools/nginx
+  links:
+    - web
   ports:
-    - '80:8000'
+    - '80:80'
+
+backup:
+  build: tools/backup
+  env_file: secrets/backup.env
   links:
     - postgres
 
@@ -16,9 +27,3 @@ send-summary-emails:
   links:
     - postgres
   command: ganttchartsctl send-summary-emails --forever
-
-backup:
-  build: tools/backup
-  env_file: secrets/backup.env
-  links:
-    - postgres
