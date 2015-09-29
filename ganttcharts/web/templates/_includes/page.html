@@ -17,8 +17,8 @@
 
     <title>{% block title %}Gantt Charts{% endblock %}</title>
 
-    <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='bower_components/ionicons/css/ionicons.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='bower_components/ionicons/css/ionicons.min.css') }}" rel="stylesheet" />
     <link href="{{ url_for('static', filename='styles/theme.css') }}" rel="stylesheet" />
 
     <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" />
@@ -104,9 +104,8 @@
       </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
-    <script src="{{ url_for('static', filename='bower_components/jquery-mousewheel/jquery.mousewheel.js') }}"></script>
-    <script src="{{ url_for('static', filename='bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 
     {% block scripts %}
     {% endblock %}
