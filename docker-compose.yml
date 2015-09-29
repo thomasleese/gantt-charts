@@ -16,3 +16,9 @@ send-summary-emails:
   links:
     - postgres
   command: ganttchartsctl send-summary-emails --forever
+
+backup:
+  build: tools/backup
+  env_file: secrets/backup.env
+  links:
+    - postgres
