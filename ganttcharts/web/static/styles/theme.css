@@ -6,7 +6,7 @@ body {
 
 .page {
     background: white;
-    padding: 2rem;
+    padding: 0.01rem 2rem 2rem 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
 }
