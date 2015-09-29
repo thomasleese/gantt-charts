@@ -35,3 +35,33 @@ body {
 }
 
 /* Primary Accent Colour: rgb(255, 228, 124) */
+
+/* Welcome Page */
+.welcome .page {
+    padding: 0;
+}
+
+.welcome .feature {
+    padding: 2rem;
+}
+
+.welcome .row {
+    margin: 0;
+}
+
+.welcome .feature:nth-of-type(even) {
+    background: rgb(248, 248, 248);
+}
+
+.welcome .separator {
+    background-size: 15px 30px;
+    height: 30px;
+}
+
+.welcome .separator1 {
+    background-image: url('../images/welcome-border-1.png');
+}
+
+.welcome .separator2 {
+    background-image: url('../images/welcome-border-2.png');
+}
