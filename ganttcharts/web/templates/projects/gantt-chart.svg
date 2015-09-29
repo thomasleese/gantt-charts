@@ -21,6 +21,8 @@
 {% set lightGrey = 'rgb(190, 190, 190)' %}
 {% set darkGrey = 'rgb(50, 50, 50)' %}
 
+{% autoescape true %}
+
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      xmlns:ganttcharts="http://example.org/gantt-charts"
@@ -334,3 +336,5 @@
     </script>
 
 </svg>
+
+{% endautoescape %}
