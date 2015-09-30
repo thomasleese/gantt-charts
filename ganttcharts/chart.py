@@ -141,6 +141,9 @@ class Chart:
 
         start = self.add_hours_to_date(self.start, first_zero)
         end = self.add_hours_to_date(start, length)
+        if end.hour == self.project.calendar.work_starts_at.hour:
+            end = end.replace(hour=self.project.calendar.work_ends_at.hour)
+            end -= self.project.calendar.business_day
 
         return Block(i, self, entry, start, end, length)
 
@@ -309,7 +312,7 @@ class Chart:
 
     def as_json(self):
         return {
-            'blocks': [b.as_json() for b in self.blocks],
+            'blocks': [b.as_json() for b in self.blocks.values()],
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
         }

@@ -480,11 +480,7 @@ def project_gantt_chart(project_id):
     #except ValueError:
     #    raise errors.NotFound()
 
-    as_json = chart.as_json()
-    if as_json is None:
-        raise errors.NotFound()
-
-    return flask.jsonify(gantt_chart=as_json)
+    return flask.jsonify(gantt_chart=chart.as_json())
 
 
 @blueprint.route('/projects/<int:project_id>/members', methods=['GET', 'POST'])
