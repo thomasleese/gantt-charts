@@ -126,8 +126,8 @@ def view_project(project_id):
     return flask.render_template('projects/view.html', project=project)
 
 
-@blueprint.route('/projects/<int:project_id>/gantt-chart/svg')
-def project_gantt_chart_svg(project_id):
+@blueprint.route('/projects/<int:project_id>/gantt-chart.<format>')
+def project_gantt_chart(project_id, format):
     project = get_project_or_404(project_id)
     account_member = get_project_member_or_403(project)
 
@@ -140,57 +140,27 @@ def project_gantt_chart_svg(project_id):
                                 project=project,
                                 today=datetime.datetime.utcnow())
 
-    response = flask.make_response(svg)
-    response.headers['Content-Type'] = 'image/svg+xml'
-    return response
+    if format == 'svg':
+        response = flask.make_response(svg)
+        response.headers['Content-Type'] = 'image/svg+xml'
+    elif format == 'pdf':
+        pdf = cairosvg.svg2pdf(svg)
 
+        response = flask.make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
 
-@blueprint.route('/projects/<int:project_id>/gantt-chart/pdf')
-def project_gantt_chart_pdf(project_id):
-    project = get_project_or_404(project_id)
-    account_member = get_project_member_or_403(project)
+        filename = 'Gantt Chart for {}.pdf'.format(project.name)
+        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    elif format == 'png':
+        png = cairosvg.svg2png(svg)
 
-    try:
-        chart = Chart(project)
-    except InvalidGanttChart:
-        chart=None
+        response = flask.make_response(png)
+        response.headers['Content-Type'] = 'image/png'
 
-    svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
-                                project=project,
-                                today=datetime.datetime.utcnow())
-
-    pdf = cairosvg.svg2pdf(svg)
-
-    response = flask.make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-
-    filename = 'Gantt Chart for {}.pdf'.format(project.name)
-    response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-
-    return response
-
-
-@blueprint.route('/projects/<int:project_id>/gantt-chart/png')
-def project_gantt_chart_png(project_id):
-    project = get_project_or_404(project_id)
-    account_member = get_project_member_or_403(project)
-
-    try:
-        chart = Chart(project)
-    except InvalidGanttChart:
-        chart=None
-
-    svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
-                                project=project,
-                                today=datetime.datetime.utcnow())
-
-    png = cairosvg.svg2png(svg)
-
-    response = flask.make_response(png)
-    response.headers['Content-Type'] = 'image/png'
-
-    filename = 'Gantt Chart for {}.png'.format(project.name)
-    response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        filename = 'Gantt Chart for {}.png'.format(project.name)
+        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    else:
+        raise errors.NotFound()
 
     return response
 

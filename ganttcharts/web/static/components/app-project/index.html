@@ -76,6 +76,14 @@
         <app-project-member-editor id="memberEditor" project-id="{{ projectId }}" on-show="_initMemberEditor" on-change="reloadMembers" on-delete="reloadMembers"></app-project-member-editor>
         <app-project-resource-editor id="resourceEditor" project-id="{{ projectId }}" on-show="_initResourceEditor" on-change="reloadResources" on-delete="reloadResources"></app-project-resource-editor>
         <app-project-calendar-holiday-editor id="calendarHolidayEditor" project-id="{{ projectId }}" on-show="_initCalendarHolidayEditor" on-change="reloadCalendar" on-delete="reloadCalendar"></app-project-calendar-holiday-editor>
+
+        <hr />
+
+        <p>
+          <a href="{{ _downloadUrl(project.id, 'pdf') }}"><span class="icon ion-android-download"></span> Download Gantt chart as a PDF file</a>
+          <br />
+          <a href="{{ _downloadUrl(project.id, 'png') }}"><span class="icon ion-android-download"></span> Download Gantt chart as a PNG file</a>
+        </p>
       </div>
     </div>
   </template>
@@ -241,6 +249,9 @@
         } else {
           return 'nav-link';
         }
+      },
+      _downloadUrl: function(id, format) {
+        return '/projects/' + id + '/gantt-chart.' + format;
       },
     });
   </script>

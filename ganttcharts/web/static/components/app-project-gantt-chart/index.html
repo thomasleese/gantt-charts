@@ -82,7 +82,7 @@
       reload: function() {
         this._saveGanttChartState();
 
-        this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart/svg?' + new Date().getTime();
+        this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart.svg?' + new Date().getTime();
 
         requests.get('/api/projects/' + this.projectId + '/entries')
           .go(function(statusCode, response) {
