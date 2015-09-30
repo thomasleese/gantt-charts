@@ -1,4 +1,5 @@
 from collections import OrderedDict, namedtuple
+import colorsys
 import datetime
 import math
 
@@ -57,7 +58,12 @@ class Block(_Block):
 
     @cached_property
     def colour(self):
-        return 'hsl({}, 50%, 50%)'.format((self.index / len(self.chart.blocks)) * 360)
+        hue = (self.index / len(self.chart.blocks))
+        r, g, b = colorsys.hls_to_rgb(hue, 0.5, 0.5)
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        return 'rgb({}, {}, {})'.format(r, g, b)
 
 
 class Chart:
