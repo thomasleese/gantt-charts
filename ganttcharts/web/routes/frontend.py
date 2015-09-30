@@ -163,6 +163,10 @@ def project_gantt_chart_pdf(project_id):
 
     response = flask.make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
+
+    filename = 'Gantt Chart for {}.pdf'.format(project.name)
+    response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+
     return response
 
 
@@ -184,6 +188,10 @@ def project_gantt_chart_png(project_id):
 
     response = flask.make_response(png)
     response.headers['Content-Type'] = 'image/png'
+
+    filename = 'Gantt Chart for {}.png'.format(project.name)
+    response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+
     return response
 
 
