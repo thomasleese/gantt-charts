@@ -15,6 +15,9 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
 RUN apt-get update && apt-get install -y nodejs nodejs-legacy npm
 RUN npm install -g bower grunt-cli
 
+# Cairo
+RUN apt-get update && apt-get install -y libcairo2-dev
+
 # Gantt Charts
 RUN mkdir /code
 WORKDIR /code

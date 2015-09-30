@@ -5,6 +5,10 @@ Routes for the front-end.
 import datetime
 import functools
 
+import cairocffi
+cairocffi.install_as_pycairo()
+
+import cairosvg
 import flask
 import sqlalchemy
 
@@ -138,6 +142,48 @@ def project_gantt_chart_svg(project_id):
 
     response = flask.make_response(svg)
     response.headers['Content-Type'] = 'image/svg+xml'
+    return response
+
+
+@blueprint.route('/projects/<int:project_id>/gantt-chart/pdf')
+def project_gantt_chart_pdf(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    try:
+        chart = Chart(project)
+    except InvalidGanttChart:
+        chart=None
+
+    svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
+                                project=project,
+                                today=datetime.datetime.utcnow())
+
+    pdf = cairosvg.svg2pdf(svg)
+
+    response = flask.make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+
+@blueprint.route('/projects/<int:project_id>/gantt-chart/png')
+def project_gantt_chart_png(project_id):
+    project = get_project_or_404(project_id)
+    account_member = get_project_member_or_403(project)
+
+    try:
+        chart = Chart(project)
+    except InvalidGanttChart:
+        chart=None
+
+    svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
+                                project=project,
+                                today=datetime.datetime.utcnow())
+
+    png = cairosvg.svg2png(svg)
+
+    response = flask.make_response(png)
+    response.headers['Content-Type'] = 'image/png'
     return response
 
 
