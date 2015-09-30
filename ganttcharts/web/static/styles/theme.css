@@ -6,16 +6,16 @@ body {
 
 .page {
     background: white;
-    padding: 0.01rem 2rem 2rem 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
+    padding: 0.01rem 2rem 2rem 2rem;
 }
 
 .jumbotron {
     background: rgb(248, 248, 248);
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
-    padding: 2rem;
+    padding: 0.01rem 2rem 2rem 2rem;
 }
 
 .star {
@@ -30,7 +30,9 @@ body {
     color: rgb(95, 104, 111);
 }
 
-.footer a {
+a.text-muted,
+a.text-muted:hover,
+.text-muted a {
     color: rgb(100, 100, 100);
 }
 
@@ -43,6 +45,10 @@ body {
 
 .welcome .feature {
     padding: 2rem;
+}
+
+.welcome .feature h2 {
+    margin-bottom: 1rem;
 }
 
 .welcome .row {
