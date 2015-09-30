@@ -2,6 +2,7 @@ from collections import OrderedDict, namedtuple
 import datetime
 import math
 
+from werkzeug.utils import cached_property
 import numpy as np
 
 
@@ -24,7 +25,7 @@ class Block(_Block):
             'entry': self.entry.as_json(),
         }
 
-    @property
+    @cached_property
     def left_cells(self):
         diff = self.start - self.chart.start
 
@@ -33,7 +34,7 @@ class Block(_Block):
 
         return days * self.chart.project.calendar.business_day_length + hours
 
-    @property
+    @cached_property
     def cells(self):
         diff = self.end - self.start
 
@@ -45,7 +46,7 @@ class Block(_Block):
 
         return days * self.chart.project.calendar.business_day_length + hours
 
-    @property
+    @cached_property
     def right_cells(self):
         diff = self.chart.end - self.end
 
@@ -54,7 +55,7 @@ class Block(_Block):
 
         return days * self.chart.project.calendar.business_day_length + hours
 
-    @property
+    @cached_property
     def colour(self):
         return 'hsl({}, 50%, 50%)'.format((self.index / len(self.chart.blocks)) * 360)
 
@@ -86,7 +87,7 @@ class Chart:
 
         self.end = max(block.end for block in self.blocks.values())
 
-    @property
+    @cached_property
     def start(self):
         try:
             return self._start
@@ -266,13 +267,17 @@ class Chart:
 
         return matrix
 
+    @cached_property
+    def no_days(self):
+        return math.ceil((self.end - self.start).days) + 1
+
     @property
     def days(self):
-        no_days = math.ceil((self.end - self.start).days) + 1
-        for i in range(no_days):
+        for i in range(self.no_days):
             yield self.start + datetime.timedelta(days=i)
 
-    def calculate_max_entry_name(self):
+    @cached_property
+    def max_entry_name(self):
         return max(len(entry.name) for entry in self.project.entries)
 
     def topolgical_sort(self, graph_unsorted):

@@ -5,7 +5,7 @@
 
 {% set charWidth = 8.5 %}
 
-{% set entryNameColumnWidth = (chart.calculate_max_entry_name() if chart else 0 + 1) * charWidth + 12 %}
+{% set entryNameColumnWidth = (chart.max_entry_name if chart else 0 + 1) * charWidth + 12 %}
 {% set entryNameColumnHeight = blockHeight %}
 {% set hourlyColumnWidth = 9 %}
 {% set dailyColumnWidth = hourlyColumnWidth * project.calendar.business_day_length %}
