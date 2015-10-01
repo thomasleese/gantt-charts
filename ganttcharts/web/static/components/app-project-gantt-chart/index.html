@@ -40,12 +40,17 @@
     <object id="ganttChart" data="{{ ganttChartSrc }}" type="image/svg+xml"></object>
 
     <template is="dom-if" if="{{ hasGanttChart }}">
-      <br /><br />
+      <hr />
+
+      <p>
+        <a href="{{ _downloadUrl(projectId, 'pdf') }}"><span class="icon ion-android-download"></span> Download Gantt chart as a PDF file</a>
+        <br />
+        <a href="{{ _downloadUrl(projectId, 'png') }}"><span class="icon ion-android-download"></span> Download Gantt chart as a PNG file</a>
+      </p>
 
       <button type="button" class="btn btn-success fixed-bottom-right" on-click="_handleNew">
         <span class="ion-plus-round m-r"></span>New entry
       </button>
-      <div class="clearfix"></div>
     </template>
 
     <template is="dom-if" if="{{ !hasGanttChart }}">
@@ -130,6 +135,9 @@
           this.$.ganttChart.width = svg.getAttribute('width');
           this.$.ganttChart.height = svg.getAttribute('height');
         }
+      },
+      _downloadUrl: function(id, format) {
+        return '/projects/' + id + '/gantt-chart.' + format;
       },
 
       _handleNew: function(e) {
