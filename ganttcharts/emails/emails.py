@@ -78,10 +78,9 @@ class Summary(Email):
                 continue
 
             for block in gantt_chart.blocks.values():
-                if block.entry.type.name == 'task':
-                    if block.start.date() <= today <= block.end.date():
-                        if block.entry.has_member(account) or len(block.entry.members) == 0:
-                            blocks_today[project].append(block)
+                if block.entry.type.name == 'task' \
+                        and block.applies_to(today, account):
+                    blocks_today[project].append(block)
 
         if not blocks_today:
             raise RuntimeError('No tasks for today.')
