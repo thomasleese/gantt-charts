@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html" />
 
+<link rel="import" href="../app-colour-picker/app-colour-picker.html" />
 <link rel="import" href="../app-thing-editor/index.html" />
 
 <dom-module id="app-project-resource-editor">
@@ -70,6 +71,8 @@
           </label>
         </div>
 
+        <app-colour-picker id="formColour" class="form-group" on-change="_handleColourChange"></app-colour-picker>
+
         <div class="form-group">
           <input type="number" class="form-control" id="formAmount" placeholder="Amount" required on-change="_handleAmountChange" />
         </div>
@@ -106,6 +109,7 @@
         this.$.form.icon.value = resource.icon;
         this.$.formAmount.value = resource.amount;
         this.$.formReusable.checked = resource.reusable;
+        this.$.formColour.selected = resource.colour;
       },
       hide: function() {
         this.resource = undefined;
@@ -154,6 +158,9 @@
       },
       _handleReusableChange: function() {
         this.submitChange('reusable', this.$.formReusable.checked);
+      },
+      _handleColourChange: function() {
+        this.submitChange('colour', this.$.formColour.selected);
       },
 
       _handleDelete: function(e) {

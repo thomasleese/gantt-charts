@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" />
+
+<dom-module id="app-colour-picker">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .colour {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+
+        color: white;
+        cursor: pointer;
+        font-size: 1.4rem;
+        text-align: center;
+
+        margin: 0.2rem 0.1rem;
+      }
+    </style>
+
+    <div id="colours">
+      <template is="dom-repeat" items="[[ choices ]]" as="colour">
+        <div class="colour" style$="[[ _divColourStyle(colour, selected) ]]" on-click="_changeSelectedColour">✓</div>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-colour-picker',
+      properties: {
+        choices: {
+          type: Array,
+          reflectToAttribute: true,
+          value: function() {
+            // Material Design Colours
+            return ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+                    '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+                    '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800',
+                    '#FF5722', '#795548', '#9E9E9E', '#607D8B', '#000000',
+                    '#FFFFFF'];
+          }
+        },
+        selected: {
+          type: String,
+          value: '#000000'
+        }
+      },
+
+      _divColourStyle: function(colour, selectedColour) {
+        if (colour === selectedColour) {
+          return 'background-color: ' + colour;
+        } else {
+          return 'background-color: ' + colour + '; color: ' + colour;
+        }
+      },
+      _changeSelectedColour: function(e) {
+        this.selected = e.model.colour;
+        this.fire('change', e.model.colour);
+      },
+    });
+  </script>
+
+</dom-module>

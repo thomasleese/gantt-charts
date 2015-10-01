@@ -588,22 +588,29 @@ def project_resource(project_id, resource_id):
     resource = get_project_resource_or_404(resource_id)
 
     if flask.request.method == 'PATCH':
-        form = forms.ApiUpdateProjectResource.from_json(flask.request.json)
-        if form.validate():
-            if form.name.raw_data:
-                resource.name = form.name.data
+        validator = Validator({
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'icon': {'type': 'string'},
+            'colour': {'type': 'string'},
+            'amount': {'type': 'integer', 'coerce': int},
+            'reusable': {'type': 'boolean'},
+        })
 
-            if form.description.raw_data:
-                resource.description = form.description.data
+        def update_model_values(model, doc, *args):
+            for arg in args:
+                try:
+                    value = doc[arg]
+                except KeyError:
+                    pass
+                else:
+                    setattr(model, arg, value)
 
-            if form.icon.raw_data:
-                resource.icon = form.icon.data
+        if validator.validate(flask.request.json, update=True):
+            doc = validator.document
 
-            if form.amount.raw_data:
-                resource.amount = form.amount.data
-
-            if form.reusable.raw_data:
-                resource.reusable = form.reusable.data
+            update_model_values(resource, doc, 'name', 'description', 'icon',
+                                'colour', 'amount', 'reusable')
 
             flask.g.sql_session.commit()
 

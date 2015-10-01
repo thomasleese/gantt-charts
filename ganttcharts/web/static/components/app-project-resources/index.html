@@ -6,8 +6,8 @@
 
 <dom-module id="app-project-resources">
 
-  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.css" />
-  <link type="css" rel="import" href="../../bower_components/ionicons/css/ionicons.css" />
+  <link type="css" rel="import" href="../../bower_components/bootstrap/dist/css/bootstrap.min.css" />
+  <link type="css" rel="import" href="../../bower_components/ionicons/css/ionicons.min.css" />
 
   <template>
     <style>
@@ -17,6 +17,17 @@
 
       li {
         cursor: pointer;
+      }
+
+      .resource-icon {
+        color: white;
+        font-size: 1.4rem;
+        text-align: center;
+
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 2rem;
       }
     </style>
 
@@ -29,7 +40,7 @@
       <ul class="list-group">
         <template is="dom-repeat" items="{{ resources }}" as="resource">
           <li class$="{{ _listItemClass(resource.selected) }}" on-click="_handleSelectResource">
-            <span class$="{{ _resourceIconClass(resource.icon) }}" style="font-size: 1.4rem;"></span>
+            <span class$="{{ _resourceIconClass(resource.icon) }}" style$="[[ _resourceIconStyle(resource.colour) ]]"></span>
             <span>{{ resource.amount }}</span>
             <span>×</span>
             <span>{{ resource.name }}</span>
@@ -154,7 +165,10 @@
         }
       },
       _resourceIconClass: function(icon) {
-        return 'ion-' + icon + ' m-r';
+        return 'resource-icon ion-' + icon + ' m-r';
+      },
+      _resourceIconStyle: function(colour) {
+        return 'background-color: ' + colour;
       },
       _listItemClass: function(isSelected) {
         var s = 'list-group-item';

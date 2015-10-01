@@ -417,6 +417,7 @@ class ProjectResource(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
+            'colour': self.colour,
             'icon': self.icon,
             'amount': self.amount,
             'reusable': self.reusable,
