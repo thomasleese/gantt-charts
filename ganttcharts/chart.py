@@ -74,6 +74,15 @@ class Block(_Block):
         b = int(b * 255)
         return 'rgb({}, {}, {})'.format(r, g, b)
 
+    def applies_to(self, date, account):
+        """
+        Determine if a certain account is going to care about this block at a
+        certain date.
+        """
+
+        return self.start.date() <= date <= self.end.date() \
+            and (self.entry.has_member(account) or not self.entry.members)
+
 
 class Chart:
     def __init__(self, project):

@@ -112,7 +112,8 @@
                       ganttcharts:entry-id="{{ block.entry.id }}" />
                 <text x="{{ entryNameColumnWidth }}" y="{{ loop.index * entryNameColumnHeight }}"
                       dy="{{ blockTextDy }}" dx="-6" class="row" text-anchor="end"
-                      ganttcharts:entry-id="{{ block.entry.id }}">
+                      ganttcharts:entry-id="{{ block.entry.id }}"
+                      style="font-weight: {{ 'bold' if block.applies_to(today.date(), g.account) else 'normal' }}">
                     {{ block.entry.name }}
                 </text>
                 <line x1="0" y1="{{ loop.index * entryNameColumnHeight }}"
@@ -189,7 +190,8 @@
                     {% if (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
                         <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
                               dy="{{ blockTextDy }}" dx="6" class="row"
-                              ganttcharts:entry-id="{{ block.entry.id }}" fill="black">
+                              ganttcharts:entry-id="{{ block.entry.id }}" fill="black"
+                              style="font-weight: {{ 'bold' if block.applies_to(today.date(), g.account) else 'normal' }}">
                             {{ block.entry.name }}
                         </text>
                     {% endif %}

@@ -457,7 +457,7 @@ class ProjectEntry(Base):
 
     def has_member(self, account):
         for member in self.members:
-            if member.account == account:
+            if member.member == account:
                 return True
         return False
 
