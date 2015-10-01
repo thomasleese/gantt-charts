@@ -3,15 +3,12 @@
 import datetime
 from enum import Enum
 import hashlib
-import math
 import os
 
 import flask
-from pandas.tseries.offsets import BusinessHour, CustomBusinessDay
-import sqlalchemy
-from sqlalchemy import event, Column, DateTime, Integer, LargeBinary, \
-    MetaData, String, Table, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import backref, deferred, scoped_session, sessionmaker, relationship
+from pandas.tseries.offsets import CustomBusinessDay
+from sqlalchemy import event, Column, String
+from sqlalchemy.orm import backref, scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.ext.hybrid import hybrid_property
 from passlib.context import CryptContext
@@ -87,15 +84,16 @@ class Account(Base):
     @property
     def my_projects(self):
         for member in self.project_members:
-            if member.access_level.owner or member.access_level.can_administrate:
+            if member.access_level.owner or \
+                    member.access_level.can_administrate:
                 yield member.project
 
     @property
     def shared_projects(self):
         for member in self.project_members:
             if (member.access_level.can_view or member.access_level.can_edit) \
-                    and not (member.access_level.owner \
-                        or member.access_level.can_administrate):
+                    and not (member.access_level.owner
+                             or member.access_level.can_administrate):
                 yield member.project
 
     @property
@@ -218,8 +216,8 @@ class AccessLevel(Enum):
 
     @property
     def is_banned(self):
-        return not (self.owner or self.can_administrate or self.can_edit \
-            or self.can_view)
+        return not (self.owner or self.can_administrate or self.can_edit
+                    or self.can_view)
 
     def as_json(self):
         return {

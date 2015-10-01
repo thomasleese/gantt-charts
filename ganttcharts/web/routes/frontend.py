@@ -12,13 +12,9 @@ import cairosvg
 import flask
 import sqlalchemy
 
-from ganttcharts import database
 from ganttcharts.chart import Chart, InvalidGanttChart
-from ganttcharts.models import generate_key, AccessLevel, Account, \
-    AccountEmailAddress, Project, ProjectCalendarHoliday, ProjectEntry, \
-    ProjectEntryDependency, ProjectEntryMember, ProjectEntryType, \
-    ProjectEntryResource, ProjectMember, ProjectResource, ProjectStar, \
-    Session as SqlSession
+from ganttcharts.models import Account, AccountEmailAddress, Project, \
+    ProjectMember, ProjectResource, ProjectStar
 from ganttcharts.web import errors, forms
 
 
@@ -54,7 +50,8 @@ def login_required(func):
     @functools.wraps(func)
     def decorated_function(*args, **kwargs):
         if 'account' not in flask.g:
-            return flask.redirect(flask.url_for('.login', next=flask.request.url))
+            return flask.redirect(flask.url_for('.login',
+                                                next=flask.request.url))
         return func(*args, **kwargs)
     return decorated_function
 
@@ -110,7 +107,8 @@ def new_project():
                           flask.g.account)
         flask.g.sql_session.add(project)
         flask.g.sql_session.commit()
-        return flask.redirect(flask.url_for('.view_project', project_id=project.id))
+        return flask.redirect(flask.url_for('.view_project',
+                                            project_id=project.id))
     return flask.render_template('projects/create.html', form=form)
 
 
@@ -129,12 +127,12 @@ def view_project(project_id):
 @blueprint.route('/projects/<int:project_id>/gantt-chart.<format>')
 def project_gantt_chart(project_id, format):
     project = get_project_or_404(project_id)
-    account_member = get_project_member_or_403(project)
+    get_project_member_or_403(project)
 
     try:
         chart = Chart(project)
     except InvalidGanttChart:
-        chart=None
+        chart = None
 
     svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
                                 project=project,

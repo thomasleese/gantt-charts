@@ -15,7 +15,7 @@ def send_out_emails():
     today = datetime.date.today()
 
     accounts = session.query(Account) \
-        .filter(Account.receive_summary_email == True)
+        .filter(Account.receive_summary_email == True)  # noqa
     for account in accounts:
         try:
             email = emails.Summary(account, today)

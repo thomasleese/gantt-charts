@@ -1,5 +1,6 @@
+"""CLI runner."""
+
 from argparse import ArgumentParser
-import time
 
 from .. import __description__
 
@@ -7,6 +8,8 @@ from . import send_summary_emails
 
 
 def main():
+    """Run the command-line tool."""
+
     parser = ArgumentParser(description=__description__)
 
     subparsers = parser.add_subparsers(title='commands')

@@ -1,12 +1,12 @@
 import flask
 from wtforms import Form
 from wtforms.fields import BooleanField, DateField, IntegerField, FormField, \
-    PasswordField, SelectField, StringField
+    PasswordField, StringField
 from wtforms.validators import DataRequired, Email, Length, Optional, \
     ValidationError
 import wtforms_json
 
-from ..models import Account, AccountEmailAddress
+from ..models import AccountEmailAddress
 
 
 wtforms_json.init()
@@ -116,7 +116,7 @@ class AccountReset1(Form):
 
 class AccountReset2(Form):
     new_password = StringField('New Password',
-                                validators=[DataRequired(), Length(8)])
+                               validators=[DataRequired(), Length(8)])
 
 
 class CreateProject(Form):

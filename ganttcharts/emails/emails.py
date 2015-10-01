@@ -1,6 +1,4 @@
-import base64
 from collections import defaultdict
-import datetime
 from email.mime.multipart import MIMEMultipart
 import email.mime.text
 from email.mime.image import MIMEImage
@@ -17,7 +15,8 @@ class Email(MIMEMultipart):
 
         self.name = name
 
-        path = Path(__file__).parent.parent / 'web' / 'static' / 'images' / 'background.png'
+        path = Path(__file__).parent.parent / 'web' / 'static' / 'images' \
+            / 'background.png'
         with path.open('rb') as f:
             image = MIMEImage(f.read())
             image.add_header('Content-ID', '<background-image>')
@@ -29,7 +28,9 @@ class Email(MIMEMultipart):
 
         self['Date'] = email.utils.formatdate()
         self['Subject'] = self.subject
-        self['From'] = email.utils.formataddr(('Gantt Charts', 'customers@ganttcharts.xyz'))
+
+        from_addr = ('Gantt Charts', 'customers@ganttcharts.xyz')
+        self['From'] = email.utils.formataddr(from_addr)
 
         self.mime_alternative = MIMEMultipart('alternative')
         self.attach(self.mime_alternative)

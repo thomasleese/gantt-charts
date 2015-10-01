@@ -9,13 +9,11 @@ from cerberus import Validator
 import flask
 import sqlalchemy
 
-from ganttcharts import database
-from ganttcharts.chart import Chart
-from ganttcharts.models import generate_key, AccessLevel, Account, \
-    AccountEmailAddress, Project, ProjectCalendarHoliday, ProjectEntry, \
-    ProjectEntryDependency, ProjectEntryMember, ProjectEntryType, \
-    ProjectEntryResource, ProjectMember, ProjectResource, ProjectStar, \
-    Session as SqlSession
+from ganttcharts.chart import Chart, InvalidGanttChart
+from ganttcharts.models import AccessLevel, Project, \
+    ProjectCalendarHoliday, ProjectEntry, ProjectEntryDependency, \
+    ProjectEntryMember, ProjectEntryType, ProjectEntryResource, \
+    ProjectMember, ProjectResource
 from ganttcharts.web import errors, forms
 
 
@@ -452,7 +450,7 @@ def project_entry_dependency(project_id, parent_id, child_id):
             chart = Chart(project)
             flask.g.sql_session.commit()
             return '', 201
-        except ValueError:
+        except InvalidGanttChart:
             flask.g.sql_session.rollback()
             raise errors.InvalidGraph()
     elif flask.request.method == 'DELETE':
@@ -473,12 +471,12 @@ def project_entry_dependency(project_id, parent_id, child_id):
 @blueprint.route('/projects/<int:project_id>/gantt-chart')
 def project_gantt_chart(project_id):
     project = get_project_or_404(project_id)
-    account_member = get_project_member_or_403(project)
+    get_project_member_or_403(project)
 
-    #try:
-    chart = Chart(project)
-    #except ValueError:
-    #    raise errors.NotFound()
+    try:
+        chart = Chart(project)
+    except InvalidGanttChart:
+        raise errors.NotFound()
 
     return flask.jsonify(gantt_chart=chart.as_json())
 
@@ -616,7 +614,7 @@ def project_resource(project_id, resource_id):
 
             return '', 204
         else:
-            raise errors.InvalidFormData(form)
+            raise errors.InvalidFormData(validator)
     elif flask.request.method == 'DELETE':
         flask.g.sql_session.delete(resource)
         flask.g.sql_session.commit()

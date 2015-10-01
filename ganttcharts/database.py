@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 _sql_engine = None
 _sql_connection = None
 
+
 def get_sql_database_uri():
     key = 'GANTT_CHARTS_SQL_URI'
     try:

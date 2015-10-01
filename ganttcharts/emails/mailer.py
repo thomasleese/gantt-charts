@@ -46,7 +46,8 @@ class Mailer:
                 if self.testing:
                     return None
                 else:
-                    raise KeyError('Missing environment variable: {}.'.format(key))
+                    raise KeyError('Missing environment variable: {}.'
+                                   .format(key))
         elif conversion == bool:
             return key in os.environ
         else:
@@ -59,7 +60,7 @@ class Mailer:
         logger.debug("Creating SMTP connection to %s:%d.", host, port)
 
         if (use_starttls and use_ssl) or (use_ssl and use_lmtp) \
-            or (use_starttls and use_lmtp):
+                or (use_starttls and use_lmtp):
             raise ValueError("You can only pick a single server type.")
 
         if use_starttls:
@@ -121,7 +122,7 @@ class Mailer:
         """
 
         logger.info("Sending '%s' to '%s'.", message["Subject"],
-                                              message["To"])
+                    message["To"])
 
         if self.testing:
             return

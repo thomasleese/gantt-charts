@@ -6,8 +6,7 @@ from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 
 from .. import database
-from ..models import generate_key, Account, AccountEmailAddress, \
-    Session as SqlSession
+from ..models import generate_key, Account, Session as SqlSession
 from . import routes
 
 
@@ -43,7 +42,7 @@ def configure_session(*args, **kwargs):
 
 
 @app.after_request
-def configure_session(response):
+def set_csrf_token(response):
     if 'account' in flask.g:
         if 'CSRF-Token' not in flask.request.cookies:
             token = generate_key()

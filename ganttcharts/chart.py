@@ -239,7 +239,7 @@ class Chart:
                 for i, entry in enumerate(self.entries):
                     for entry_resource in entry.resources:
                         if entry_resource.resource == resource:
-                            for j, value in enumerate(np.nditer(existence_matrix[i,:])):
+                            for j, value in enumerate(np.nditer(existence_matrix[i, :])):
                                 if value != 0:
                                     matrix[i,j] = entry_resource.amount
 
