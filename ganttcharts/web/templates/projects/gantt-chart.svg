@@ -23,6 +23,20 @@
 
 {% autoescape true %}
 
+{% macro resource_stripes(entry, x, y, height=100) -%}
+    {% set line_width = 3 %}
+    <g transform="translate({{ x }} {{ y }})">
+        {% set counter = Counter() %}
+        {% for entry_resource in entry.resources | reverse %}
+            {% set width = line_width * entry_resource.amount %}
+            <rect x="{{ -counter.count(width + 1) - width }}" y="0"
+                  width="{{ width }}"
+                  height="{{ height }}" stroke="none"
+                  fill="{{ entry_resource.resource.colour }}" />
+        {% endfor %}
+    </g>
+{%- endmacro %}
+
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      xmlns:ganttcharts="http://example.org/gantt-charts"
@@ -172,6 +186,8 @@
                             {{ block.entry.name }}
                         </text>
                     {% endif %}
+
+                    {{ resource_stripes(block.entry, (block.left_cells + block.cells) * hourlyColumnWidth - 2, y, blockHeight) }}
                 {% elif block.entry.type.name == 'milestone' %}
                     <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
                           width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
