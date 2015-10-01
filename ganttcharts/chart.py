@@ -57,9 +57,18 @@ class Block(_Block):
         return days * self.chart.project.calendar.business_day_length + hours
 
     @cached_property
-    def colour(self):
+    def fill_colour(self):
         hue = (self.index / len(self.chart.blocks))
-        r, g, b = colorsys.hls_to_rgb(hue, 0.5, 0.5)
+        r, g, b = colorsys.hls_to_rgb(hue, 0.95, 0.9)
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        return 'rgb({}, {}, {})'.format(r, g, b)
+
+    @cached_property
+    def stroke_colour(self):
+        hue = (self.index / len(self.chart.blocks))
+        r, g, b = colorsys.hls_to_rgb(hue, 0.6, 0.5)
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)

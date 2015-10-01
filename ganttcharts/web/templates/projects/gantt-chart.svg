@@ -16,10 +16,10 @@
 {% set gridWidth = dailyColumnWidth * (chart.days | list | length + 6) %}
 {% set fullWidth = entryNameColumnWidth + gridWidth %}
 
-{% set veryLightGrey = 'rgb(235, 235, 235)' %}
-{% set slightlyLightGrey = 'rgb(210, 210, 210)' %}
-{% set lightGrey = 'rgb(190, 190, 190)' %}
-{% set darkGrey = 'rgb(50, 50, 50)' %}
+{% set veryLightGrey = 'rgb(240, 240, 240)' %}
+{% set slightlyLightGrey = 'rgb(230, 230, 230)' %}
+{% set lightGrey = 'rgb(210, 210, 210)' %}
+{% set darkGrey = 'rgb(140, 140, 140)' %}
 
 {% autoescape true %}
 
@@ -126,7 +126,7 @@
                 {% if block.entry.type.name == 'milestone' %}
                     <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="0"
                           x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y2="{{ gridHeight }}"
-                          stroke="{{ block.colour }}" stroke-width="2" />
+                          stroke="{{ block.stroke_colour }}" stroke-width="2" />
                 {% endif %}
             {% endfor %}
 
@@ -140,12 +140,12 @@
 
                     <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
                           x2="{{ x2 + 1 }}" y2="{{ y + blockHeight / 2 }}"
-                          stroke="{{ block.colour }}" stroke-width="2" />
+                          stroke="{{ block.stroke_colour }}" stroke-width="2" />
                     <line x1="{{ x2 }}" y1="{{ y + blockHeight / 2 }}"
                           x2="{{ x2 }}" y2="{{ y3 }}"
-                          stroke="{{ block.colour }}" stroke-width="2" />
+                          stroke="{{ block.stroke_colour }}" stroke-width="2" />
                     <path d="M0,0 L0,4 L4,2 L0,0" transform="rotate(90 {{ x2 + 4 }} {{ y3 }}) translate({{ x2 + 4 }} {{ y3 }}) scale(2)"
-                          fill="{{ block.colour }}"/>
+                          fill="{{ block.stroke_colour }}"/>
                 {% endfor %}
             {% endfor %}
 
@@ -162,13 +162,13 @@
                 {% if block.entry.type.name == 'task' %}
                     <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
                           width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
-                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
+                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.fill_colour }}" class="row"
                           ganttcharts:entry-id="{{ block.entry.id }}" />
 
                     {% if (block.entry.name | length + 1) * charWidth + 10 < block.cells * hourlyColumnWidth %}
                         <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
                               dy="-6" dx="5" class="row"
-                              ganttcharts:entry-id="{{ block.entry.id }}" fill="white">
+                              ganttcharts:entry-id="{{ block.entry.id }}" fill="black">
                             {{ block.entry.name }}
                         </text>
                     {% endif %}
@@ -182,19 +182,19 @@
                         <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               x2="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               y1="{{ y + blockHeight * 0.1 }}" y2="{{ y + blockHeight * 0.9 }}"
-                              stroke="{{ block.colour }}" stroke-width="2" class="row"
+                              stroke="{{ block.stroke_colour }}" stroke-width="2" class="row"
                               ganttcharts:entry-id="{{ block.entry.id }}" />
 
                         <line x1="{{ block.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 }}"
                               x2="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}"
                               y1="{{ y + blockHeight / 2 }}" y2="{{ y + blockHeight / 2 }}"
-                              stroke="{{ block.colour }}" stroke-width="2" class="row"
+                              stroke="{{ block.stroke_colour }}" stroke-width="2" class="row"
                               ganttcharts:entry-id="{{ block.entry.id }}" />
                     {% endif %}
 
                     <rect x="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y="{{ y }}"
                           width="{{ milestoneSize }}" height="{{ milestoneSize }}"
-                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.colour }}" class="row"
+                          stroke="{{ darkGrey }}" stroke-width="1" fill="{{ block.fill_colour }}" class="row"
                           transform="rotate(45 {{ (block.left_cells + block.cells) * hourlyColumnWidth }} {{ y }})"
                           ganttcharts:entry-id="{{ block.entry.id }}" />
                 {% endif %}
