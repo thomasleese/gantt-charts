@@ -1,0 +1,9 @@
+{% macro avatar(account, x=0, y=0, size=1000) -%}
+    <g transform="translate({{ x }} {{ y }}) scale({{ size / 1000 }})">
+        <rect y="0" x="0" width="1000" height="1000" id="background"
+              style="fill: hsl({{ account.hue }}, 50%, 50%)" />
+
+        <text x="500" y="500" dy="-45" transform="scale(1, 1.2)"
+              style="fill: white; font-family: 'PT Sans', sans-serif; font-size: 500px; letter-spacing: 50px; font-weight: bold; text-anchor: middle; alignment-baseline: middle;">{{ account.initials | escape }}</text>
+    </g>
+{%- endmacro %}

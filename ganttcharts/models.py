@@ -76,6 +76,10 @@ class Account(Base):
             return names[0][0] + names[-1][0]
 
     @property
+    def hue(self):
+        return sum(ord(c) for c in self.initials) % 360
+
+    @property
     def projects(self):
         for member in self.project_members:
             yield member.project

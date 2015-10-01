@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-{% autoescape true %}
+{% from '_includes/avatar.svg' import avatar %}
 
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1000 1000"
      height="1000" width="1000">
 
-    <rect y="0" x="0" width="1000" height="1000" id="background"
-          style="fill: hsl({{ hue }}, 50%, 50%)" />
-
-    <text x="50%" y="50%" dy="-30px" transform="scale(1, 1.2)"
-          style="fill: white; font-family: 'PT Sans', sans-serif; font-size: 500px; letter-spacing: 50px; font-weight: bold; text-anchor: middle; alignment-baseline: middle;">{{ initials }}</text>
+    {{ avatar(account) }}
 
 </svg>
-
-{% endautoescape %}

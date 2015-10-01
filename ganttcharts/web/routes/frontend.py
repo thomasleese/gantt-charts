@@ -306,12 +306,7 @@ def account_avatar(account_id):
     if account is None:
         raise errors.NotFound()
 
-    initials = account.initials
-
-    hue = account_id % 360
-
-    svg = flask.render_template('account/avatar.svg', hue=hue,
-                                initials=initials)
+    svg = flask.render_template('account/avatar.svg', account=account)
 
     response = flask.make_response(svg)
     response.headers['Content-Type'] = 'image/svg+xml'

@@ -23,16 +23,27 @@
 
 {% autoescape true %}
 
-{% macro resource_stripes(entry, x, y, height=100) -%}
-    {% set line_width = 3 %}
+{% from '_includes/avatar.svg' import avatar %}
+
+{% macro block_overlay(entry, x, y, height=100) -%}
     <g transform="translate({{ x }} {{ y }})">
         {% set counter = Counter() %}
-        {% for entry_resource in entry.resources | reverse %}
-            {% set width = line_width * entry_resource.amount %}
-            <rect x="{{ -counter.count(width + 1) - width }}" y="0"
-                  width="{{ width }}"
-                  height="{{ height }}" stroke="none"
-                  fill="{{ entry_resource.resource.colour }}" />
+
+        {% if entry.resources %}
+            {% set line_width = 6 %}
+            {% for entry_resource in entry.resources | reverse %}
+                {% set width = line_width * entry_resource.amount %}
+                <rect x="{{ -counter.count(width + 1) - width }}" y="0.5"
+                      width="{{ width }}" height="{{ height - 1 }}" stroke="none"
+                      fill="{{ entry_resource.resource.colour }}" />
+            {% endfor %}
+
+            {% set _ = counter.count(2) %}
+        {% endif %}
+
+        {% for entry_member in entry.members | reverse %}
+            {% set size = height - 4 %}
+            {{ avatar(entry_member.member.account, -counter.count(size + 1) - size, 2, size) | safe }}
         {% endfor %}
     </g>
 {%- endmacro %}
@@ -187,7 +198,7 @@
                         </text>
                     {% endif %}
 
-                    {{ resource_stripes(block.entry, (block.left_cells + block.cells) * hourlyColumnWidth - 2, y, blockHeight) }}
+                    {{ block_overlay(block.entry, (block.left_cells + block.cells) * hourlyColumnWidth - 2, y, blockHeight) }}
                 {% elif block.entry.type.name == 'milestone' %}
                     <rect x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y }}"
                           width="{{ block.cells * hourlyColumnWidth }}" height="{{ blockHeight }}"
