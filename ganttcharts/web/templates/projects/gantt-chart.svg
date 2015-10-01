@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-{% set blockHeight = 24 %}
-{% set milestoneSize = 16.3 %}
+{% set blockHeight = 30 %}
+{% set milestoneSize = 21 %}
 
 {% set charWidth = 8.5 %}
 
@@ -29,21 +29,16 @@
     <g transform="translate({{ x }} {{ y }})">
         {% set counter = Counter() %}
 
-        {% if entry.resources %}
-            {% set line_width = 6 %}
-            {% for entry_resource in entry.resources | reverse %}
-                {% set width = line_width * entry_resource.amount %}
-                <rect x="{{ -counter.count(width + 1) - width }}" y="0.5"
-                      width="{{ width }}" height="{{ height - 1 }}" stroke="none"
-                      fill="{{ entry_resource.resource.colour }}" />
-            {% endfor %}
-
-            {% set _ = counter.count(2) %}
-        {% endif %}
+        {% for entry_resource in entry.resources | reverse %}
+            {% set width = 9 * entry_resource.amount %}
+            <rect x="{{ -counter.count(width + 2) - width }}" y="0.5"
+                  width="{{ width }}" height="{{ height - 1 }}" stroke="none"
+                  fill="{{ entry_resource.resource.colour }}" />
+        {% endfor %}
 
         {% for entry_member in entry.members | reverse %}
-            {% set size = height - 4 %}
-            {{ avatar(entry_member.member.account, -counter.count(size + 1) - size, 2, size) | safe }}
+            {% set size = height - 1 %}
+            {{ avatar(entry_member.member.account, -counter.count(size + 2) - size, 0.5, size) | safe }}
         {% endfor %}
     </g>
 {%- endmacro %}
