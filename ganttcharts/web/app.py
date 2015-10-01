@@ -61,4 +61,22 @@ def server_error(e):
     return flask.render_template('errors/500.html')
 
 
+class Counter:
+    def __init__(self):
+        self.value = 0
+
+    def increment(self, by=1):
+        self.value += by
+
+    def count(self, by=1):
+        old_value = self.value
+        self.value += by
+        return old_value
+
+
+@app.context_processor
+def inject_counter():
+    return dict(Counter=Counter)
+
+
 routes.register(app)
