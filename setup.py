@@ -19,7 +19,7 @@ setup(
         'Cerberus >=0.9, <1',
         'Flask >=0.10, <1',
         'passlib >=1.6, <2',
-        'SQLAlchemy >=0.9, <1',
+        'SQLAlchemy >=1.0, <2',
         'numpy >=1.9, <2',
         'pandas >=0.16, <1',
         'psycopg2 >=2.5, <3',

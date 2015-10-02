@@ -180,9 +180,11 @@ def project_gantt_chart(project_id, format):
     else:
         raise errors.NotFound()
 
-    if not flask.current_app.debug:
-        filename = 'Gantt Chart for {}.{}'.format(project.name, format)
-        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    if format != 'svg':
+        if not flask.current_app.debug:
+            filename = 'Gantt Chart for {}.{}'.format(project.name, format)
+            content_disposition = 'attachment; filename="{}"'.format(filename)
+            response.headers['Content-Disposition'] = content_disposition
 
     return response
 
