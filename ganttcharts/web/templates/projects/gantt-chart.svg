@@ -82,12 +82,14 @@
             {% endfor %}
         </g>
 
-        <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
-            {% set index = (today - chart.start).days %}
-            <rect x="{{ dailyColumnWidth * index }}" y="0"
-                  width="{{ dailyColumnWidth }}" height="{{ fullHeight }}"
-                  fill="{{ slightlyLightGrey }}" />
-        </g>
+        {% if dynamic %}
+            <g id="today" transform="translate({{ entryNameColumnWidth }} 0)">
+                {% set index = (today - chart.start).days %}
+                <rect x="{{ dailyColumnWidth * index }}" y="0"
+                      width="{{ dailyColumnWidth }}" height="{{ fullHeight }}"
+                      fill="{{ slightlyLightGrey }}" />
+            </g>
+        {% endif %}
 
         <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
             {% for day in chart.days %}
@@ -113,7 +115,7 @@
                 <text x="{{ entryNameColumnWidth }}" y="{{ loop.index * entryNameColumnHeight }}"
                       dy="{{ blockTextDy }}" dx="-6" class="row" text-anchor="end"
                       ganttcharts:entry-id="{{ block.entry.id }}"
-                      style="font-weight: {{ 'bold' if block.applies_to(today.date(), g.account) else 'normal' }}">
+                      style="font-weight: {{ 'bold' if dynamic and block.applies_to(today.date(), g.account) else 'normal' }}">
                     {{ block.entry.name }}
                 </text>
                 <line x1="0" y1="{{ loop.index * entryNameColumnHeight }}"
@@ -191,7 +193,7 @@
                         <text x="{{ block.left_cells * hourlyColumnWidth }}" y="{{ y + blockHeight }}"
                               dy="{{ blockTextDy }}" dx="6" class="row"
                               ganttcharts:entry-id="{{ block.entry.id }}" fill="black"
-                              style="font-weight: {{ 'bold' if block.applies_to(today.date(), g.account) else 'normal' }}">
+                              style="font-weight: {{ 'bold' if dynamic and block.applies_to(today.date(), g.account) else 'normal' }}">
                             {{ block.entry.name }}
                         </text>
                     {% endif %}

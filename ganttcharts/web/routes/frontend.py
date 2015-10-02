@@ -134,8 +134,10 @@ def project_gantt_chart(project_id, format):
     except InvalidGanttChart:
         chart = None
 
+    dynamic = format == 'svg'
+
     svg = flask.render_template('projects/gantt-chart.svg', chart=chart,
-                                project=project,
+                                project=project, dynamic=dynamic,
                                 today=datetime.datetime.utcnow())
 
     if format == 'svg':
