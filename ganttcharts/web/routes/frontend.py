@@ -4,12 +4,14 @@ Routes for the front-end.
 
 import datetime
 import functools
-
-import cairocffi
-cairocffi.install_as_pycairo()
+import io
 
 import cairosvg
 import flask
+import reportlab.pdfgen.canvas
+import reportlab.lib.pagesizes
+import reportlab.lib.utils
+import PIL.Image
 import sqlalchemy
 
 from ganttcharts.chart import Chart, InvalidGanttChart
@@ -144,7 +146,29 @@ def project_gantt_chart(project_id, format):
         response = flask.make_response(svg)
         response.mimetype = 'image/svg+xml'
     elif format == 'pdf':
-        pdf = cairosvg.svg2pdf(svg)
+        png = cairosvg.svg2png(svg)
+        image = PIL.Image.open(io.BytesIO(png))
+
+        page_size = reportlab.lib.pagesizes.A4[::-1]  # landscape
+
+        output = io.BytesIO()
+        canvas = reportlab.pdfgen.canvas.Canvas(output, pagesize=page_size)
+
+        image_width = page_size[0]
+        image_height = image.height * (image_width / image.width)
+        y = (page_size[1] - image_height) / 2
+        canvas.drawImage(reportlab.lib.utils.ImageReader(io.BytesIO(png)), 0,
+                         y, width=image_width, height=image_height)
+        canvas.drawCentredString(page_size[0] / 2, page_size[1] - 40,
+                                 'Gantt Chart for {}'.format(project.name))
+        canvas.drawCentredString(page_size[0] / 2, page_size[1] - 60,
+                                 '{} to {}'.format(chart.start.date(),
+                                                   chart.end.date()))
+        canvas.showPage()
+        canvas.save()
+
+        pdf = output.getvalue()
+        output.close()
 
         response = flask.make_response(pdf)
         response.mimetype = 'application/pdf'

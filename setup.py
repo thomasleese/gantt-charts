@@ -26,6 +26,7 @@ setup(
         'alembic >=0.7, <1',
         'WTForms >=2.0, <3',
         'WTForms-JSON >=0.2, <1',
+        'reportlab >=3.2, <4',
     ],
     test_suite='nose.collector',
     entry_points={
