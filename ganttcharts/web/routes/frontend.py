@@ -142,25 +142,23 @@ def project_gantt_chart(project_id, format):
 
     if format == 'svg':
         response = flask.make_response(svg)
-        response.headers['Content-Type'] = 'image/svg+xml'
+        response.mimetype = 'image/svg+xml'
     elif format == 'pdf':
         pdf = cairosvg.svg2pdf(svg)
 
         response = flask.make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-
-        filename = 'Gantt Chart for {}.pdf'.format(project.name)
-        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response.mimetype = 'application/pdf'
     elif format == 'png':
         png = cairosvg.svg2png(svg)
 
         response = flask.make_response(png)
-        response.headers['Content-Type'] = 'image/png'
-
-        filename = 'Gantt Chart for {}.png'.format(project.name)
-        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response.mimetype = 'image/png'
     else:
         raise errors.NotFound()
+
+    if not flask.current_app.debug:
+        filename = 'Gantt Chart for {}.{}'.format(project.name, format)
+        response.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
     return response
 
