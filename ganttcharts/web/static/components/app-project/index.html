@@ -202,9 +202,9 @@
         this.hideEditorsExcept(this.$.entryEditor);
       },
       _deinitEntryEditor: function(e) {
+        this.$.ganttChart.stopSelecting();
         this.$.resources.stopSelecting();
         this.$.members.stopSelecting();
-        this.$.ganttChart.stopSelecting();
       },
       _entryEditorShow: function(e) {
         this.$.entryEditor.show(e.detail);

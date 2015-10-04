@@ -164,15 +164,24 @@
         return false;
       },
       startSelecting: function() {
-        this.$.ganttChart.contentDocument.startSelecting();
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.startSelecting) {
+          this.$.ganttChart.contentDocument.startSelecting();
+        }
+
         this._saveGanttChartState();
       },
       stopSelecting: function() {
-        this.$.ganttChart.contentDocument.stopSelecting();
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.stopSelecting) {
+          this.$.ganttChart.contentDocument.stopSelecting();
+        }
+
         this._saveGanttChartState();
       },
       clearSelection: function() {
-        this.$.ganttChart.contentDocument.clearSelection();
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.stopSelecting) {
+          this.$.ganttChart.contentDocument.clearSelection();
+        }
+
         this._saveGanttChartState();
       },
       selectItem: function(entry) {
