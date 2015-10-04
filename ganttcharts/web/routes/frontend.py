@@ -231,7 +231,8 @@ def account_email_addresses():
 
 
 @blueprint.route('/account/reset', methods=['GET', 'POST'])
-@blueprint.route('/account/reset/<int:account_id>/<reset_password_key>', methods=['GET', 'POST'])
+@blueprint.route('/account/reset/<int:account_id>'
+                 '/<reset_password_key>', methods=['GET', 'POST'])
 def account_reset(account_id=None, reset_password_key=None):
     if account_id is not None and reset_password_key is not None:
         account = flask.g.sql_session.query(Account) \
@@ -293,7 +294,8 @@ def account_delete_email(id):
             flask.g.sql_session.delete(email_address)
             flask.g.sql_session.commit()
         else:
-            flask.flash('You cannot delete your primary email address.', 'warning')
+            flask.flash('You cannot delete your primary email address.',
+                        'warning')
     return flask.redirect(flask.url_for('.account'))
 
 
