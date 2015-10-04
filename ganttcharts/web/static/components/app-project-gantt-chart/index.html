@@ -37,7 +37,7 @@
     <p class="text-muted" hidden$="[[ isSelecting ]]">Tap on a row to change or remove it.</p>
     <p class="text-muted" hidden$="[[ !isSelecting ]]">Tap on a row to select it.</p>
 
-    <object id="ganttChart" data="{{ ganttChartSrc }}" type="image/svg+xml"></object>
+    <object id="ganttChart" data="{{ ganttChartSrc }}" type="image/svg+xml" on-load="_setUpGanttChart"></object>
 
     <template is="dom-if" if="{{ hasGanttChart }}">
       <hr />
@@ -78,15 +78,10 @@
 
       ready: function() {
         this.isSelecting = false;
-
-        this.$.ganttChart.onload = function() {
-          this._setUpGanttChart(this.$.ganttChart.contentDocument);
-        }.bind(this);
+        this.selectedEntries = [];
       },
 
       reload: function() {
-        this._saveGanttChartState();
-
         this.ganttChartSrc = '/projects/' + this.projectId + '/gantt-chart.svg?' + new Date().getTime();
 
         requests.get('/api/projects/' + this.projectId + '/entries')
@@ -100,37 +95,45 @@
           }.bind(this));
       },
 
-      _saveGanttChartState: function() {
-        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.saveState) {
-          this._savedState = this.$.ganttChart.contentDocument.saveState();
-        } else {
-          this._savedState = null;
-        }
-      },
       _restoreGanttChartState: function() {
-        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.restoreState) {
-          this.$.ganttChart.contentDocument.restoreState(this._savedState);
+        console.log('Restoring Gantt chart state.');
+
+        if (this.isSelecting) {
+          this.$.ganttChart.contentDocument.startSelecting();
+        } else {
+          this.$.ganttChart.contentDocument.stopSelecting();
+        }
+
+        this.$.ganttChart.contentDocument.clearSelection();
+        for (var i = 0; i < this.selectedEntries.length; i++) {
+          this.$.ganttChart.contentDocument.selectEntry(this.selectedEntries[i]);
         }
       },
       _setUpGanttChart: function(ganttChart) {
+        console.log('Setting up Gantt chart.');
+
         this._restoreGanttChartState();
 
-        ganttChart.addEventListener('open-entry', function(e) {
+        this.$.ganttChart.contentDocument.addEventListener('open-entry', function(e) {
           this.fire('open', this.entries[e.detail]);
-          this._saveGanttChartState();
         }.bind(this));
 
-        ganttChart.addEventListener('select-entry', function(e) {
+        this.$.ganttChart.contentDocument.addEventListener('select-entry', function(e) {
           this.fire('select', this.entries[e.detail]);
-          this._saveGanttChartState();
+
+          this.selectedEntries.push(e.detail);
         }.bind(this));
 
-        ganttChart.addEventListener('deselect-entry', function(e) {
+        this.$.ganttChart.contentDocument.addEventListener('deselect-entry', function(e) {
           this.fire('deselect', this.entries[e.detail]);
-          this._saveGanttChartState();
+
+          var index = this.selectedEntries.indexOf(e.detail);
+          if (index !== -1) {
+            this.selectedEntries.splice(index, 1);
+          }
         }.bind(this));
 
-        var svg = ganttChart.querySelector('svg');
+        var svg = this.$.ganttChart.contentDocument.querySelector('svg');
         if (svg) {
           this.$.ganttChart.width = svg.getAttribute('width');
           this.$.ganttChart.height = svg.getAttribute('height');
@@ -168,27 +171,39 @@
           this.$.ganttChart.contentDocument.startSelecting();
         }
 
-        this._saveGanttChartState();
+        this.isSelecting = true;
       },
       stopSelecting: function() {
         if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.stopSelecting) {
           this.$.ganttChart.contentDocument.stopSelecting();
         }
 
-        this._saveGanttChartState();
+        this.isSelecting = false;
+        this.selectedEntries = [];
       },
       clearSelection: function() {
         if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.stopSelecting) {
           this.$.ganttChart.contentDocument.clearSelection();
         }
 
-        this._saveGanttChartState();
+        this.selectedEntries = [];
       },
       selectItem: function(entry) {
-        this.$.ganttChart.contentDocument.selectEntry(entry.id);
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.selectEntry) {
+          this.$.ganttChart.contentDocument.selectEntry(entry.id);
+        }
+
+        this.selectedEntries.push(entry.id);
       },
       unselectItem: function(entry) {
-        this.$.ganttChart.contentDocument.deselectEntry(entry.id);
+        if (this.$.ganttChart.contentDocument && this.$.ganttChart.contentDocument.deselectEntry) {
+          this.$.ganttChart.contentDocument.deselectEntry(entry.id);
+        }
+
+        var index = this.selectedEntries.indexOf(entry.id);
+        if (index !== -1) {
+          this.selectedEntries.splice(index, 1);
+        }
       },
     });
   </script>
