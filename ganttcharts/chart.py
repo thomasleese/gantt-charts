@@ -159,7 +159,8 @@ class Chart:
 
         start = self.add_hours_to_date(self.start, first_zero)
         end = self.add_hours_to_date(start, length)
-        if end.hour == self.project.calendar.work_starts_at.hour:
+
+        if start != end and end.hour == self.project.calendar.work_starts_at.hour:
             end = end.replace(hour=self.project.calendar.work_ends_at.hour)
             end -= self.project.calendar.business_day
 
@@ -282,7 +283,7 @@ class Chart:
         first_zero = matrix[row,:].nonzero()[0][0]
         last_zero = matrix[row,:].nonzero()[0][-1]
 
-        #print('Moving', entry.name, 'by', amount)
+        # print('Moving', entry.name, 'by', amount)
 
         matrix = self.upsize(matrix, cols=max(last_zero + 2, matrix.shape[1]))
 
