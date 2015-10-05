@@ -7,7 +7,8 @@ from werkzeug.utils import cached_property
 import numpy as np
 
 
-_Block = namedtuple('Block', ['index', 'chart', 'entry', 'start', 'end', 'length'])
+_Block = namedtuple('Block',
+                    ['index', 'chart', 'entry', 'start', 'end', 'length'])
 
 
 class InvalidGanttChart(ValueError):
@@ -96,17 +97,17 @@ class Chart:
 
         existence_matrix = self.produce_existence_matrix()
 
-        #print('-- EXISTENCE MATRIX 1 --')
-        #print(existence_matrix)
+        # print('-- EXISTENCE MATRIX 1 --')
+        # print(existence_matrix)
 
         existence_matrix = self.assign_resources(existence_matrix)
 
-        #print('-- EXISTENCE MATRIX 2 --')
-        #print(existence_matrix)
+        # print('-- EXISTENCE MATRIX 2 --')
+        # print(existence_matrix)
 
         self.blocks = OrderedDict()
         for i, entry in enumerate(self.entries):
-            row = existence_matrix[i,:]
+            row = existence_matrix[i, :]
             self.blocks[entry] = self.block_for_row(i, entry, row)
 
         self.end = max(block.end for block in self.blocks.values())
@@ -118,7 +119,9 @@ class Chart:
         except AttributeError:
             pass
 
-        start_date = datetime.datetime.combine(self.project.calendar.start_date, self.project.calendar.work_starts_at)
+        start_date = datetime.datetime.combine(
+            self.project.calendar.start_date,
+            self.project.calendar.work_starts_at)
         start_date = start_date.replace(minute=0, second=0)
 
         bday = self.project.calendar.business_day
@@ -129,19 +132,20 @@ class Chart:
         return start_date
 
     def add_hours_to_date(self, date, duration):
-        #print('Adding', duration, 'hours to', date)
+        # print('Adding', duration, 'hours to', date)
 
-        bday = self.project.calendar.business_day
-        business_hours = self.project.calendar.business_day_length
+        calendar = self.project.calendar
+        bday = calendar.business_day
+        business_hours = calendar.business_day_length
 
         days = duration // business_hours
         new_date = date + days * bday
 
         hours = (duration - days * business_hours)
 
-        hours_left = self.project.calendar.work_ends_at.hour - new_date.hour
+        hours_left = calendar.work_ends_at.hour - new_date.hour
         if hours >= hours_left:
-            new_date = new_date.replace(hour=self.project.calendar.work_starts_at.hour)
+            new_date = new_date.replace(hour=calendar.work_starts_at.hour)
             hours -= hours_left
             new_date += bday
 
@@ -160,13 +164,15 @@ class Chart:
         start = self.add_hours_to_date(self.start, first_zero)
         end = self.add_hours_to_date(start, length)
 
-        if start != end and end.hour == self.project.calendar.work_starts_at.hour:
-            end = end.replace(hour=self.project.calendar.work_ends_at.hour)
-            end -= self.project.calendar.business_day
+        if start != end:  # for 0 duration stuff
+            if end.hour == self.project.calendar.work_starts_at.hour:
+                end = end.replace(hour=self.project.calendar.work_ends_at.hour)
+                end -= self.project.calendar.business_day
 
         return Block(i, self, entry, start, end, length)
 
     def produce_existence_matrix(self):
+        calendar = self.project.calendar
         matrix = np.zeros((len(self.entries), 0))
 
         for i, entry in enumerate(self.entries):
@@ -185,14 +191,16 @@ class Chart:
                 start = 0
 
             if entry.min_start_date:
-                bday = self.project.calendar.business_day
+                bday = calendar.business_day
 
                 min_start_date = entry.min_start_date
-                if min_start_date.hour >= self.project.calendar.work_ends_at.hour:
+                if min_start_date.hour >= calendar.work_ends_at.hour:
                     min_start_date += bday
-                    min_start_date = min_start_date.replace(hour=self.project.calendar.work_starts_at.hour)
-                if min_start_date.hour < self.project.calendar.work_starts_at.hour:
-                    min_start_date = min_start_date.replace(hour=self.project.calendar.work_starts_at.hour)
+                    min_start_date = min_start_date.replace(
+                        hour=calendar.work_starts_at.hour)
+                if min_start_date.hour < calendar.work_starts_at.hour:
+                    min_start_date = min_start_date.replace(
+                        hour=calendar.work_starts_at.hour)
 
                 days = -1
                 while True:
@@ -202,9 +210,9 @@ class Chart:
                     else:
                         break
 
-                hours = min_start_date.hour - self.project.calendar.work_starts_at.hour
+                hours = min_start_date.hour - calendar.work_starts_at.hour
 
-                min_start = self.project.calendar.business_day_length * days + hours
+                min_start = calendar.business_day_length * days + hours
 
                 start = max(min_start, start)
 
@@ -240,13 +248,17 @@ class Chart:
                 for i, entry in enumerate(self.entries):
                     for entry_resource in entry.resources:
                         if entry_resource.resource == resource:
-                            for j, value in enumerate(np.nditer(existence_matrix[i, :])):
+                            iterator = np.nditer(existence_matrix[i, :])
+                            for j, value in enumerate(iterator):
                                 if value != 0:
-                                    matrix[i,j] = entry_resource.amount
+                                    matrix[i, j] = entry_resource.amount
 
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
                     if value > resource.amount:
-                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, pick_entry_to_move(matrix[:, i]))
+                        existence_matrix = \
+                            self.move_entry_in_existence_matrix(
+                                existence_matrix,
+                                pick_entry_to_move(matrix[:, i]))
                         had_a_problem = True
                         break
 
@@ -255,13 +267,17 @@ class Chart:
                 for i, entry in enumerate(self.entries):
                     for entry_member in entry.members:
                         if entry_member.member == member:
-                            for j, value in enumerate(np.nditer(existence_matrix[i,:])):
+                            iterator = np.nditer(existence_matrix[i, :])
+                            for j, value in enumerate(iterator):
                                 if value != 0:
                                     matrix[i, j] = 1
 
                 for i, value in enumerate(np.nditer(matrix.sum(axis=0))):
                     if value > 1:
-                        existence_matrix = self.move_entry_in_existence_matrix(existence_matrix, pick_entry_to_move(matrix[:, i]))
+                        existence_matrix = \
+                            self.move_entry_in_existence_matrix(
+                                existence_matrix,
+                                pick_entry_to_move(matrix[:, i]))
                         had_a_problem = True
                         break
 
@@ -280,18 +296,19 @@ class Chart:
 
     def move_entry_in_existence_matrix(self, matrix, entry, amount=1):
         row = self.entries.index(entry)
-        first_zero = matrix[row,:].nonzero()[0][0]
-        last_zero = matrix[row,:].nonzero()[0][-1]
+        first_zero = matrix[row, :].nonzero()[0][0]
+        last_zero = matrix[row, :].nonzero()[0][-1]
 
         # print('Moving', entry.name, 'by', amount)
 
         matrix = self.upsize(matrix, cols=max(last_zero + 2, matrix.shape[1]))
 
-        matrix[row,first_zero] = 0
-        matrix[row,last_zero + 1] = 1
+        matrix[row, first_zero] = 0
+        matrix[row, last_zero + 1] = 1
 
         for dependency in entry.dependees:
-            matrix = self.move_entry_in_existence_matrix(matrix, dependency.parent, amount)
+            matrix = self.move_entry_in_existence_matrix(
+                matrix, dependency.parent, amount)
 
         return matrix
 
