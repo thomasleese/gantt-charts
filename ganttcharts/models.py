@@ -1,5 +1,6 @@
 """Models."""
 
+import colorsys
 import datetime
 from enum import Enum
 import hashlib
@@ -131,6 +132,14 @@ class Account(Base):
             + datetime.timedelta(hours=2)
 
         self.send_reset_password_email()
+
+    @property
+    def colour(self):
+        r, g, b = colorsys.hls_to_rgb(self.hue, 0.5, 0.5)
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        return 'rgb({}, {}, {})'.format(r, g, b)
 
     def as_json(self):
         return {
