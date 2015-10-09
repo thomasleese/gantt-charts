@@ -5,6 +5,7 @@ Routes for the front-end.
 import datetime
 import functools
 import io
+import math
 
 import cairosvg
 import flask
@@ -149,22 +150,53 @@ def project_gantt_chart(project_id, format):
         png = cairosvg.svg2png(svg)
         image = PIL.Image.open(io.BytesIO(png))
 
-        page_size = reportlab.lib.pagesizes.A4[::-1]  # landscape
+        page_size = reportlab.lib.pagesizes.A4
+        page_margin = 30
 
         output = io.BytesIO()
         canvas = reportlab.pdfgen.canvas.Canvas(output, pagesize=page_size)
 
-        image_width = page_size[0]
-        image_height = image.height * (image_width / image.width)
-        y = (page_size[1] - image_height) / 2
-        canvas.drawImage(reportlab.lib.utils.ImageReader(io.BytesIO(png)), 0,
-                         y, width=image_width, height=image_height)
-        canvas.drawCentredString(page_size[0] / 2, page_size[1] - 40,
-                                 'Gantt Chart for {}'.format(project.name))
-        canvas.drawCentredString(page_size[0] / 2, page_size[1] - 60,
-                                 '{} to {}'.format(chart.start.date(),
-                                                   chart.end.date()))
-        canvas.showPage()
+        def draw_title_header():
+            x = page_size[0] / 2
+            y = page_size[1] - page_margin
+            title1 = 'Gantt Chart for {}'.format(project.name)
+            title2 = '{} to {}'.format(chart.start.date(), chart.end.date())
+            canvas.setFont('Helvetica', 14)
+            canvas.drawCentredString(x, y - 10, title1)
+            canvas.setFont('Helvetica', 10)
+            canvas.drawCentredString(x, y - 25, title2)
+
+        chart_x = page_margin
+        chart_y = page_margin
+        chart_width = int(page_size[0] - chart_x - page_margin)
+        chart_height = int(page_size[1] - chart_y - page_margin - 50)
+
+        new_height = int(chart_height)
+        new_width = int(image.width * (new_height / image.height))
+        image = image.resize((new_width, new_height), PIL.Image.ANTIALIAS)
+
+        def split_image():
+            for i in range(math.ceil(image.width / chart_width)):
+                x2 = (i + 1) * chart_width
+                if x2 >= image.width:
+                    box = (i * chart_width, 0, image.width, image.height)
+
+                    final = PIL.Image.new(mode='RGB',
+                                          size=(chart_width, chart_height),
+                                          color=(255, 255, 255))
+                    final.paste(image.crop(box), (0, 0))
+                    yield final
+                else:
+                    box = (i * chart_width, 0, x2, image.height)
+                    yield image.crop(box)
+
+        for subimage in split_image():
+            canvas.drawImage(reportlab.lib.utils.ImageReader(subimage),
+                             chart_x, chart_y, width=chart_width,
+                             height=chart_height)
+            draw_title_header()
+            canvas.showPage()
+
         canvas.save()
 
         pdf = output.getvalue()
