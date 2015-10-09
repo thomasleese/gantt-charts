@@ -71,6 +71,9 @@
     /* ]]> */
     </style>
 
+    <rect x="0" y="0" width="{{ fullWidth }}" height="{{ fullHeight }}"
+          fill="white" />
+
     {% if chart %}
         <g id="non-working-days" transform="translate({{ entryNameColumnWidth }} 0)">
             {% for day in chart.days %}
