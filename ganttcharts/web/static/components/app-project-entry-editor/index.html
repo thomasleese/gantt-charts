@@ -27,6 +27,10 @@
         border-bottom-left-radius: 0;
         width: 100%;
       }
+
+      input[type=datetime-local] {
+        line-height: 1.43rem !important;
+      }
     </style>
 
     <app-delete-modal id="deleteModal" what="entry" on-delete="_handleActuallyDelete"></app-delete-modal>
@@ -87,13 +91,14 @@
         </div>
 
         <div class="form-group">
-          <label class="c-input c-checkbox">
-            <input type="checkbox" id="formEnableMinStartDate" on-change="_handleMinStartDateChange" />
-            <span class="c-indicator"></span>
-            Must start on or after
-          </label>
+          <label class="control-label">Must start on or after</label>
 
-          <input type="datetime-local" id="formMinStartDate" class="form-control" placeholder="Must start after" on-change="_handleMinStartDateChange" required />
+          <div class="input-group">
+            <input type="datetime-local" id="formMinStartDate" class="form-control" placeholder="Must start after" on-change="_handleMinStartDateChange" required />
+            <span class="input-group-btn">
+              <button class="btn btn-secondary" type="button" on-click="_handleMinStartDateClear">Clear</button>
+            </span>
+          </div>
         </div>
       </form>
 
@@ -190,16 +195,11 @@
         this._submitEntryChange('pessimistic_time_estimate', value);
       },
       _handleMinStartDateChange: function(e) {
-        var dom = Polymer.dom(e);
-        if (dom.rootTarget === this.$.formMinStartDate) {
-          this.$.formEnableMinStartDate.checked = true;
-        }
-
-        if (this.$.formEnableMinStartDate.checked && this.$.formMinStartDate.value) {
-          this._submitEntryChange('min_start_date', this.$.formMinStartDate.value);
-        } else {
-          this._submitEntryChange('min_start_date', null);
-        }
+        this._submitEntryChange('min_start_date', this.$.formMinStartDate.value);
+      },
+      _handleMinStartDateClear: function(e) {
+        this.$.formMinStartDate.value = '';
+        this._submitEntryChange('min_start_date', null);
       },
       _handleDelete: function(e) {
         this.$.deleteModal.show(this.$.cardFormName.value, this.entryId);
@@ -273,9 +273,6 @@
         this.$.formPessimisticUnits.value = pessimisticUnits;
 
         this.$.formMinStartDate.value = entry.min_start_date;
-        if (entry.min_start_date) {
-          this.$.formEnableMinStartDate.checked = true;
-        }
 
         this.$.editor.show(entry.name);
         this.fire('show', entry);
