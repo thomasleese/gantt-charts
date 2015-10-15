@@ -8,7 +8,7 @@
 
 {% set entryNameColumnWidth = ((chart.max_entry_name if chart else 0 + 1) * charWidth + 12) | round(method='ceil') | int %}
 {% set entryNameColumnHeight = blockHeight %}
-{% set hourlyColumnWidth = 9 %}
+{% set hourlyColumnWidth = 2 %}
 {% set dailyColumnWidth = hourlyColumnWidth * project.calendar.business_day_length %}
 {% set dailyColumnHeight = 80 %}
 
@@ -31,7 +31,7 @@
         {% set counter = Counter() %}
 
         {% for entry_resource in entry.resources | reverse %}
-            {% set width = 9 * entry_resource.amount %}
+            {% set width = hourlyColumnWidth * entry_resource.amount %}
             <rect x="{{ -counter.count(width + 2) - width }}" y="0.5"
                   width="{{ width }}" height="{{ height - 1 }}" stroke="none"
                   fill="{{ entry_resource.resource.colour }}" />
@@ -96,16 +96,18 @@
 
         <g id="days-headings" transform="translate({{ entryNameColumnWidth }} 0)">
             {% for day in chart.days %}
-                <line x1="{{ dailyColumnWidth * loop.index0 + dailyColumnHeight * 1.732 }}"
-                      y1="0"
-                      x2="{{ dailyColumnWidth * loop.index0 }}"
-                      y2="{{ dailyColumnHeight }}"
-                      stroke="{{ lightGrey }}" stroke-width="1" />
+                {% if loop.index0 % 3 == 0 %}
+                    <line x1="{{ dailyColumnWidth * loop.index0 + dailyColumnHeight * 1.732 }}"
+                          y1="0"
+                          x2="{{ dailyColumnWidth * loop.index0 }}"
+                          y2="{{ dailyColumnHeight }}"
+                          stroke="{{ lightGrey }}" stroke-width="1" />
 
-                <text x="-1" y="-5"
-                      transform="rotate(-30 {{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }}) translate({{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }})">
-                    {{ day.strftime('%a %-d %b %Y') }}
-                </text>
+                    <text x="-1" y="-5"
+                          transform="rotate(-30 {{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }}) translate({{ loop.index0 * dailyColumnWidth }} {{ dailyColumnHeight }})">
+                        {{ day.strftime('%a %-d %b %Y') }}
+                    </text>
+                {% endif %}
             {% endfor %}
         </g>
 
@@ -162,7 +164,7 @@
 
                 {% for dependee in block.entry.dependees %}
                     {% set dependeeBlock = chart.blocks[dependee.parent] %}
-                    {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + hourlyColumnWidth / 2 %}
+                    {% set x2 = dependeeBlock.left_cells * hourlyColumnWidth + 5 %}
                     {% set y3 = dependeeBlock.index * blockHeight - 8 %}
 
                     <line x1="{{ (block.left_cells + block.cells) * hourlyColumnWidth }}" y1="{{ y + blockHeight / 2 }}"
