@@ -150,8 +150,8 @@ def project_gantt_chart(project_id, format):
         png = cairosvg.svg2png(svg)
         image = PIL.Image.open(io.BytesIO(png))
 
-        page_size = reportlab.lib.pagesizes.A4
-        page_margin = 30
+        page_size = tuple(reversed(reportlab.lib.pagesizes.A4))
+        page_margin = 50
 
         output = io.BytesIO()
         canvas = reportlab.pdfgen.canvas.Canvas(output, pagesize=page_size)
