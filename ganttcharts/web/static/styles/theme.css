@@ -71,3 +71,7 @@ a.text-muted:hover,
 .welcome .separator2 {
     background-image: url('../images/welcome-border-2.png');
 }
+
+.ad {
+    width: 100%;
+}
