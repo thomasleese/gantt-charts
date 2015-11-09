@@ -25,4 +25,4 @@ alembic upgrade head
 
 deactivate
 
-echo "==> App is now ready to go!"
+echo "===> App is now ready to go!"
