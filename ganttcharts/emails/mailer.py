@@ -33,7 +33,7 @@ class Mailer:
         self._smtp = None
 
     def _env_arg(self, passed_value, key, conversion=str,
-                 prefix='GANTT_CHARTS_MAIL_'):
+                 prefix='MAIL_'):
         if passed_value is not None:
             return passed_value
 
