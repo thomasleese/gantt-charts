@@ -11,7 +11,8 @@
     "postinstall": "./postinstall.sh"
   },
   "engines": {
-    "node": "5.0.0"
+    "node": "5.0.x",
+    "npm": "3.3.x"
   },
   "repository": {
     "type": "git",
