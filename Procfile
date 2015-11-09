@@ -1,2 +1,2 @@
 web: bin/web
-send-summary-emails: ganttchartsctl send-summary-emails --forever
+sendsummaryemails: ganttchartsctl send-summary-emails --forever
