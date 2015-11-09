@@ -16,7 +16,7 @@
     "ionicons": "~2.0.1",
     "iron-pages": "PolymerElements/iron-pages#~1.0.3",
     "moment": "~2.10.6",
-    "polymer": "~1.1.3"
+    "polymer": "~1.2.0"
   },
   "private": true
 }
