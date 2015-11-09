@@ -59,3 +59,19 @@ def get_sql_connection():
     if _sql_connection is None or _sql_connection.closed:
         connect_to_sql()
     return _sql_connection
+
+
+@sqlalchemy.event.listens_for(sqlalchemy.pool.Pool, 'checkout')
+def sql_ping_connection(dbapi_connection, connection_record, connection_proxy):
+    cursor = dbapi_connection.cursor()
+    try:
+        cursor.execute("SELECT 1")
+    except:
+        # optional - dispose the whole pool
+        # instead of invalidating one at a time
+        # connection_proxy._pool.dispose()
+
+        # raise DisconnectionError - pool will try
+        # connecting again up to three times before raising.
+        raise sqlalchemy.exc.DisconnectionError()
+    cursor.close()
