@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# script/bootstrap: Resolve all dependencies that the application requires to
+#                   run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Brew
+brew bundle check 2>&1 >/dev/null || {
+    echo "==> Installing Homebrew dependencies…"
+    brew bundle
+}
+
+# Python
+echo "==> Installing Python dependencies…"
+
+if [ ! -d "venv" ]; then
+    pyvenv venv
+fi
+
+source venv/bin/activate
+pip install --quiet -r requirements.txt
+pip install --quiet -e .
+deactivate
+
+# Node
+echo "==> Installing Node.js dependencies…"
+
+npm install

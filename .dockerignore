@@ -1,5 +1,0 @@
-.git
-venv
-ganttcharts.egg-info
-*.pyc
-*/bower_components

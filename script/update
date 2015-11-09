@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+script/bootstrap
+
+echo "===> Updating DB..."
+
+brew services restart postgres
+
+export DATABASE_URL=postgres://localhost/ganttcharts
+
+source venv/bin/activate
+
+alembic upgrade head
+
+deactivate
