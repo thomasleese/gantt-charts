@@ -35,3 +35,4 @@ SQLAlchemy==1.0.8
 Werkzeug==0.10.4
 WTForms==2.0.2
 WTForms-JSON==0.2.10
+-e .
