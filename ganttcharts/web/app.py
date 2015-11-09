@@ -11,7 +11,7 @@ from . import routes
 
 
 app = flask.Flask('ganttcharts.web')
-app.secret_key = os.environ['GANTT_CHARTS_SECRET_KEY']
+app.secret_key = os.environ['SECRET_KEY']
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 

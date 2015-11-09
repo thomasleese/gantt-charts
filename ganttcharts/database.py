@@ -8,6 +8,8 @@ import sqlalchemy
 from . import models
 
 
+DATABASE_URI_KEY = 'DATABASE_URL'
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,8 +17,7 @@ _sql_engine = None
 _sql_connection = None
 
 
-def get_sql_database_uri():
-    key = 'GANTT_CHARTS_SQL_URI'
+def get_sql_database_uri(key=DATABASE_URI_KEY):
     try:
         return os.environ[key]
     except KeyError:
