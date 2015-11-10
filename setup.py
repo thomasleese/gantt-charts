@@ -27,7 +27,7 @@ setup(
         'WTForms-JSON >=0.2, <1',
         'reportlab >=3.2, <4',
     ],
-    test_suite='nose.collector',
+    test_suite='tests',
     entry_points={
         'console_scripts': [
             'ganttchartsctl = ganttcharts.cli.__main__:main'
