@@ -69,8 +69,11 @@ def change_account():
 
 
 def get_project_or_404(project_id):
-    return flask.g.sql_session.query(Project) \
-        .filter(Project.id == project_id).one()
+    try:
+        return flask.g.sql_session.query(Project) \
+            .filter(Project.id == project_id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise errors.NotFound()
 
 
 def get_project_member_or_404(member_id):
