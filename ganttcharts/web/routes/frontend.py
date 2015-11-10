@@ -371,6 +371,28 @@ def account_avatar(account_id):
     return response
 
 
+@blueprint.route('/robots.txt')
+def robots():
+    text = flask.render_template('robots.txt')
+    return flask.Response(text, mimetype='text/plain')
+
+
+@blueprint.route('/sitemap.xml')
+def sitemap():
+    pages = []
+
+    ten_days_ago = (datetime.datetime.now() -
+                    datetime.timedelta(days=10)).date().isoformat()
+
+    for rule in flask.current_app.url_map.iter_rules():
+        if 'GET' in rule.methods and not rule.arguments:
+            pages.append([flask.url_for(rule.endpoint, _external=True),
+                          ten_days_ago, 'weekly', 1])
+
+    sitemap = flask.render_template('sitemap.xml', pages=pages)
+    return flask.Response(sitemap, mimetype='application/xml')
+
+
 @blueprint.errorhandler(404)
 def page_not_found(e):
     return flask.render_template('errors/404.html'), 404
