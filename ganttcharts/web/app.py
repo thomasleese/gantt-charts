@@ -62,6 +62,11 @@ def remove_session(*args, **kwargs):
     SqlSession.remove()
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return flask.render_template('errors/404.html')
+
+
 @app.errorhandler(500)
 def server_error(e):
     return flask.render_template('errors/500.html')
