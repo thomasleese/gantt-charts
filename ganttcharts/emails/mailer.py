@@ -23,13 +23,17 @@ class Mailer:
                  use_ssl=None, use_lmtp=None, user=None, password=None,
                  testing=None):
         self.testing = self._env_arg(testing, 'TESTING', bool)
-        self.host = self._env_arg(host, 'HOST')
-        self.port = self._env_arg(port, 'PORT')
-        self.use_starttls = self._env_arg(use_starttls, 'USE_STARTTLS', bool)
-        self.use_ssl = self._env_arg(use_ssl, 'USE_SSL', bool)
-        self.use_lmtp = self._env_arg(use_lmtp, 'USE_LMTP', bool)
-        self.user = self._env_arg(user, 'USER')
-        self.password = self._env_arg(password, 'PASSWORD')
+
+        if not self.testing:
+            self.host = self._env_arg(host, 'HOST')
+            self.port = self._env_arg(port, 'PORT')
+            self.use_starttls = self._env_arg(use_starttls, 'USE_STARTTLS',
+                                              bool)
+            self.use_ssl = self._env_arg(use_ssl, 'USE_SSL', bool)
+            self.use_lmtp = self._env_arg(use_lmtp, 'USE_LMTP', bool)
+            self.user = self._env_arg(user, 'USER')
+            self.password = self._env_arg(password, 'PASSWORD')
+
         self._smtp = None
 
     def _env_arg(self, passed_value, key, conversion=str,

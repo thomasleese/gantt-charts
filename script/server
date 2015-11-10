@@ -19,5 +19,6 @@ export ENV=development
 
 export DATABASE_URL=postgres://localhost/ganttcharts
 export SECRET_KEY=a_secret_key
+export MAIL_TESTING=true
 
 foreman start
