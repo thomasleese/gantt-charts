@@ -12,21 +12,38 @@ set -e
 cd "$(dirname "$0")/.."
 
 # Brew
-brew bundle check 2>&1 >/dev/null || {
-    progress "Installing Homebrew dependencies…"
-    brew bundle
-}
+if [ -z "$CI" ]; then
+    brew bundle check 2>&1 >/dev/null || {
+        progress "Installing Homebrew dependencies…"
+        brew bundle
+    }
+fi
 
 # Python
 progress "Installing Python dependencies…"
 
 if [ ! -d "venv" ]; then
-    pyvenv venv
+    for pyvenv in pyvenv pyvenv-3.5; do
+        if hash $pyvenv 2>/dev/null; then
+            $pyvenv venv
+            break
+        fi
+    done
+fi
+
+if [ ! -d "venv" ]; then
+    echo "Virtual environment not created."
+    exit 1
+fi
+
+PIP_FLAGS=
+if [ -z "$CI" ]; then
+    PIP_FLAGS="--quiet"
 fi
 
 source venv/bin/activate
-pip install --quiet -r requirements.txt
-pip install --quiet -e .
+pip install $PIP_FLAGS -r requirements.txt
+pip install $PIP_FLAGS -e .
 deactivate
 
 # Node
@@ -35,6 +52,8 @@ progress "Installing Node.js dependencies…"
 npm install
 
 # Services
-progress "Starting services…"
+if [ -z "$CI" ]; then
+    progress "Starting services…"
 
-brew services restart postgres
+    brew services restart postgres
+fi
