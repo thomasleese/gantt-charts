@@ -1,0 +1,16 @@
+addons:
+  postgresql: '9.3'
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
+      - python3.5-dev
+      - python3.5-venv
+
+services:
+  - postgresql
+
+script:
+  - bash -n script/*
+  - bash script/cibuild

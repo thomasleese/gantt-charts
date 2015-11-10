@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# script/test: Run test suite for application. Optionallly pass in a path to an
+#              individual test file to run a single test.
+
+function progress {
+    echo "$(tput bold)$(tput setaf 4)==>$(tput sgr0) $(tput bold)$1$(tput sgr0)"
+}
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ -z "$CI" ]; then
+    script/update
+else
+    script/setup
+fi
+
+progress "Running tests…"
+
+source venv/bin/activate
+
+if [ -n "$1" ]; then
+  # pass arguments to test call. This is useful for calling a single test.
+  ./setup.py nosetests $*
+else
+  ./setup.py nosetests
+fi
+
+deactivate
