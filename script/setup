@@ -18,7 +18,7 @@ progress "Setting up DB…"
 dropdb --if-exists ganttcharts
 createdb ganttcharts
 
-export DATABASE_URL=postgres://localhost/ganttcharts
+export DATABASE_URL=postgresql://localhost/ganttcharts
 
 source venv/bin/activate
 

@@ -14,7 +14,7 @@ script/bootstrap
 
 progress "Updating DB…"
 
-export DATABASE_URL=postgres://localhost/ganttcharts
+export DATABASE_URL=postgresql://localhost/ganttcharts
 
 source venv/bin/activate
 
