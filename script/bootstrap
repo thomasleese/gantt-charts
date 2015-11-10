@@ -36,9 +36,14 @@ if [ ! -d "venv" ]; then
     exit 1
 fi
 
+PIP_FLAGS=
+if [ -z "$CI" ]; then
+    PIP_FLAGS="--quiet"
+fi
+
 source venv/bin/activate
-pip install --quiet -r requirements.txt
-pip install --quiet -e .
+pip install $PIP_FLAGS -r requirements.txt
+pip install $PIP_FLAGS -e .
 deactivate
 
 # Node
