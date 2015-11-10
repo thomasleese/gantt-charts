@@ -373,4 +373,4 @@ def account_avatar(account_id):
 
 @blueprint.errorhandler(404)
 def page_not_found(e):
-    return flask.render_template('errors/404.html')
+    return flask.render_template('errors/404.html'), 404

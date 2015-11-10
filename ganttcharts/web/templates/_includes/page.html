@@ -36,28 +36,28 @@
 
   <body>
     <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-      <a class="navbar-brand" href="{{ url_for('.home') }}">Gantt Charts &nbsp;<span class="ion-ios-home"></span></a>
+      <a class="navbar-brand" href="{{ url_for('frontend.home') }}">Gantt Charts &nbsp;<span class="ion-ios-home"></span></a>
 
       {% if g.account %}
         <ul class="nav navbar-nav">
           {% for star in g.account.stars %}
             <li class="nav-item {% if current_project == star.project.id %}active{% endif %}">
-              <a class="nav-link" href="{{ url_for('.view_project', project_id=star.project.id) }}">{{ star.project.name }}</a>
+              <a class="nav-link" href="{{ url_for('frontend.view_project', project_id=star.project.id) }}">{{ star.project.name }}</a>
             </li>
           {% endfor %}
         </ul>
 
         <ul class="nav navbar-nav pull-right">
           <li class="nav-item {% if section == 'account' %}active{% endif %}">
-            <a class="nav-link" href="{{ url_for('.account') }}">My Account</a>
+            <a class="nav-link" href="{{ url_for('frontend.account') }}">My Account</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('.logout') }}">Log out</a>
+            <a class="nav-link" href="{{ url_for('frontend.logout') }}">Log out</a>
           </li>
         </ul>
       {% else %}
-        <form class="form-inline navbar-form pull-right hidden-sm-down" action="{{ url_for('.login') }}" method="POST">
+        <form class="form-inline navbar-form pull-right hidden-sm-down" action="{{ url_for('frontend.login') }}" method="POST">
           <div class="form-group">
             <input type="email" name="email_address" placeholder="Email address" class="form-control">
           </div>
@@ -69,7 +69,7 @@
 
         <ul class="nav navbar-nav pull-right hidden-md-up">
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('.login') }}">Log in</a>
+            <a class="nav-link" href="{{ url_for('frontend.login') }}">Log in</a>
           </li>
         </ul>
       {% endif %}

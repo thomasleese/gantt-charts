@@ -64,12 +64,12 @@ def remove_session(*args, **kwargs):
 
 @app.errorhandler(404)
 def not_found(e):
-    return flask.render_template('errors/404.html')
+    return flask.render_template('errors/404.html'), 404
 
 
 @app.errorhandler(500)
 def server_error(e):
-    return flask.render_template('errors/500.html')
+    return flask.render_template('errors/500.html'), 500
 
 
 class Counter:
