@@ -1,17 +1,17 @@
 addons:
   postgresql: '9.3'
+
   apt:
     sources:
-    - deadsnakes
+      - deadsnakes
     packages:
-    - python3.5
-    - python3.5-dev
-    - python3.5-venv
+      - python3.5
+      - python3.5-dev
+      - python3.5-venv
+
 services:
-- postgresql
+  - postgresql
+
 script:
-- bash -n script/*
-- bash script/cibuild
-notifications:
-  slack:
-    secure: O4+sTl15DJC309Txothip9J67UoEpAQ9UfcHcfiRGWMqrcDdaJWuFy2/rvlHZOzvgtdCxd3OfG5GPpBbQ9xDEo41DvybeYX+ZK1n6FrDGoWUZv6NpEe6s2Jeq8JkkYWV2gfoGh1wSR4O+oajhTeCsRXdZqhFNQmENnPYEWfhZf9mZad6Rqd0AX3Dvjp6LDU92iX9NjqThrKtK5pq9DCNbjB7bzhpYCpp/l4g+4otCG3UR3dO7QpA9EsBte3vjl0OsCOYKfeOE8ROXqK00HxL6lMabzWG5tJ8n0ugNr0Qv/NrhagRc+uxVwoXIkWeNzqc+pKvULQgbdLa8Q3pO+++/OP2sPqSa4D3r+LRSR3aOT6/VaNu+6WXKVokYzxj6yOx48ZG6R91xUQoHS/GeR1EC/U/t6EPRZqO4OQ0EKEugA+DpqoOgHdG2dDKBYIhG0AQ1CReo6X8fcl6oHdqvw3Ag4dj7cEuwETE7yAGWI5chj4y9MbrZENTbN9bTEpmSUWHg4zw/6VM1dTSUnFKT4KqFW66tvrMJsUXkj5w7aZIhPzgN7a9FZcBGIaU/7cE0H5VbSAjqcsjUPY+/BC3v+5MtpJPjFIWoVM+JDAMWgCPvGmPxg6vDX93z6qVdDTmnhW3eBQrfO423jFSPPy2AqKPByoaOuSexIsd2UFSx2kOoMQ=
+  - bash -n script/*
+  - bash script/cibuild
