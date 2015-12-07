@@ -7,6 +7,8 @@ import functools
 import io
 import math
 
+import cairocffi
+cairocffi.install_as_pycairo()
 import cairosvg
 import flask
 import reportlab.pdfgen.canvas
