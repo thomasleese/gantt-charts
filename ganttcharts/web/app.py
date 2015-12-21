@@ -1,9 +1,7 @@
-import logging
 import os
 
 import flask
-import rollbar
-import rollbar.contrib.flask
+from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 
 from .. import database
@@ -15,20 +13,7 @@ app = flask.Flask('ganttcharts.web')
 app.secret_key = os.environ['SECRET_KEY']
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
-
-@app.before_first_request
-def initialise_rollbar():
-    try:
-        access_token = os.environ['ROLLBAR_ACCESS_TOKEN']
-    except KeyError:
-        return
-
-    rollbar.init(access_token, 'gantt-charts',
-                 root=os.path.dirname(os.path.realpath(__file__)),
-                 allow_logging_basic_config=False)
-
-    flask.got_request_exception.connect(rollbar.contrib.flask.report_exception,
-                                        app)
+sentry = Sentry(app)
 
 
 @app.before_first_request
