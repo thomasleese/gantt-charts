@@ -42,37 +42,37 @@
         <p class="card-text">Set the working week for your project here.</p>
 
         <div class="card-group working-week">
-          <div id="worksOnMonday" class="card text-center" on-click="_toggleMonday">
+          <div id="worksOnMonday" class="card text-xs-center" on-click="_toggleMonday">
             <div class="card-block">
               <p class="card-text">Monday</p>
             </div>
           </div>
-          <div id="worksOnTuesday" class="card text-center" on-click="_toggleTuesday">
+          <div id="worksOnTuesday" class="card text-xs-center" on-click="_toggleTuesday">
             <div class="card-block">
               <p class="card-text">Tuesday</p>
             </div>
           </div>
-          <div id="worksOnWednesday" class="card text-center" on-click="_toggleWednesday">
+          <div id="worksOnWednesday" class="card text-xs-center" on-click="_toggleWednesday">
             <div class="card-block">
               <p class="card-text">Wednesday</p>
             </div>
           </div>
-          <div id="worksOnThursday" class="card text-center" on-click="_toggleThursday">
+          <div id="worksOnThursday" class="card text-xs-center" on-click="_toggleThursday">
             <div class="card-block">
               <p class="card-text">Thursday</p>
             </div>
           </div>
-          <div id="worksOnFriday" class="card text-center" on-click="_toggleFriday">
+          <div id="worksOnFriday" class="card text-xs-center" on-click="_toggleFriday">
             <div class="card-block">
               <p class="card-text">Friday</p>
             </div>
           </div>
-          <div id="worksOnSaturday" class="card text-center" on-click="_toggleSaturday">
+          <div id="worksOnSaturday" class="card text-xs-center" on-click="_toggleSaturday">
             <div class="card-block">
               <p class="card-text">Saturday</p>
             </div>
           </div>
-          <div id="worksOnSunday" class="card text-center" on-click="_toggleSunday">
+          <div id="worksOnSunday" class="card text-xs-center" on-click="_toggleSunday">
             <div class="card-block">
               <p class="card-text">Sunday</p>
             </div>
@@ -82,7 +82,7 @@
         <br />
 
         <form class="form-inline">
-          <div class="form-group m-r-lg">
+          <div class="form-group m-r-3">
             <label class="control-label"for="workingDayStart">Working day starts at:</label>
             <input class="form-control" type="time" id="workingDayStart" placeholder="Start of working day" on-change="_handleWorkingDayStartChange" />
           </div>
@@ -108,22 +108,22 @@
               <li class="list-group-item" on-click="_handleEditHoliday">
                 <span class="m-r">{{ holiday.name }}</span>
                 <small><span>{{ holiday.start }}</span> — <span>{{ holiday.end }}</span></small>
-                <button class="btn btn-sm btn-danger pull-right" on-click="_handleDeleteHoliday"><span class="ion-trash-a m-r"></span>Delete</button>
+                <button class="btn btn-sm btn-danger pull-xs-right" on-click="_handleDeleteHoliday"><span class="ion-trash-a m-r"></span>Delete</button>
               </li>
             </template>
           </ul>
 
           <br />
-          <button type="button" class="btn btn-success pull-right" on-click="_handleNewHoliday">
+          <button type="button" class="btn btn-success pull-xs-right" on-click="_handleNewHoliday">
             <span class="ion-plus-round m-r"></span>New holiday
           </button>
           <div class="clearfix"></div>
         </template>
 
         <template is="dom-if" if="{{ !hasHolidays }}">
-          <p class="lead text-center">This project hasn't got any holidays.</p>
-          <p class="text-center">Click the button below to create one.</p>
-          <p class="text-center">
+          <p class="lead text-xs-center">This project hasn't got any holidays.</p>
+          <p class="text-xs-center">Click the button below to create one.</p>
+          <p class="text-xs-center">
             <button type="button" class="btn btn-success" on-click="_handleNewHoliday"><span class="ion-plus-round m-r"></span>New holiday</button>
           </p>
         </template>

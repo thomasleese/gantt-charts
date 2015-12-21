@@ -46,22 +46,22 @@
             <span>{{ resource.name }}</span>
             <small class="m-l">{{ resource.description }}</small>
             <span class="label label-default m-l" hidden$="{{ !resource.reusable }}">Reusable</span>
-            <button class="btn btn-danger btn-sm pull-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
+            <button class="btn btn-danger btn-sm pull-xs-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
           </li>
         </template>
       </ul>
 
       <br />
-      <button type="button" class="btn btn-success pull-right" on-click="_handleNewResource">
+      <button type="button" class="btn btn-success pull-xs-right" on-click="_handleNewResource">
         <span class="ion-plus-round m-r"></span>New resource
       </button>
       <div class="clearfix"></div>
     </template>
 
     <template is="dom-if" if="{{ !hasResources }}">
-      <p class="lead text-center">This project hasn't got any resources.</p>
-      <p class="text-center">Click the button below to create one.</p>
-      <p class="text-center">
+      <p class="lead text-xs-center">This project hasn't got any resources.</p>
+      <p class="text-xs-center">Click the button below to create one.</p>
+      <p class="text-xs-center">
         <button type="button" class="btn btn-success" on-click="_handleNewResource"><span class="ion-plus-round m-r"></span>New resource</button>
       </p>
     </template>

@@ -65,13 +65,13 @@
           <img class="img-avatar m-r" src="{{ member.account.photo_url }}" width="32" height="32" />
           <span>{{ member.account.display_name }}</span>
           <span class="label label-default m-l">{{ member.access_level.description }}</span>
-          <button class="btn btn-danger btn-sm pull-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
+          <button class="btn btn-danger btn-sm pull-xs-right" hidden$="[[ isSelecting ]]" on-click="_handleDelete"><span class="icon ion-trash-a m-r"></span>Delete</button>
         </li>
       </template>
     </ul>
 
     <br />
-    <button type="button" class="btn btn-success pull-right" on-click="_handleNewMember">
+    <button type="button" class="btn btn-success pull-xs-right" on-click="_handleNewMember">
       <span class="ion-plus-round m-r"></span>New member
     </button>
     <div class="clearfix"></div>

@@ -8,14 +8,14 @@ body {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
-    padding: 0.01rem 2rem 2rem 2rem;
+    padding: 2rem 2rem 2rem 2rem;
 }
 
 .jumbotron {
     background: rgb(248, 248, 248);
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem rgb(200, 200, 200);
-    padding: 0.01rem 2rem 2rem 2rem;
+    padding: 2rem 2rem 2rem 2rem;
 }
 
 .star {

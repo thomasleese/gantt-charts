@@ -73,15 +73,15 @@
           {% endif %}
 
           {% if g.account.primary_email_address != email_address %}
-            <a href="{{ url_for('.account_delete_email', id=email_address.id) }}" class="pull-right btn btn-danger btn-sm m-l">Delete</a>
+            <a href="{{ url_for('.account_delete_email', id=email_address.id) }}" class="pull-xs-right btn btn-danger btn-sm m-l">Delete</a>
           {% endif %}
 
           {% if g.account.primary_email_address != email_address %}
-            <a href="{{ url_for('.account_primary_email', id=email_address.id) }}" class="pull-right btn btn-success btn-sm m-l">Make primary</a>
+            <a href="{{ url_for('.account_primary_email', id=email_address.id) }}" class="pull-xs-right btn btn-success btn-sm m-l">Make primary</a>
           {% endif %}
 
           {% if not email_address.verified %}
-            <a href="{{ url_for('.account_send_verify_email', id=email_address.id) }}" class="pull-right btn btn-warning btn-sm">Verify</a></li>
+            <a href="{{ url_for('.account_send_verify_email', id=email_address.id) }}" class="pull-xs-right btn btn-warning btn-sm">Verify</a></li>
           {% endif %}
       {% endfor %}
     </ul>

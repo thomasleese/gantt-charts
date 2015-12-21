@@ -47,7 +47,7 @@
           {% endfor %}
         </ul>
 
-        <ul class="nav navbar-nav pull-right">
+        <ul class="nav navbar-nav pull-xs-right">
           <li class="nav-item {% if section == 'account' %}active{% endif %}">
             <a class="nav-link" href="{{ url_for('frontend.account') }}">My Account</a>
           </li>
@@ -57,7 +57,7 @@
           </li>
         </ul>
       {% else %}
-        <form class="form-inline navbar-form pull-right hidden-sm-down" action="{{ url_for('frontend.login') }}" method="POST">
+        <form class="form-inline navbar-form pull-xs-right hidden-sm-down" action="{{ url_for('frontend.login') }}" method="POST">
           <div class="form-group">
             <input type="email" name="email_address" placeholder="Email address" class="form-control">
           </div>
@@ -67,7 +67,7 @@
           <button type="submit" class="btn btn-success">Log in</button>
         </form>
 
-        <ul class="nav navbar-nav pull-right hidden-md-up">
+        <ul class="nav navbar-nav pull-xs-right hidden-md-up">
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('frontend.login') }}">Log in</a>
           </li>
@@ -92,21 +92,21 @@
       </div>
     {% endblock %}
 
-    <footer class="footer m-t-lg">
-      <div class="container m-b-md">
+    <footer class="footer m-t-3">
+      <div class="container m-b-2">
         {% include "_includes/ad.html" %}
       </div>
 
       <div class="container">
-        <div class="text-center m-b m-t-md">
+        <div class="text-xs-center m-b m-t-2">
           <img class="orycion" src="{{ url_for('static', filename='images/orycion.png') }}" width="72" height="72" />
         </div>
 
-        <p class="text-center text-muted">
+        <p class="text-xs-center text-muted">
           A website by <a href="https://www.thomasleese.me">Thomas Leese</a> and <a href="https://uk.linkedin.com/in/vikashtank">Vikash Tank</a>.
         </p>
 
-        <p class="text-center text-muted">
+        <p class="text-xs-center text-muted">
           <small><a href="mailto:feedback@ganttcharts.xyz">Submit Feedback</a> &middot; <a href="https://github.com/thomasleese/gantt-charts">Code</a></small>
         </p>
       </div>
