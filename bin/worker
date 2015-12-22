@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ganttchartsctl send-summary-emails --forever
