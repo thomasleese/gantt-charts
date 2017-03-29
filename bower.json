@@ -12,7 +12,6 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~4.0.0",
     "ionicons": "~2.0.1",
     "iron-pages": "PolymerElements/iron-pages#~1.0.3",
     "moment": "~2.10.6",
